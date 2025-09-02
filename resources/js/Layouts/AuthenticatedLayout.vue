@@ -7,7 +7,6 @@ import QuickTaskModal from '@/Components/QuickTaskModal.vue';
 import RealTimeNotifications from '@/Components/RealTimeNotifications.vue';
 import EmailNotificationSnackbar from '@/Components/EmailNotificationSnackbar.vue';
 import LanguageSelector from '@/Components/LanguageSelector.vue';
-import ThemeToggle from '@/Components/ThemeToggle.vue';
 import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -391,8 +390,6 @@ onUnmounted(() => {
                         <div class="flex items-center space-x-2">
                             <!-- Language Selector -->
                             <LanguageSelector />
-                            <!-- Theme Toggle -->
-                            <ThemeToggle />
 
                             <!-- Create Task Button -->
                             <button 
