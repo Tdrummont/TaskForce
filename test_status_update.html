@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Atualização de Status</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        .info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste de Atualização de Status</h1>
+        <p>Este teste verifica se a API de atualização de status está funcionando corretamente.</p>
+        
+        <div class="form-group">
+            <label for="taskId">ID da Tarefa:</label>
+            <input type="number" id="taskId" value="71" placeholder="Digite o ID da tarefa">
+        </div>
+        
+        <div class="form-group">
+            <label for="newStatus">Novo Status:</label>
+            <select id="newStatus">
+                <option value="pending">Pendente</option>
+                <option value="in_progress">Em Progresso</option>
+                <option value="completed">Concluída</option>
+            </select>
+        </div>
+        
+        <button onclick="testUpdateStatus()">🔄 Testar Atualização de Status</button>
+        
+        <div id="result" class="result info">
+            Clique no botão para testar a atualização de status...
+        </div>
+    </div>
+
+    <script>
+        function testUpdateStatus() {
+            const taskId = document.getElementById('taskId').value;
+            const newStatus = document.getElementById('newStatus').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!taskId) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ Por favor, digite um ID de tarefa válido.';
+                return;
+            }
+            
+            resultDiv.className = 'result info';
+            resultDiv.textContent = '🔄 Testando atualização de status...';
+            
+            // Fazer a requisição
+            fetch(`/tasks/${taskId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: newStatus
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ SUCESSO!\n\nMensagem: ${data.message}\n\nTarefa:\n- ID: ${data.task.id}\n- Título: ${data.task.title}\n- Status Anterior: ${data.task.old_status}\n- Status Novo: ${data.task.status}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ ERRO!\n\nMensagem: ${data.message}\n\nDados: ${JSON.stringify(data, null, 2)}`;
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ ERRO NA REQUISIÇÃO!\n\nErro: ${error.message}\n\nVerifique o console para mais detalhes.`;
+            });
+        }
+        
+        // Teste automático ao carregar a página
+        window.addEventListener('load', () => {
+            console.log('🚀 Página carregada. Pronto para testar!');
+            console.log('📋 Para testar manualmente, clique no botão "Testar Atualização de Status"');
+        });
+    </script>
+</body>
+</html> 

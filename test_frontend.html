@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Frontend - Laravel Echo</title>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
+</head>
+<body>
+    <h1>🧪 Teste do Laravel Echo</h1>
+    
+    <div id="status">
+        <h2>Status do Sistema</h2>
+        <div id="echo-status">Carregando...</div>
+        <div id="pusher-status">Carregando...</div>
+        <div id="connection-status">Carregando...</div>
+    </div>
+    
+    <div id="test-section">
+        <h2>Teste de Conexão</h2>
+        <button onclick="testConnection()">Testar Conexão</button>
+        <button onclick="testChannel()">Testar Canal</button>
+        <div id="test-results"></div>
+    </div>
+    
+    <div id="logs">
+        <h2>Logs</h2>
+        <div id="log-content"></div>
+    </div>
+
+    <script>
+        // Configuração do Laravel Echo
+        const pusherKey = '661cf3c78faa86d8e332';
+        const pusherCluster = 'sa1';
+        
+        console.log('🔧 Configurando Laravel Echo...');
+        console.log('🔑 Pusher Key:', pusherKey);
+        console.log('🌐 Pusher Cluster:', pusherCluster);
+        
+        // Configurar Pusher
+        window.Pusher = Pusher;
+        
+        // Configurar Echo
+        window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key: pusherKey,
+            cluster: pusherCluster,
+            forceTLS: true,
+            encrypted: true,
+            authorizer: (channel, options) => {
+                return {
+                    authorize: (socketId, callback) => {
+                        console.log('🔐 Autenticando canal:', channel.name);
+                        
+                        // Para teste, vamos simular autenticação
+                        // Em produção, isso seria uma chamada para /broadcasting/auth
+                        callback(null, {
+                            auth: 'fake_auth_token_for_testing'
+                        });
+                    }
+                };
+            }
+        });
+        
+        // Verificar status
+        function updateStatus() {
+            const echoStatus = document.getElementById('echo-status');
+            const pusherStatus = document.getElementById('pusher-status');
+            const connectionStatus = document.getElementById('connection-status');
+            
+            if (window.Echo) {
+                echoStatus.innerHTML = '✅ Laravel Echo: Carregado';
+                echoStatus.style.color = 'green';
+            } else {
+                echoStatus.innerHTML = '❌ Laravel Echo: Não carregado';
+                echoStatus.style.color = 'red';
+            }
+            
+            if (window.Pusher) {
+                pusherStatus.innerHTML = '✅ Pusher: Carregado';
+                pusherStatus.style.color = 'green';
+            } else {
+                pusherStatus.innerHTML = '❌ Pusher: Não carregado';
+                pusherStatus.style.color = 'red';
+            }
+            
+            if (window.Echo && window.Pusher) {
+                connectionStatus.innerHTML = '✅ Conexão: Pronta para teste';
+                connectionStatus.style.color = 'green';
+            } else {
+                connectionStatus.innerHTML = '❌ Conexão: Não configurada';
+                connectionStatus.style.color = 'red';
+            }
+        }
+        
+        // Testar conexão
+        function testConnection() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<p>🔄 Testando conexão...</p>';
+            
+            try {
+                if (window.Echo) {
+                    // Testar conexão com canal público
+                    const channel = window.Echo.channel('test-channel');
+                    
+                    channel.subscribed(() => {
+                        results.innerHTML = '<p>✅ Conexão bem-sucedida!</p>';
+                        addLog('✅ Conexão com canal público estabelecida');
+                        
+                        // Testar evento
+                        channel.listen('.test-event', (data) => {
+                            addLog('🎉 Evento recebido: ' + JSON.stringify(data));
+                        });
+                        
+                        // Emitir evento de teste
+                        setTimeout(() => {
+                            channel.whisper('test-event', { message: 'Teste de conexão' });
+                            addLog('📡 Evento de teste enviado');
+                        }, 1000);
+                    });
+                    
+                    channel.error((error) => {
+                        results.innerHTML = '<p>❌ Erro na conexão: ' + error.message + '</p>';
+                        addLog('❌ Erro na conexão: ' + error.message);
+                    });
+                } else {
+                    results.innerHTML = '<p>❌ Laravel Echo não está disponível</p>';
+                    addLog('❌ Laravel Echo não está disponível');
+                }
+            } catch (error) {
+                results.innerHTML = '<p>❌ Erro: ' + error.message + '</p>';
+                addLog('❌ Erro no teste: ' + error.message);
+            }
+        }
+        
+        // Testar canal privado
+        function testChannel() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<p>🔄 Testando canal privado...</p>';
+            
+            try {
+                if (window.Echo) {
+                    // Simular usuário ID 2 (como no teste anterior)
+                    const channel = window.Echo.private('user.2');
+                    
+                    channel.subscribed(() => {
+                        results.innerHTML = '<p>✅ Canal privado conectado!</p>';
+                        addLog('✅ Conectado ao canal privado: user.2');
+                        
+                        // Escutar evento de tarefa atribuída
+                        channel.listen('.task.assigned', (data) => {
+                            addLog('🎉 Tarefa atribuída recebida: ' + JSON.stringify(data));
+                            results.innerHTML = '<p>🎉 Notificação recebida!</p>';
+                        });
+                    });
+                    
+                    channel.error((error) => {
+                        results.innerHTML = '<p>❌ Erro no canal privado: ' + error.message + '</p>';
+                        addLog('❌ Erro no canal privado: ' + error.message);
+                    });
+                } else {
+                    results.innerHTML = '<p>❌ Laravel Echo não está disponível</p>';
+                    addLog('❌ Laravel Echo não está disponível');
+                }
+            } catch (error) {
+                results.innerHTML = '<p>❌ Erro: ' + error.message + '</p>';
+                addLog('❌ Erro no teste: ' + error.message);
+            }
+        }
+        
+        // Adicionar log
+        function addLog(message) {
+            const logContent = document.getElementById('log-content');
+            const timestamp = new Date().toLocaleTimeString();
+            logContent.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+            console.log(`[${timestamp}] ${message}`);
+        }
+        
+        // Inicializar
+        window.addEventListener('load', () => {
+            updateStatus();
+            addLog('🚀 Página carregada, sistema inicializado');
+            
+            // Verificar se tudo está funcionando
+            setTimeout(() => {
+                if (window.Echo && window.Pusher) {
+                    addLog('✅ Sistema pronto para testes');
+                } else {
+                    addLog('❌ Sistema não configurado corretamente');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

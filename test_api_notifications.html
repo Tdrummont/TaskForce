@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste API de Notificações</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background-color: #007bff; color: white; }
+        pre { background-color: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste da API de Notificações</h1>
+    
+    <div class="test-section info">
+        <h3>📋 Informações do Teste</h3>
+        <p>Este arquivo testa se a API de notificações está funcionando corretamente.</p>
+        <p><strong>Status:</strong> <span id="status">Aguardando...</span></p>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 Teste da API</h3>
+        <button class="btn-primary" onclick="testAPI()">Testar API de Notificações</button>
+        <div id="api-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Resultado</h3>
+        <pre id="result"></pre>
+    </div>
+
+    <script>
+        function updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = type;
+        }
+
+        async function testAPI() {
+            updateStatus('Testando API...', 'info');
+            const resultElement = document.getElementById('result');
+            const apiResultElement = document.getElementById('api-result');
+            
+            try {
+                console.log('🔍 Testando API de notificações...');
+                
+                // Testar rota principal
+                const response = await fetch('/api/notifications', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('📡 Response status:', response.status);
+                console.log('📡 Response headers:', response.headers);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 Dados recebidos:', data);
+                    
+                    resultElement.textContent = JSON.stringify(data, null, 2);
+                    
+                    if (data.success && data.notifications) {
+                        apiResultElement.innerHTML = '<div class="success">✅ API funcionando! Notificações recebidas: ' + data.notifications.length + '</div>';
+                        updateStatus('API funcionando!', 'success');
+                        
+                        // Mostrar detalhes das notificações
+                        if (data.notifications.length > 0) {
+                            console.log('📝 Primeira notificação:', data.notifications[0]);
+                        }
+                    } else {
+                        apiResultElement.innerHTML = '<div class="error">❌ API retornou dados inválidos</div>';
+                        updateStatus('Dados inválidos', 'error');
+                    }
+                    
+                } else if (response.status === 401) {
+                    apiResultElement.innerHTML = '<div class="info">ℹ️ API funcionando (requer autenticação)</div>';
+                    updateStatus('API funcionando (requer login)', 'info');
+                    resultElement.textContent = 'Status: 401 Unauthorized - API funcionando mas requer autenticação';
+                } else if (response.status === 302) {
+                    apiResultElement.innerHTML = '<div class="info">ℹ️ API funcionando (redirect para login)</div>';
+                    updateStatus('API funcionando (redirect)', 'info');
+                    resultElement.textContent = 'Status: 302 Redirect - API funcionando mas redireciona para login';
+                } else {
+                    apiResultElement.innerHTML = '<div class="error">❌ API retornou status: ' + response.status + '</div>';
+                    updateStatus('Erro na API', 'error');
+                    resultElement.textContent = 'Status: ' + response.status + ' - ' + response.statusText;
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao testar API:', error);
+                apiResultElement.innerHTML = '<div class="error">❌ Erro: ' + error.message + '</div>';
+                updateStatus('Erro na conexão', 'error');
+                resultElement.textContent = 'Erro: ' + error.message;
+            }
+        }
+
+        // Inicializar teste
+        updateStatus('Pronto para teste', 'success');
+        console.log('🚀 Teste de API de notificações iniciado');
+    </script>
+</body>
+</html> 

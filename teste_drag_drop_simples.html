@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Drag & Drop Simples</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuedraggable/4.1.0/vuedraggable.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .kanban-column {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 300px;
+        }
+        
+        .column-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .task-card {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: move;
+            border-left: 4px solid #007bff;
+        }
+        
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .task-id {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .sortable-ghost {
+            opacity: 0.5;
+            background: #c8ebfb;
+        }
+        
+        .sortable-drag {
+            opacity: 0.8;
+            transform: rotate(5deg);
+        }
+        
+        .debug-info {
+            background: #e9ecef;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <h1>🧪 Teste Drag & Drop Simples</h1>
+            
+            <div class="debug-info">
+                <div><strong>Status:</strong> {{ status }}</div>
+                <div><strong>Última ação:</strong> {{ lastAction }}</div>
+                <div><strong>Pendentes:</strong> {{ pendingTasks.length }}</div>
+                <div><strong>Em Progresso:</strong> {{ inProgressTasks.length }}</div>
+                <div><strong>Concluídas:</strong> {{ completedTasks.length }}</div>
+            </div>
+            
+            <div class="kanban-board">
+                <!-- Pendentes -->
+                <div class="kanban-column">
+                    <div class="column-title">📋 Pendentes</div>
+                    <draggable 
+                        v-model="pendingTasks" 
+                        group="tasks"
+                        class="space-y-2"
+                        item-key="id"
+                        @start="onDragStart"
+                        @end="onDragEnd">
+                        <template #item="{ element: task }">
+                            <div class="task-card">
+                                <div class="task-title">{{ task.title }}</div>
+                                <div class="task-id">ID: {{ task.id }}</div>
+                            </div>
+                        </template>
+                    </draggable>
+                </div>
+                
+                <!-- Em Progresso -->
+                <div class="kanban-column">
+                    <div class="column-title">⚡ Em Progresso</div>
+                    <draggable 
+                        v-model="inProgressTasks" 
+                        group="tasks"
+                        class="space-y-2"
+                        item-key="id"
+                        @start="onDragStart"
+                        @end="onDragEnd">
+                        <template #item="{ element: task }">
+                            <div class="task-card">
+                                <div class="task-title">{{ task.title }}</div>
+                                <div class="task-id">ID: {{ task.id }}</div>
+                            </div>
+                        </template>
+                    </draggable>
+                </div>
+                
+                <!-- Concluídas -->
+                <div class="kanban-column">
+                    <div class="column-title">✅ Concluídas</div>
+                    <draggable 
+                        v-model="completedTasks" 
+                        group="tasks"
+                        class="space-y-2"
+                        item-key="id"
+                        @start="onDragStart"
+                        @end="onDragEnd">
+                        <template #item="{ element: task }">
+                            <div class="task-card">
+                                <div class="task-title">{{ task.title }}</div>
+                                <div class="task-id">ID: {{ task.id }}</div>
+                            </div>
+                        </template>
+                    </draggable>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <button @click="addTask" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
+                    ➕ Adicionar Tarefa
+                </button>
+                <button @click="resetTasks" style="background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; margin-left: 10px;">
+                    🔄 Resetar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+        
+        createApp({
+            setup() {
+                const status = ref('Pronto para testar');
+                const lastAction = ref('Nenhuma ação ainda');
+                let taskCounter = 0;
+                
+                // Dados de teste
+                const tasks = ref([
+                    { id: ++taskCounter, title: 'Tarefa 1', status: 'pending' },
+                    { id: ++taskCounter, title: 'Tarefa 2', status: 'pending' },
+                    { id: ++taskCounter, title: 'Tarefa 3', status: 'in_progress' },
+                    { id: ++taskCounter, title: 'Tarefa 4', status: 'completed' }
+                ]);
+                
+                // Computed properties simples
+                const pendingTasks = computed({
+                    get: () => tasks.value.filter(task => task.status === 'pending'),
+                    set: (value) => {
+                        console.log('🔄 Set pendingTasks:', value);
+                        updateTaskStatuses(value, 'pending');
+                    }
+                });
+                
+                const inProgressTasks = computed({
+                    get: () => tasks.value.filter(task => task.status === 'in_progress'),
+                    set: (value) => {
+                        console.log('🔄 Set inProgressTasks:', value);
+                        updateTaskStatuses(value, 'in_progress');
+                    }
+                });
+                
+                const completedTasks = computed({
+                    get: () => tasks.value.filter(task => task.status === 'completed'),
+                    set: (value) => {
+                        console.log('🔄 Set completedTasks:', value);
+                        updateTaskStatuses(value, 'completed');
+                    }
+                });
+                
+                // Funções
+                const updateTaskStatuses = (newTasks, newStatus) => {
+                    console.log(`🚀 Atualizando tarefas para status: ${newStatus}`, newTasks);
+                    
+                    newTasks.forEach(task => {
+                        if (task.status !== newStatus) {
+                            const taskIndex = tasks.value.findIndex(t => t.id === task.id);
+                            if (taskIndex !== -1) {
+                                tasks.value[taskIndex].status = newStatus;
+                                lastAction.value = `Tarefa "${task.title}" movida para ${getStatusLabel(newStatus)}`;
+                                status.value = '✅ Funcionando!';
+                                console.log(`✅ Tarefa ${task.id} movida para ${newStatus}`);
+                            }
+                        }
+                    });
+                };
+                
+                const onDragStart = (event) => {
+                    console.log('🚀 Drag started:', event.dragged.element.id);
+                    lastAction.value = `Iniciando drag da tarefa ${event.dragged.element.id}`;
+                    status.value = '🔄 Arrastando...';
+                };
+                
+                const onDragEnd = (event) => {
+                    console.log('✅ Drag ended:', event.dragged.element.id);
+                    lastAction.value = `Drag finalizado para tarefa ${event.dragged.element.id}`;
+                    status.value = '✅ Funcionando!';
+                };
+                
+                const getStatusLabel = (status) => {
+                    const labels = { 
+                        pending: 'Pendentes', 
+                        in_progress: 'Em Progresso', 
+                        completed: 'Concluídas' 
+                    };
+                    return labels[status] || status;
+                };
+                
+                const addTask = () => {
+                    taskCounter++;
+                    const newTask = {
+                        id: taskCounter,
+                        title: `Tarefa ${taskCounter}`,
+                        status: 'pending'
+                    };
+                    tasks.value.push(newTask);
+                    lastAction.value = `Nova tarefa "${newTask.title}" criada`;
+                    status.value = '✅ Funcionando!';
+                };
+                
+                const resetTasks = () => {
+                    taskCounter = 0;
+                    tasks.value = [
+                        { id: ++taskCounter, title: 'Tarefa 1', status: 'pending' },
+                        { id: ++taskCounter, title: 'Tarefa 2', status: 'pending' },
+                        { id: ++taskCounter, title: 'Tarefa 3', status: 'in_progress' },
+                        { id: ++taskCounter, title: 'Tarefa 4', status: 'completed' }
+                    ];
+                    lastAction.value = 'Tarefas resetadas';
+                    status.value = 'Pronto para testar';
+                };
+                
+                return {
+                    status,
+                    lastAction,
+                    pendingTasks,
+                    inProgressTasks,
+                    completedTasks,
+                    onDragStart,
+                    onDragEnd,
+                    addTask,
+                    resetTasks
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html> 

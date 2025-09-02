@@ -1,0 +1,112 @@
+# Laravel
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+
+# Build assets
+/public/build
+/public/mix-manifest.json
+/public/css
+/public/js
+/public/mix-manifest.json
+
+# Storage
+/storage/app/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+/storage/debugbar/*
+
+# Cache
+/bootstrap/cache/*
+/bootstrap/providers.php
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+/coverage
+.phpunit.cache
+
+# Backup files
+*.bak
+*.backup
+*.sql
+*.zip
+*.tar.gz
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Composer
+composer.phar
+composer.lock
+
+# NPM
+package-lock.json
+yarn.lock
+
+# Laravel specific
+.env.local
+.env.staging
+.env.testing
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Redis
+dump.rdb
+
+# Mail
+*.eml
+
+# Logs
+*.log
+logs/
+
+# Cache
+cache/
+tmp/
+
+# Uploads (if any)
+/public/uploads/*
+/public/storage/*
+/storage/app/public/*
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Deployment
+deploy.php
+deploy.sh
