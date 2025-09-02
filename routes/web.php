@@ -7,6 +7,7 @@ use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\SocialLoginController;
+use App\Http\Controllers\LanguageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,6 +22,10 @@ use Inertia\Inertia;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+// Rotas de idioma
+Route::get('/language/{locale}', [LanguageController::class, 'changeLanguage'])->name('language.change');
+Route::get('/api/language/current', [LanguageController::class, 'getCurrentLanguage'])->name('language.current');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

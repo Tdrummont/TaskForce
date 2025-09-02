@@ -6,6 +6,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import QuickTaskModal from '@/Components/QuickTaskModal.vue';
 import RealTimeNotifications from '@/Components/RealTimeNotifications.vue';
 import EmailNotificationSnackbar from '@/Components/EmailNotificationSnackbar.vue';
+import LanguageSelector from '@/Components/LanguageSelector.vue';
 import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -387,6 +388,9 @@ onUnmounted(() => {
 
                         <!-- Action Buttons -->
                         <div class="flex items-center space-x-2">
+                            <!-- Language Selector -->
+                            <LanguageSelector />
+
                             <!-- Create Task Button -->
                             <button 
                                 @click="router.get(route('tasks.create'))"
@@ -397,8 +401,6 @@ onUnmounted(() => {
                                 </svg>
                                 <span>Nova Tarefa</span>
                             </button>
-
-
 
                             <!-- Notifications -->
                             <div class="relative notification-dropdown">
