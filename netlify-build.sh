@@ -5,6 +5,13 @@ set -e
 
 echo "🚀 Iniciando build no Netlify..."
 
+# Configurar variáveis de ambiente para o build
+echo "🔧 Configurando variáveis de ambiente..."
+export VITE_PUSHER_APP_KEY=""
+export VITE_PUSHER_APP_CLUSTER=""
+export VITE_APP_ENV="production"
+export NODE_ENV="production"
+
 # Verificar versões
 echo "📋 Versões das ferramentas:"
 node --version
