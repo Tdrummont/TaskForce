@@ -1,366 +1,202 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarefa Delegada - Iron Force Tasks</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #1f2937;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .container {
-            background-color: #ffffff;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            position: relative;
-            overflow: hidden;
-        }
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #8b5cf6, #ec4899, #f59e0b);
-        }
-        .header {
-            text-align: center;
-            border-bottom: 3px solid #8b5cf6;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            color: #7c3aed;
-            margin: 0;
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .header .subtitle {
-            color: #6b7280;
-            font-size: 18px;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-        .greeting {
-            font-size: 20px;
-            color: #374151;
-            margin-bottom: 25px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f3e8ff, #ede9fe);
-            border-radius: 12px;
-            border-left: 4px solid #8b5cf6;
-        }
-        .task-details {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            border-radius: 16px;
-            padding: 30px;
-            margin: 30px 0;
-            border: 1px solid #e2e8f0;
-        }
-        .task-details h3 {
-            color: #7c3aed;
-            margin-top: 0;
-            font-size: 22px;
-            border-bottom: 2px solid #e9d5ff;
-            padding-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-            align-items: center;
-        }
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        .detail-label {
-            font-weight: 600;
-            color: #475569;
-            font-size: 16px;
-        }
-        .detail-value {
-            color: #1f2937;
-            font-weight: 500;
-            text-align: right;
-            max-width: 60%;
-        }
-        .priority-high { 
-            color: #dc2626; 
-            font-weight: 700; 
-            background: #fef2f2;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .priority-medium { 
-            color: #d97706; 
-            font-weight: 700; 
-            background: #fffbeb;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .priority-low { 
-            color: #059669; 
-            font-weight: 700; 
-            background: #f0fdf4;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .status-pending { 
-            color: #d97706; 
-            font-weight: 700; 
-            background: #fffbeb;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .status-in_progress { 
-            color: #2563eb; 
-            font-weight: 700; 
-            background: #eff6ff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .status-completed { 
-            color: #059669; 
-            font-weight: 700; 
-            background: #f0fdf4;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .delegation-info {
-            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-            border: 1px solid #93c5fd;
-            border-radius: 16px;
-            padding: 25px;
-            margin: 30px 0;
-        }
-        .delegation-info h4 {
-            color: #1e40af;
-            margin-top: 0;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .delegation-info p {
-            color: #1e3a8a;
-            margin: 8px 0;
-            font-weight: 500;
-        }
-        .action-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            color: #ffffff;
-            padding: 16px 32px;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 18px;
-            margin: 30px 0;
-            text-align: center;
-            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
-            transition: all 0.3s ease;
-        }
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.4);
-        }
-        .next-steps {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border: 1px solid #86efac;
-            border-radius: 16px;
-            padding: 25px;
-            margin: 30px 0;
-        }
-        .next-steps h4 {
-            color: #166534;
-            margin-top: 0;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .next-steps ul {
-            color: #166534;
-            margin: 15px 0;
-            padding-left: 25px;
-        }
-        .next-steps li {
-            margin: 10px 0;
-            font-weight: 500;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 2px solid #e5e7eb;
-            color: #6b7280;
-            font-size: 14px;
-        }
-        .contact-info {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            border: 1px solid #fcd34d;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: center;
-        }
-        .contact-info p {
-            color: #92400e;
-            margin: 8px 0;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        .emoji {
-            font-size: 20px;
-            margin-right: 8px;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Tarefa Delegada • Iron Force Tasks</title>
+  <!-- Preheader: aparece como prévia no inbox -->
+  <meta name="x-preheader" content="Uma nova tarefa foi delegada para você. Veja os detalhes e prossiga com os próximos passos.">
+  <style>
+    /* Ajustes responsivos leves (suportados por Gmail iOS/Android e Apple Mail) */
+    @media (max-width:600px){
+      .container{ width:100% !important; }
+      .px-24{ padding-left:16px !important; padding-right:16px !important; }
+      .py-24{ padding-top:16px !important; padding-bottom:16px !important; }
+      .h1{ font-size:22px !important; }
+      .text{ font-size:15px !important; }
+      .btn{ display:block !important; width:100% !important; }
+    }
+    /* Suaviza dark mode agressivo em alguns clientes */
+    @media (prefers-color-scheme: dark) {
+      .bg-body { background-color:#0b0b0c !important; }
+      .bg-card { background-color:#161618 !important; }
+      .text, .muted { color:#e6e6e6 !important; }
+      .divider { border-color:#2a2a2a !important; }
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🔄 Tarefa Delegada</h1>
-            <div class="subtitle">Iron Force Tasks</div>
-        </div>
+<body class="bg-body" style="margin:0; padding:0; background-color:#f5f7fb;">
+  <!-- Preheader invisível -->
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0;">
+    Uma nova tarefa foi delegada para você. Veja os detalhes e prossiga com os próximos passos.
+  </div>
 
-        <div class="greeting">
-            Olá <strong>{{ $delegatedTo->name }}</strong>! 👋
-        </div>
+  <!-- Wrapper -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f5f7fb;">
+    <tr>
+      <td align="center" style="padding:24px;">
+        <!-- Card -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="container bg-card" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 6px 24px rgba(16,24,40,0.06);">
+          <!-- Cabeçalho com logo/nome -->
+          <tr>
+            <td style="padding:20px 24px; border-bottom:1px solid #eef2f7;" class="px-24 py-24">
+              <table role="presentation" width="100%">
+                <tr>
+                  <td align="left" style="font-family:Arial,Helvetica,sans-serif; color:#0f172a; font-size:14px; font-weight:700;">
+                    <!-- Se tiver logo, substitua a linha abaixo por uma <img> -->
+                    Iron Force Tasks
+                  </td>
+                  <td align="right" style="font-family:Arial,Helvetica,sans-serif; color:#64748b; font-size:12px;">
+                    {{ now()->format('d/m/Y H:i') }}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-        <p style="font-size: 18px; color: #374151; margin-bottom: 30px;">
-            Uma tarefa foi <strong>delegada especificamente para você</strong>! 
-            Isso significa que você foi escolhido para executar esta tarefa. 🎯
-        </p>
+          <!-- Título -->
+          <tr>
+            <td style="padding:24px 24px 0;" class="px-24">
+              <h1 class="h1" style="margin:0; font-family:Arial,Helvetica,sans-serif; font-weight:700; font-size:24px; line-height:1.25; color:#0f172a;">
+                🔄 Tarefa delegada para você
+              </h1>
+              <p class="muted" style="margin:8px 0 0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#64748b;">
+                Olá <strong style="color:#0f172a;">{{ $delegatedTo->name }}</strong>, confira os detalhes abaixo.
+              </p>
+            </td>
+          </tr>
 
-        <div class="delegation-info">
-            <h4><span class="emoji">📋</span>Informações da Delegação</h4>
-            <p><strong>Delegada por:</strong> {{ $delegatedBy->name }}</p>
-            <p><strong>Data da delegação:</strong> {{ now()->format('d/m/Y H:i') }}</p>
-            <p><strong>Motivo:</strong> Você foi selecionado para executar esta tarefa</p>
-        </div>
+          <!-- Mensagem principal -->
+          <tr>
+            <td style="padding:16px 24px 0;" class="px-24">
+              <p class="text" style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:16px; line-height:1.6; color:#1f2937;">
+                Você foi designado(a) para conduzir esta tarefa. Utilize o botão abaixo para acessá-la e atualizar o andamento.
+              </p>
+            </td>
+          </tr>
 
-        <div class="task-details">
-            <h3><span class="emoji">📝</span>Detalhes da Tarefa</h3>
-            
-            <div class="detail-row">
-                <span class="detail-label">Título:</span>
-                <span class="detail-value">{{ $task->title }}</span>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-label">Descrição:</span>
-                <span class="detail-value">{{ $task->description ?: 'Não fornecida' }}</span>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-label">Prioridade:</span>
-                <span class="detail-value priority-{{ $task->priority }}">
+          <!-- Bloco de contexto (quem delegou) -->
+          <tr>
+            <td style="padding:20px 24px 0;" class="px-24">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f8fafc; border:1px solid #e5e7eb; border-radius:10px;">
+                <tr>
+                  <td style="padding:14px 16px;">
+                    <table role="presentation" width="100%">
+                      <tr>
+                        <td style="font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#334155;">
+                          <strong>Delegado por:</strong> {{ $delegatedBy->name }}
+                        </td>
+                        <td align="right" style="font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#334155;">
+                          <strong>Referência:</strong> #{{ $task->id }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" style="padding-top:6px; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#334155;">
+                          <strong>Motivo:</strong> Alocação direcionada para execução desta atividade.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divisor -->
+          <tr><td style="padding:16px 24px 0;" class="px-24"><hr class="divider" style="border:0; border-top:1px solid #eef2f7; margin:0;"></td></tr>
+
+          <!-- Detalhes da tarefa -->
+          <tr>
+            <td style="padding:16px 24px 0;" class="px-24">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569; width:35%;"><strong>Título</strong></td>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#0f172a;" align="right">{{ $task->title }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569;"><strong>Descrição</strong></td>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#0f172a;" align="right">{{ $task->description ?: 'Não fornecida' }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569;"><strong>Prioridade</strong></td>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#0f172a;" align="right">
                     @switch($task->priority)
-                        @case('high')
-                            🔴 Alta
-                            @break
-                        @case('medium')
-                            🟡 Média
-                            @break
-                        @case('low')
-                            🟢 Baixa
-                            @break
-                        @default
-                            ⚪ {{ ucfirst($task->priority) }}
+                      @case('high') <span style="display:inline-block; padding:4px 10px; border-radius:999px; background-color:#fee2e2; color:#b91c1c; font-weight:700;">Alta</span> @break
+                      @case('medium') <span style="display:inline-block; padding:4px 10px; border-radius:999px; background-color:#fff7ed; color:#b45309; font-weight:700;">Média</span> @break
+                      @case('low') <span style="display:inline-block; padding:4px 10px; border-radius:999px; background-color:#ecfdf5; color:#047857; font-weight:700;">Baixa</span> @break
+                      @default <span style="color:#475569;">{{ ucfirst($task->priority) }}</span>
                     @endswitch
-                </span>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-label">Status:</span>
-                <span class="detail-value status-{{ $task->status }}">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569;"><strong>Status</strong></td>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#0f172a;" align="right">
                     @switch($task->status)
-                        @case('pending')
-                            🟡 Pendente
-                            @break
-                        @case('in_progress')
-                            🔵 Em Progresso
-                            @break
-                        @case('completed')
-                            🟢 Concluída
-                            @break
-                        @default
-                            ⚪ {{ ucfirst($task->status) }}
+                      @case('pending') <span style="display:inline-block; padding:4px 10px; border-radius:6px; background-color:#f1f5f9; color:#475569; font-weight:700;">Pendente</span> @break
+                      @case('in_progress') <span style="display:inline-block; padding:4px 10px; border-radius:6px; background-color:#eff6ff; color:#1d4ed8; font-weight:700;">Em progresso</span> @break
+                      @case('completed') <span style="display:inline-block; padding:4px 10px; border-radius:6px; background-color:#ecfdf5; color:#047857; font-weight:700;">Concluída</span> @break
+                      @default <span style="color:#475569;">{{ ucfirst($task->status) }}</span>
                     @endswitch
-                </span>
-            </div>
-            
-            @if($task->category)
-            <div class="detail-row">
-                <span class="detail-label">Categoria:</span>
-                <span class="detail-value">🏷️ {{ $task->category }}</span>
-            </div>
-            @endif
-            
-            @if($task->due_date)
-            <div class="detail-row">
-                <span class="detail-label">Data de Vencimento:</span>
-                <span class="detail-value">⏰ {{ $task->due_date->format('d/m/Y H:i') }}</span>
-            </div>
-            @endif
-            
-            @if($task->estimated_hours)
-            <div class="detail-row">
-                <span class="detail-label">Horas Estimadas:</span>
-                <span class="detail-value">⏱️ {{ $task->estimated_hours }}h</span>
-            </div>
-            @endif
-        </div>
+                  </td>
+                </tr>
+                @if($task->category)
+                <tr>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569;"><strong>Categoria</strong></td>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#0f172a;" align="right">{{ $task->category }}</td>
+                </tr>
+                @endif
+                @if($task->due_date)
+                <tr>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569;"><strong>Vencimento</strong></td>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#0f172a;" align="right">⏰ {{ $task->due_date->format('d/m/Y H:i') }}</td>
+                </tr>
+                @endif
+                @if($task->estimated_hours)
+                <tr>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569;"><strong>Estimativa</strong></td>
+                  <td style="padding:8px 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#0f172a;" align="right">⏱️ {{ $task->estimated_hours }}h</td>
+                </tr>
+                @endif
+              </table>
+            </td>
+          </tr>
 
-        <div class="next-steps">
-            <h4><span class="emoji">🚀</span>Próximos Passos</h4>
-            <ul>
-                <li><strong>Acesse o sistema</strong> para ver os detalhes completos da tarefa</li>
-                <li><strong>Atualize o status</strong> conforme o progresso</li>
-                <li><strong>Entre em contato</strong> com {{ $delegatedBy->name }} se tiver dúvidas</li>
-                <li><strong>Mantenha o status atualizado</strong> para melhor acompanhamento</li>
-            </ul>
-        </div>
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding:24px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td bgcolor="#4f46e5" style="border-radius:10px;">
+                    <a href="{{ route('tasks.index') }}"
+                       class="btn"
+                       style="display:inline-block; padding:14px 22px; font-family:Arial,Helvetica,sans-serif; font-size:16px; color:#ffffff; text-decoration:none; border-radius:10px; background-color:#4f46e5;">
+                      Ver tarefa no sistema
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <!-- <p class="muted" style="margin:10px 0 0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#64748b;">
+                Caso o botão não funcione, copie e cole no navegador: {{ route('tasks.index') }}
+              </p> -->
+            </td>
+          </tr>
 
-        <div style="text-align: center;">
-            <a href="{{ route('tasks.index') }}" class="action-button">
-                📋 Ver Tarefa Completa
-            </a>
-        </div>
-
-        <div class="contact-info">
-            <p>💡 <strong>Precisa de ajuda?</strong></p>
-            <p>Entre em contato com {{ $delegatedBy->name }}</p>
-        </div>
-
-        <div class="footer">
-            <p><strong>Atenciosamente,</strong></p>
-            <p style="font-size: 18px; color: #7c3aed; font-weight: 600;">Equipe Iron Force Tasks</p>
-            <p>Este é um email automático, não responda diretamente.</p>
-        </div>
-    </div>
+          <!-- Rodapé -->
+          <tr>
+            <td style="padding:12px 24px 24px; border-top:1px solid #eef2f7;" class="px-24">
+              <p class="muted" style="margin:8px 0 0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#64748b;">
+                Atenciosamente,<br>
+                <span style="color:#4f46e5; font-weight:700;">Equipe Iron Force Tasks</span>
+              </p>
+              <p class="muted" style="margin:8px 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#94a3b8;">
+                Este é um e-mail automático, não responda.
+              </p>
+            </td>
+          </tr>
+        </table>
+        <!-- /Card -->
+      </td>
+    </tr>
+  </table>
 </body>
-</html> 
+</html>
