@@ -54,9 +54,9 @@ function submit() {
 <template>
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="text-xl font-semibold text-gray-800 leading-tight">
-        {{ t('task.edit_title') /* ex.: "Edit Task" / "Editar Tarefa" */ }}
-      </h2>
+              <h2 class="text-xl font-semibold text-gray-800 leading-tight">
+          {{ t('tasks.edit.page_title') /* ex.: "Edit Task" / "Editar Tarefa" */ }}
+        </h2>
     </template>
 
     <div class="py-12">
@@ -64,7 +64,7 @@ function submit() {
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
           <div class="p-6 space-y-6">
             <h1 class="text-2xl font-bold text-gray-900">
-              {{ t('task.edit_title') }}
+              {{ t('tasks.edit.page_title') }}
             </h1>
 
             <!-- Alerta de feriado -->
@@ -80,33 +80,33 @@ function submit() {
             <form @submit.prevent="submit" class="space-y-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ t('task.title_label') }}
+                  {{ t('tasks.form.title') }}
                 </label>
                 <input
                   v-model="form.title"
                   type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  :placeholder="t('task.title_placeholder')"
+                  :placeholder="t('tasks.form.title_ph')"
                 />
                 <div v-if="form.errors.title" class="text-red-500 text-sm mt-1">{{ form.errors.title }}</div>
               </div>
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ t('task.description_label') }}
+                  {{ t('tasks.form.description') }}
                 </label>
                 <textarea
                   v-model="form.description"
                   rows="4"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  :placeholder="t('task.description_placeholder')"
+                  :placeholder="t('tasks.form.description_ph')"
                 ></textarea>
                 <div v-if="form.errors.description" class="text-red-500 text-sm mt-1">{{ form.errors.description }}</div>
               </div>
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ t('task.due_date_label') }}
+                  {{ t('tasks.form.end_date') }}
                 </label>
                 <input
                   v-model="form.due_date"
@@ -118,7 +118,7 @@ function submit() {
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ t('task.status_label') }}
+                  {{ t('tasks.form.status') }}
                 </label>
                 <select
                   v-model="form.status"
@@ -133,7 +133,7 @@ function submit() {
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ t('task.priority_label') }}
+                  {{ t('tasks.form.priority') }}
                 </label>
                 <select
                   v-model="form.priority"
@@ -148,13 +148,13 @@ function submit() {
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ t('task.assigned_to_label') }}
+                  {{ t('tasks.form.assignee') }}
                 </label>
                 <input
                   v-model="form.assigned_to"
                   type="number"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  :placeholder="t('task.assigned_to_placeholder')"
+                  :placeholder="t('tasks.form.assignee_none')"
                 />
                 <div v-if="form.errors.assigned_to" class="text-red-500 text-sm mt-1">{{ form.errors.assigned_to }}</div>
               </div>
@@ -165,7 +165,7 @@ function submit() {
                   class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                   :disabled="form.processing"
                 >
-                  {{ form.processing ? t('common.saving') : t('common.update') }}
+                  {{ form.processing ? t('common.saving') : t('tasks.form.actions.update') }}
                 </button>
                 <Link
                   :href="routeL('tasks.index')"
