@@ -1,10 +1,11 @@
 [build]
   publish = "public"
-  command = "npm run build"
+  command = "./netlify-build.sh"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 [[redirects]]
   from = "/*"
