@@ -99,7 +99,7 @@ php artisan key:generate
 
 ### **4. Configure o banco de dados**
 ```env
-DB_CONNECTION=mysql
+DB_CONNECTION=sqlite
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=taskforce
