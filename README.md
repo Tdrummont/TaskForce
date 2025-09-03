@@ -273,24 +273,13 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 
 ## 👨‍💻 **Autor**
 
-**Thiago Drummond** - [tdrummontt@gmail.com](mailto:tdrummontt@gmail.com)
+**Thalita Drummont]** - [tdrummontt@gmail.com](mailto:tdrummontt@gmail.com)
 
 - **GitHub**: [@tdrummontt](https://github.com/tdrummontt)
-- **LinkedIn**: [Thiago Drummond](https://linkedin.com/in/tdrummontt)
-
-## 🙏 **Agradecimentos**
-
-- **Laravel Team** pelo framework incrível
-- **Vue.js Team** pela biblioteca frontend
-- **Tailwind CSS** pelos estilos utilitários
-- **Comunidade open source** por todas as contribuições
+- **LinkedIn**: [Thalita Drummont](https://www.linkedin.com/in/thalita-s-costa
 
 ## 📞 **Suporte**
 
 - **Issues**: [GitHub Issues](https://github.com/tdrummontt/taskforce/issues)
 - **Email**: [tdrummontt@gmail.com](mailto:tdrummontt@gmail.com)
 - **Documentação**: [Wiki do Projeto](https://github.com/tdrummontt/taskforce/wiki)
-
----
-
-⭐ **Se este projeto te ajudou, considere dar uma estrela no GitHub!**
