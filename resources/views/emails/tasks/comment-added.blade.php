@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova Tarefa Atribuída - Iron Force Tasks</title>
+    <title>Novo Comentário - Iron Force Tasks</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,7 +12,7 @@
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
         .container {
             background-color: #ffffff;
@@ -29,7 +29,7 @@
             left: 0;
             right: 0;
             height: 6px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            background: linear-gradient(90deg, #8b5cf6, #7c3aed, #6d28d9);
         }
         .header {
             text-align: center;
@@ -37,11 +37,11 @@
             position: relative;
         }
         .header h1 {
-            color: #1e40af;
+            color: #7c3aed;
             margin: 0;
             font-size: 32px;
             font-weight: 700;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -57,9 +57,54 @@
             color: #374151;
             margin-bottom: 30px;
             padding: 20px;
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            background: linear-gradient(135deg, #f3e8ff, #ede9fe);
             border-radius: 12px;
-            border-left: 4px solid #3b82f6;
+            border-left: 4px solid #8b5cf6;
+        }
+        .comment-section {
+            background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid #e9d5ff;
+        }
+        .comment-section h3 {
+            color: #7c3aed;
+            margin-top: 0;
+            font-size: 22px;
+            border-bottom: 2px solid #e9d5ff;
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .comment-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e9d5ff;
+            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.1);
+        }
+        .comment-author {
+            font-weight: 600;
+            color: #7c3aed;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .comment-text {
+            color: #374151;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .comment-time {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 15px;
+            font-style: italic;
         }
         .task-details {
             background: linear-gradient(135deg, #f8fafc, #f1f5f9);
@@ -69,10 +114,10 @@
             border: 1px solid #e2e8f0;
         }
         .task-details h3 {
-            color: #1e40af;
+            color: #7c3aed;
             margin-top: 0;
             font-size: 22px;
-            border-bottom: 2px solid #dbeafe;
+            border-bottom: 2px solid #e9d5ff;
             padding-bottom: 15px;
             display: flex;
             align-items: center;
@@ -150,7 +195,7 @@
         }
         .action-button {
             display: inline-block;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
             color: #ffffff;
             padding: 16px 32px;
             text-decoration: none;
@@ -159,22 +204,22 @@
             font-size: 18px;
             margin: 30px 0;
             text-align: center;
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
             transition: all 0.3s ease;
         }
         .action-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.4);
         }
         .next-steps {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border: 1px solid #86efac;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #93c5fd;
             border-radius: 16px;
             padding: 25px;
             margin: 30px 0;
         }
         .next-steps h4 {
-            color: #166534;
+            color: #1e40af;
             margin-top: 0;
             font-size: 20px;
             display: flex;
@@ -182,7 +227,7 @@
             gap: 10px;
         }
         .next-steps ul {
-            color: #166534;
+            color: #1e40af;
             margin: 15px 0;
             padding-left: 25px;
         }
@@ -198,7 +243,11 @@
             color: #6b7280;
             font-size: 14px;
         }
-        .contact-info {
+        .emoji {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+        .collaboration-info {
             background: linear-gradient(135deg, #fef3c7, #fde68a);
             border: 1px solid #fcd34d;
             border-radius: 16px;
@@ -206,33 +255,45 @@
             margin: 30px 0;
             text-align: center;
         }
-        .contact-info p {
+        .collaboration-info p {
             color: #92400e;
             margin: 8px 0;
             font-weight: 600;
             font-size: 16px;
-        }
-        .emoji {
-            font-size: 20px;
-            margin-right: 8px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎯 Nova Tarefa Atribuída</h1>
+            <h1>💬 Novo Comentário</h1>
             <div class="subtitle">Iron Force Tasks</div>
         </div>
 
         <div class="greeting">
-            Olá <strong>{{ $assignedTo->name }}</strong>! 👋
+            Olá <strong>{{ $user->name }}</strong>! 👋
         </div>
 
         <p style="font-size: 18px; color: #374151; margin-bottom: 30px;">
-            Você recebeu uma nova tarefa atribuída por <strong>{{ $assignedBy->name }}</strong>. 
-            Esta é uma oportunidade para demonstrar suas habilidades! 💪
+            Um novo comentário foi adicionado à tarefa <strong>"{{ $task->title }}"</strong>. 
+            Mantenha-se atualizado com as discussões da equipe! 💭
         </p>
+
+        <div class="comment-section">
+            <h3><span class="emoji">💬</span>Comentário Adicionado</h3>
+            
+            <div class="comment-content">
+                <div class="comment-author">
+                    👤 <strong>{{ $comment->user->name }}</strong>
+                </div>
+                <div class="comment-text">
+                    {{ $comment->content }}
+                </div>
+                <div class="comment-time">
+                    📅 {{ $comment->created_at->format('d/m/Y H:i') }}
+                </div>
+            </div>
+        </div>
 
         <div class="task-details">
             <h3><span class="emoji">📋</span>Detalhes da Tarefa</h3>
@@ -288,14 +349,14 @@
             @if($task->due_date)
             <div class="detail-row">
                 <span class="detail-label">Data de Vencimento:</span>
-                <span class="detail-value">⏰ {{ \Carbon\Carbon::parse($task->due_date)->format('d/m/Y H:i') }}</span>
+                <span class="detail-value">⏰ {{ $task->due_date->format('d/m/Y H:i') }}</span>
             </div>
             @endif
             
-            @if($task->tags)
+            @if($task->assigned_to)
             <div class="detail-row">
-                <span class="detail-label">Tags:</span>
-                <span class="detail-value">🏷️ {{ $task->tags }}</span>
+                <span class="detail-label">Responsável:</span>
+                <span class="detail-value">👤 {{ $task->assigned_to->name }}</span>
             </div>
             @endif
         </div>
@@ -303,29 +364,29 @@
         <div class="next-steps">
             <h4><span class="emoji">🚀</span>Próximos Passos</h4>
             <ul>
-                <li><strong>Revisar</strong> os detalhes da tarefa cuidadosamente</li>
-                <li><strong>Atualizar</strong> o status conforme necessário</li>
-                <li><strong>Adicionar</strong> comentários ou anexos se precisar</li>
+                <li><strong>Revisar</strong> o comentário adicionado</li>
+                <li><strong>Responder</strong> se necessário</li>
+                <li><strong>Atualizar</strong> o status da tarefa se aplicável</li>
                 <li><strong>Comunicar</strong> progresso para a equipe</li>
             </ul>
         </div>
 
         <div style="text-align: center;">
             <a href="{{ $taskUrl }}" class="action-button">
-                📋 Ver Tarefa Completa
+                💬 Ver Tarefa e Comentários
             </a>
         </div>
 
-        <div class="contact-info">
-            <p>💡 <strong>Precisa de ajuda?</strong></p>
-            <p>Entre em contato com {{ $assignedBy->name }} ou responda a este email</p>
+        <div class="collaboration-info">
+            <p>💡 <strong>Dica de Colaboração</strong></p>
+            <p>Comentários ajudam a manter a equipe alinhada e documentam decisões importantes!</p>
         </div>
 
         <div class="footer">
             <p><strong>Atenciosamente,</strong></p>
-            <p style="font-size: 18px; color: #1e40af; font-weight: 600;">Equipe Iron Force Tasks</p>
-            <p>Este é um email automático, não responda diretamente.</p>
+            <p style="font-size: 18px; color: #7c3aed; font-weight: 600;">Equipe Iron Force Tasks</p>
+            <p>Esta notificação foi enviada automaticamente pelo sistema.</p>
         </div>
     </div>
 </body>
-</html> 
+</html>

@@ -8,139 +8,234 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #1f2937;
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         .container {
             background-color: #ffffff;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #8b5cf6, #ec4899, #f59e0b);
         }
         .header {
             text-align: center;
-            border-bottom: 3px solid #6366f1;
+            border-bottom: 3px solid #8b5cf6;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
         .header h1 {
-            color: #6366f1;
+            color: #7c3aed;
             margin: 0;
-            font-size: 28px;
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .header .subtitle {
             color: #6b7280;
-            font-size: 16px;
-            margin-top: 5px;
+            font-size: 18px;
+            margin-top: 8px;
+            font-weight: 500;
         }
         .greeting {
-            font-size: 18px;
+            font-size: 20px;
             color: #374151;
             margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f3e8ff, #ede9fe);
+            border-radius: 12px;
+            border-left: 4px solid #8b5cf6;
         }
         .task-details {
-            background-color: #f3f4f6;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid #e2e8f0;
         }
         .task-details h3 {
-            color: #374151;
+            color: #7c3aed;
             margin-top: 0;
-            border-bottom: 2px solid #d1d5db;
-            padding-bottom: 10px;
+            font-size: 22px;
+            border-bottom: 2px solid #e9d5ff;
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .detail-row {
             display: flex;
             justify-content: space-between;
-            margin: 10px 0;
-            padding: 8px 0;
-            border-bottom: 1px solid #e5e7eb;
+            margin: 15px 0;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
         }
         .detail-label {
             font-weight: 600;
-            color: #4b5563;
+            color: #475569;
+            font-size: 16px;
         }
         .detail-value {
-            color: #374151;
+            color: #1f2937;
+            font-weight: 500;
+            text-align: right;
+            max-width: 60%;
         }
-        .priority-high { color: #dc2626; font-weight: 600; }
-        .priority-medium { color: #d97706; font-weight: 600; }
-        .priority-low { color: #059669; font-weight: 600; }
-        .status-pending { color: #d97706; font-weight: 600; }
-        .status-in_progress { color: #2563eb; font-weight: 600; }
-        .status-completed { color: #059669; font-weight: 600; }
+        .priority-high { 
+            color: #dc2626; 
+            font-weight: 700; 
+            background: #fef2f2;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .priority-medium { 
+            color: #d97706; 
+            font-weight: 700; 
+            background: #fffbeb;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .priority-low { 
+            color: #059669; 
+            font-weight: 700; 
+            background: #f0fdf4;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .status-pending { 
+            color: #d97706; 
+            font-weight: 700; 
+            background: #fffbeb;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .status-in_progress { 
+            color: #2563eb; 
+            font-weight: 700; 
+            background: #eff6ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .status-completed { 
+            color: #059669; 
+            font-weight: 700; 
+            background: #f0fdf4;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
         .delegation-info {
-            background-color: #dbeafe;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
             border: 1px solid #93c5fd;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
         }
         .delegation-info h4 {
             color: #1e40af;
             margin-top: 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .delegation-info p {
             color: #1e3a8a;
-            margin: 5px 0;
+            margin: 8px 0;
+            font-weight: 500;
         }
         .action-button {
             display: inline-block;
-            background-color: #6366f1;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
             color: #ffffff;
-            padding: 12px 24px;
+            padding: 16px 32px;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 12px;
             font-weight: 600;
-            margin: 20px 0;
+            font-size: 18px;
+            margin: 30px 0;
             text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
         }
         .action-button:hover {
-            background-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.4);
         }
         .next-steps {
-            background-color: #f0fdf4;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
             border: 1px solid #86efac;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
         }
         .next-steps h4 {
             color: #166534;
             margin-top: 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .next-steps ul {
             color: #166534;
-            margin: 10px 0;
-            padding-left: 20px;
+            margin: 15px 0;
+            padding-left: 25px;
         }
         .next-steps li {
-            margin: 5px 0;
+            margin: 10px 0;
+            font-weight: 500;
         }
         .footer {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
             color: #6b7280;
             font-size: 14px;
         }
         .contact-info {
-            background-color: #fef3c7;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
             border: 1px solid #fcd34d;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 30px 0;
             text-align: center;
         }
         .contact-info p {
             color: #92400e;
-            margin: 5px 0;
+            margin: 8px 0;
             font-weight: 600;
+            font-size: 16px;
+        }
+        .emoji {
+            font-size: 20px;
+            margin-right: 8px;
         }
     </style>
 </head>
@@ -152,20 +247,23 @@
         </div>
 
         <div class="greeting">
-            Olá <strong>{{ $delegatedTo->name }}</strong>!
+            Olá <strong>{{ $delegatedTo->name }}</strong>! 👋
         </div>
 
-        <p>Uma tarefa foi <strong>delegada especificamente para você</strong>! Isso significa que você foi escolhido para executar esta tarefa.</p>
+        <p style="font-size: 18px; color: #374151; margin-bottom: 30px;">
+            Uma tarefa foi <strong>delegada especificamente para você</strong>! 
+            Isso significa que você foi escolhido para executar esta tarefa. 🎯
+        </p>
 
         <div class="delegation-info">
-            <h4>📋 Informações da Delegação</h4>
+            <h4><span class="emoji">📋</span>Informações da Delegação</h4>
             <p><strong>Delegada por:</strong> {{ $delegatedBy->name }}</p>
             <p><strong>Data da delegação:</strong> {{ now()->format('d/m/Y H:i') }}</p>
             <p><strong>Motivo:</strong> Você foi selecionado para executar esta tarefa</p>
         </div>
 
         <div class="task-details">
-            <h3>📝 Detalhes da Tarefa</h3>
+            <h3><span class="emoji">📝</span>Detalhes da Tarefa</h3>
             
             <div class="detail-row">
                 <span class="detail-label">Título:</span>
@@ -238,12 +336,12 @@
         </div>
 
         <div class="next-steps">
-            <h4>🚀 Próximos Passos</h4>
+            <h4><span class="emoji">🚀</span>Próximos Passos</h4>
             <ul>
-                <li>Acesse o sistema para ver os detalhes completos da tarefa</li>
-                <li>Atualize o status conforme o progresso</li>
-                <li>Entre em contato com {{ $delegatedBy->name }} se tiver dúvidas</li>
-                <li>Mantenha o status atualizado para melhor acompanhamento</li>
+                <li><strong>Acesse o sistema</strong> para ver os detalhes completos da tarefa</li>
+                <li><strong>Atualize o status</strong> conforme o progresso</li>
+                <li><strong>Entre em contato</strong> com {{ $delegatedBy->name }} se tiver dúvidas</li>
+                <li><strong>Mantenha o status atualizado</strong> para melhor acompanhamento</li>
             </ul>
         </div>
 
@@ -260,7 +358,7 @@
 
         <div class="footer">
             <p><strong>Atenciosamente,</strong></p>
-            <p>Equipe Iron Force Tasks</p>
+            <p style="font-size: 18px; color: #7c3aed; font-weight: 600;">Equipe Iron Force Tasks</p>
             <p>Este é um email automático, não responda diretamente.</p>
         </div>
     </div>

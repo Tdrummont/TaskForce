@@ -6,6 +6,7 @@ use App\Events\TaskAssigned;
 use App\Events\TaskDelegated;
 use App\Notifications\TaskAssignedNotification;
 use App\Notifications\TaskDelegatedNotification;
+use App\Notifications\TaskCreatedNotification;
 use App\Models\Task;
 use App\Models\User;
 use App\Services\NotificationService;
@@ -215,12 +216,32 @@ class TaskController extends Controller
 
             // Criar notificação para o criador da tarefa
             try {
+                // Notificação no banco de dados
                 NotificationService::taskCreated($task, Auth::user());
-                Log::info('🔔 Notificação de tarefa criada enviada', ['task_id' => $task->id]);
+                Log::info('🔔 Notificação de tarefa criada salva no banco', ['task_id' => $task->id]);
+                
+                // Enviar email de notificação para o criador
+                Auth::user()->notify(new TaskCreatedNotification($task, Auth::user()));
+                Log::info('📧 Email de notificação de tarefa criada enviado', ['task_id' => $task->id]);
+                
+                // Adicionar mensagem de sucesso para o snackbar
+                session()->flash('email_sent', [
+                    'type' => 'success',
+                    'title' => 'Tarefa Criada!',
+                    'message' => "Tarefa '{$task->title}' criada com sucesso e notificação enviada para seu email"
+                ]);
+                
             } catch (\Exception $e) {
                 Log::error('❌ Erro ao criar notificação de tarefa criada', [
                     'task_id' => $task->id,
                     'error' => $e->getMessage()
+                ]);
+                
+                // Adicionar mensagem de erro para o snackbar
+                session()->flash('email_error', [
+                    'type' => 'error',
+                    'title' => 'Erro na Notificação',
+                    'message' => 'Tarefa criada, mas não foi possível enviar a notificação por email'
                 ]);
             }
 
