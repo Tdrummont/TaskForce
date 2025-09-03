@@ -63,7 +63,8 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $locale = $request->attributes->get('locale', app()->getLocale() ?: config('app.locale', 'pt'));
+        return redirect()->intended(route('dashboard', ['locale' => $locale], false));
     }
 
     /**
@@ -77,6 +78,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        $locale = $request->attributes->get('locale', app()->getLocale() ?: config('app.locale', 'pt'));
+        return redirect()->route('welcome', ['locale' => $locale]);
     }
 }

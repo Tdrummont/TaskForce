@@ -1,76 +1,185 @@
 <script setup>
+import { ref, watch } from 'vue'
 import { Link, useForm } from '@inertiajs/vue3'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useLocale } from '@/Components/useLocale'
 
-const props = defineProps({ task: Object })
-
-const form = useForm({
-  title: props.task.title,
-  description: props.task.description,
-  due_date: props.task.due_date,
-  status: props.task.status,
-  priority: props.task.priority,
-  assigned_to: props.task.assigned_to
+const props = defineProps({
+  task: Object,
+  // passe isso do controller: $user->state ?? 'SP'
+  userState: { type: String, default: 'SP' }
 })
 
+const { routeL, t } = useLocale()
+
+const form = useForm({
+  title: props.task.title ?? '',
+  description: props.task.description ?? '',
+  due_date: props.task.due_date ?? '',
+  status: props.task.status ?? 'pending',
+  priority: props.task.priority ?? 'medium',
+  assigned_to: props.task.assigned_to ?? ''
+})
+
+const holiday = ref(null) // { name, date } | null
+const checkingHoliday = ref(false)
+const stateUF = ref(props.userState || 'SP')
+
+async function checkHoliday() {
+  holiday.value = null
+  const date = form.due_date
+  if (!date) return
+  try {
+    checkingHoliday.value = true
+    const r = await fetch(`/api/holidays/check?date=${encodeURIComponent(date)}&state=${encodeURIComponent(stateUF.value)}`, {
+      headers: { 'Accept': 'application/json' }
+    })
+    if (!r.ok) throw new Error('holiday request failed')
+    const data = await r.json()
+    holiday.value = data.is_holiday ? data.holiday : null
+  } catch (e) {
+    console.error('holiday check error', e)
+  } finally {
+    checkingHoliday.value = false
+  }
+}
+
+watch(() => form.due_date, checkHoliday, { immediate: false })
+
 function submit() {
-  form.put(`/tasks/${props.task.id}`)
+  form.put(routeL('tasks.update', { task: props.task.id }))
 }
 </script>
 
 <template>
-  <div>
-    <h1 class="text-2xl font-bold mb-4">Editar Tarefa</h1>
-    <form @submit.prevent="submit">
-      <div class="mb-3">
-        <label class="block mb-1">Título</label>
-        <input v-model="form.title" type="text" class="border p-2 w-full rounded" />
-        <div v-if="form.errors.title" class="text-red-500 text-sm">{{ form.errors.title }}</div>
-      </div>
+  <AuthenticatedLayout>
+    <template #header>
+      <h2 class="text-xl font-semibold text-gray-800 leading-tight">
+        {{ t('task.edit_title') /* ex.: "Edit Task" / "Editar Tarefa" */ }}
+      </h2>
+    </template>
 
-      <div class="mb-3">
-        <label class="block mb-1">Descrição</label>
-        <textarea v-model="form.description" class="border p-2 w-full rounded"></textarea>
-        <div v-if="form.errors.description" class="text-red-500 text-sm">{{ form.errors.description }}</div>
-      </div>
+    <div class="py-12">
+      <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+          <div class="p-6 space-y-6">
+            <h1 class="text-2xl font-bold text-gray-900">
+              {{ t('task.edit_title') }}
+            </h1>
 
-      <div class="mb-3">
-        <label class="block mb-1">Data de entrega</label>
-        <input v-model="form.due_date" type="date" class="border p-2 w-full rounded" />
-        <div v-if="form.errors.due_date" class="text-red-500 text-sm">{{ form.errors.due_date }}</div>
-      </div>
+            <!-- Alerta de feriado -->
+            <div
+              v-if="holiday"
+              class="rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900"
+            >
+              <strong>{{ t('holidays.alert') }}:</strong>
+              {{ t('holidays.on_date') }}
+              <span class="font-medium">{{ holiday.name }}</span>
+            </div>
 
-      <div class="mb-3">
-        <label class="block mb-1">Status</label>
-        <select v-model="form.status" class="border p-2 w-full rounded">
-          <option value="pending">Pendente</option>
-          <option value="in_progress">Em andamento</option>
-          <option value="completed">Concluída</option>
-        </select>
-        <div v-if="form.errors.status" class="text-red-500 text-sm">{{ form.errors.status }}</div>
-      </div>
+            <form @submit.prevent="submit" class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ t('task.title_label') }}
+                </label>
+                <input
+                  v-model="form.title"
+                  type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  :placeholder="t('task.title_placeholder')"
+                />
+                <div v-if="form.errors.title" class="text-red-500 text-sm mt-1">{{ form.errors.title }}</div>
+              </div>
 
-      <div class="mb-3">
-        <label class="block mb-1">Prioridade</label>
-        <select v-model="form.priority" class="border p-2 w-full rounded">
-          <option value="low">Baixa</option>
-          <option value="medium">Média</option>
-          <option value="high">Alta</option>
-        </select>
-        <div v-if="form.errors.priority" class="text-red-500 text-sm">{{ form.errors.priority }}</div>
-      </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ t('task.description_label') }}
+                </label>
+                <textarea
+                  v-model="form.description"
+                  rows="4"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  :placeholder="t('task.description_placeholder')"
+                ></textarea>
+                <div v-if="form.errors.description" class="text-red-500 text-sm mt-1">{{ form.errors.description }}</div>
+              </div>
 
-      <div class="mb-3">
-        <label class="block mb-1">Atribuir para (ID do usuário)</label>
-        <input v-model="form.assigned_to" type="number" class="border p-2 w-full rounded" />
-        <div v-if="form.errors.assigned_to" class="text-red-500 text-sm">{{ form.errors.assigned_to }}</div>
-      </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ t('task.due_date_label') }}
+                </label>
+                <input
+                  v-model="form.due_date"
+                  type="date"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+                <div v-if="form.errors.due_date" class="text-red-500 text-sm mt-1">{{ form.errors.due_date }}</div>
+              </div>
 
-      <div class="flex gap-2">
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Atualizar</button>
-        <Link href="/tasks" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</Link>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ t('task.status_label') }}
+                </label>
+                <select
+                  v-model="form.status"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="pending">{{ t('status.pending') }}</option>
+                  <option value="in_progress">{{ t('status.in_progress') }}</option>
+                  <option value="completed">{{ t('status.completed') }}</option>
+                </select>
+                <div v-if="form.errors.status" class="text-red-500 text-sm mt-1">{{ form.errors.status }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ t('task.priority_label') }}
+                </label>
+                <select
+                  v-model="form.priority"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="low">{{ t('priority.low') }}</option>
+                  <option value="medium">{{ t('priority.medium') }}</option>
+                  <option value="high">{{ t('priority.high') }}</option>
+                </select>
+                <div v-if="form.errors.priority" class="text-red-500 text-sm mt-1">{{ form.errors.priority }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ t('task.assigned_to_label') }}
+                </label>
+                <input
+                  v-model="form.assigned_to"
+                  type="number"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  :placeholder="t('task.assigned_to_placeholder')"
+                />
+                <div v-if="form.errors.assigned_to" class="text-red-500 text-sm mt-1">{{ form.errors.assigned_to }}</div>
+              </div>
+
+              <div class="flex gap-2 justify-end">
+                <button
+                  type="submit"
+                  class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  :disabled="form.processing"
+                >
+                  {{ form.processing ? t('common.saving') : t('common.update') }}
+                </button>
+                <Link
+                  :href="routeL('tasks.index')"
+                  class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                >
+                  {{ t('common.cancel') }}
+                </Link>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-    </form>
-  </div>
+    </div>
+  </AuthenticatedLayout>
 </template>
 
 

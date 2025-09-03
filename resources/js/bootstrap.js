@@ -5,6 +5,14 @@ import Pusher from 'pusher-js';
 window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+
+ // 🔐 CSRF global para T-O-D-O request Axios (ex.: POST /change-language)
+ const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+ if (csrfToken) {
+   window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+ } else {
+   console.warn('⚠️ CSRF meta tag não encontrada. Confira seu Blade base.');
+ }
 // Configuração do Laravel Echo para WebSockets
 window.Pusher = Pusher;
 
@@ -68,4 +76,6 @@ if (!pusherKey) {
             };
         }
     });
+
+
 }

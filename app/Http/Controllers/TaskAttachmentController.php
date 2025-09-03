@@ -12,7 +12,7 @@ use Inertia\Inertia;
 
 class TaskAttachmentController extends Controller
 {
-    public function store(Request $request, Task $task)
+    public function store(Request $request, $locale, Task $task)
     {
         $request->validate([
             'file' => 'required|file|max:10240', // 10MB max
@@ -41,7 +41,7 @@ class TaskAttachmentController extends Controller
         ]);
     }
 
-    public function download(TaskAttachment $attachment)
+    public function download($locale, TaskAttachment $attachment)
     {
         if (!Storage::disk('public')->exists($attachment->file_path)) {
             abort(404, 'Arquivo não encontrado');
@@ -53,7 +53,7 @@ class TaskAttachmentController extends Controller
         );
     }
 
-    public function destroy(TaskAttachment $attachment)
+    public function destroy($locale, TaskAttachment $attachment)
     {
         if ($attachment->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
             abort(403, 'Você não tem permissão para excluir este anexo');
@@ -67,7 +67,7 @@ class TaskAttachmentController extends Controller
         ]);
     }
 
-    public function index(Task $task)
+    public function index($locale, Task $task)
     {
         $attachments = $task->attachments()->with('user')->orderBy('created_at', 'desc')->get();
 

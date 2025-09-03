@@ -28,7 +28,7 @@ class GenerateDashboardData extends Command
         Task::where('created_by', $userId)->delete();
 
         $now = Carbon::now();
-        $categories = ['Trabalho', 'Estudo', 'Pessoal', 'Saúde', 'Finanças'];
+        $categories = ['work', 'study', 'personal', 'health', 'finance'];
         $priorities = ['low', 'medium', 'high'];
         $statuses = ['pending', 'in_progress', 'completed'];
 
@@ -75,7 +75,7 @@ class GenerateDashboardData extends Command
                 'description' => 'Esta tarefa está em atraso para testar o dashboard',
                 'status' => 'pending',
                 'priority' => 'high',
-                'category' => 'Trabalho',
+                'category' => 'work',
                 'due_date' => $now->copy()->subDays(rand(1, 10)),
                 'created_by' => $userId,
                 'created_at' => $now->copy()->subDays(rand(5, 15)),
@@ -118,7 +118,7 @@ class GenerateDashboardData extends Command
     private function generateTaskTitle($category)
     {
         $titles = [
-            'Trabalho' => [
+            'work' => [
                 'Reunião com cliente',
                 'Relatório mensal',
                 'Atualizar documentação',
@@ -128,7 +128,7 @@ class GenerateDashboardData extends Command
                 'Preparar apresentação',
                 'Responder emails'
             ],
-            'Estudo' => [
+            'study' => [
                 'Ler capítulo do livro',
                 'Fazer exercícios práticos',
                 'Assistir vídeo aula',
@@ -138,7 +138,7 @@ class GenerateDashboardData extends Command
                 'Pesquisar sobre tema',
                 'Participar de fórum'
             ],
-            'Pessoal' => [
+            'personal' => [
                 'Fazer exercícios',
                 'Ligar para família',
                 'Organizar casa',
@@ -148,7 +148,7 @@ class GenerateDashboardData extends Command
                 'Sair com amigos',
                 'Meditar'
             ],
-            'Saúde' => [
+            'health' => [
                 'Consulta médica',
                 'Exame de sangue',
                 'Fazer exercícios',
@@ -158,7 +158,7 @@ class GenerateDashboardData extends Command
                 'Caminhar',
                 'Preparar refeição saudável'
             ],
-            'Finanças' => [
+            'finance' => [
                 'Pagar contas',
                 'Revisar orçamento',
                 'Investir dinheiro',
@@ -170,7 +170,7 @@ class GenerateDashboardData extends Command
             ]
         ];
 
-        $categoryTitles = $titles[$category] ?? $titles['Pessoal'];
+        $categoryTitles = $titles[$category] ?? $titles['personal'];
         return $categoryTitles[array_rand($categoryTitles)];
     }
 
@@ -193,14 +193,14 @@ class GenerateDashboardData extends Command
     private function generateTags($category)
     {
         $tags = [
-            'Trabalho' => ['urgente', 'importante', 'cliente', 'projeto', 'deadline'],
-            'Estudo' => ['curso', 'aprendizado', 'conhecimento', 'desenvolvimento', 'habilidade'],
-            'Pessoal' => ['lazer', 'família', 'amigos', 'hobby', 'descanso'],
-            'Saúde' => ['bem-estar', 'exercício', 'nutrição', 'medicina', 'prevenção'],
-            'Finanças' => ['dinheiro', 'investimento', 'economia', 'orçamento', 'planejamento']
+            'work' => ['urgente', 'importante', 'cliente', 'projeto', 'deadline'],
+            'study' => ['curso', 'aprendizado', 'conhecimento', 'desenvolvimento', 'habilidade'],
+            'personal' => ['lazer', 'família', 'amigos', 'hobby', 'descanso'],
+            'health' => ['bem-estar', 'exercício', 'nutrição', 'medicina', 'prevenção'],
+            'finance' => ['dinheiro', 'investimento', 'economia', 'orçamento', 'planejamento']
         ];
 
-        $categoryTags = $tags[$category] ?? $tags['Pessoal'];
+        $categoryTags = $tags[$category] ?? $tags['personal'];
         $selectedTags = array_rand($categoryTags, min(2, count($categoryTags)));
         
         if (!is_array($selectedTags)) {

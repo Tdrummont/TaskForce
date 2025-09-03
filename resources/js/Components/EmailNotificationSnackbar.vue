@@ -61,4 +61,4 @@ watch([hasEmailSent, hasEmailError], ([emailSent, emailError]) => {
 const closeSnackbar = () => {
     showSnackbar.value = false;
 };
-</script> 
+</script>

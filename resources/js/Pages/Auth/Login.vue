@@ -1,118 +1,113 @@
-<template>
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-        <div>
-            <Link href="/">
-                <h2 class="text-2xl font-bold text-gray-900">Sistema de Tarefas</h2>
-            </Link>
-        </div>
+<script setup lang="ts">
+import { Head, Link, useForm } from '@inertiajs/vue3'
+import { useLocale } from '@/Components/useLocale'
+import AuthLangToggle from '@/Components/AuthLangToggle.vue'
+import ValidationError from '@/Components/ValidationError.vue'
 
-        <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-            <form @submit.prevent="submit">
-                <div>
-                    <label for="email" class="block font-medium text-sm text-gray-700">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        v-model="form.email"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                        required
-                        autofocus
-                        autocomplete="username"
-                    />
-                    <div v-if="form.errors.email" class="mt-2 text-sm text-red-600">
-                        {{ form.errors.email }}
-                    </div>
-                </div>
-
-                <div class="mt-4">
-                    <label for="password" class="block font-medium text-sm text-gray-700">Senha</label>
-                    <input
-                        id="password"
-                        type="password"
-                        v-model="form.password"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                        required
-                        autocomplete="current-password"
-                    />
-                    <div v-if="form.errors.password" class="mt-2 text-sm text-red-600">
-                        {{ form.errors.password }}
-                    </div>
-                </div>
-
-                <div class="block mt-4">
-                    <label class="flex items-center">
-                        <input
-                            type="checkbox"
-                            v-model="form.remember"
-                            class="rounded border-gray-300 text-indigo-600 shadow-sm"
-                        />
-                        <span class="ml-2 text-sm text-gray-600">Lembrar-me</span>
-                    </label>
-                </div>
-
-                <div class="flex items-center justify-end mt-4">
-                    <Link
-                        v-if="canResetPassword"
-                        :href="route('password.request')"
-                        class="underline text-sm text-gray-600 hover:text-gray-900"
-                    >
-                        Esqueceu sua senha?
-                    </Link>
-
-                    <button
-                        type="submit"
-                        class="ml-4 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150"
-                        :disabled="form.processing"
-                    >
-                        Entrar
-                    </button>
-                </div>
-            </form>
-
-            <!-- Separador -->
-            <div class="mt-6 flex items-center">
-                <div class="flex-1 border-t border-gray-300"></div>
-                <span class="px-3 text-sm text-gray-500">ou</span>
-                <div class="flex-1 border-t border-gray-300"></div>
-            </div>
-
-            <!-- Botão de Login com Google -->
-            <div class="mt-6">
-                <GoogleLoginButton />
-            </div>
-
-            <div class="mt-6 text-center">
-                <span class="text-sm text-gray-600">Não tem conta?</span>
-                <Link :href="route('register')" class="ml-1 text-sm text-indigo-600 hover:text-indigo-500">
-                    Registre-se
-                </Link>
-            </div>
-        </div>
-    </div>
-</template>
-
-<script setup>
-import { Link, useForm } from '@inertiajs/vue3';
-import GoogleLoginButton from '@/Components/GoogleLoginButton.vue';
-
-defineProps({
-    canResetPassword: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-});
+const { t, routeL } = useLocale()
 
 const form = useForm({
-    email: '',
-    password: '',
-    remember: false,
-});
+  email: '',
+  password: '',
+  remember: false,
+})
 
-const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
-    });
-};
+function submit() {
+  form.post(routeL('login')) // POST {locale}/login
+}
 </script>
+
+<template>
+  <Head :title="t('auth.sign_in')" />
+
+  <div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <!-- Botão de idioma no topo -->
+    <div class="absolute top-4 right-6">
+      <AuthLangToggle />
+    </div>
+
+    <div class="w-full max-w-md bg-white rounded-lg shadow p-6">
+      <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('auth.title') }}</h1>
+      </div>
+
+      <form @submit.prevent="submit" class="space-y-4">
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t('auth.email') }}
+          </label>
+          <input
+            v-model="form.email"
+            type="email"
+            autocomplete="username"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+          <ValidationError :error="form.errors.email" />
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t('auth.password') }}
+          </label>
+          <input
+            v-model="form.password"
+            type="password"
+            autocomplete="current-password"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+          <ValidationError :error="form.errors.password" />
+        </div>
+
+        <!-- Remember + Forgot -->
+        <div class="flex items-center justify-between">
+          <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+            <input v-model="form.remember" type="checkbox" />
+            <span>{{ t('auth.remember') }}</span>
+          </label>
+
+          <Link
+            :href="routeL('password.request')"
+            class="text-sm text-blue-600 hover:underline"
+          >
+            {{ t('auth.forgot') }}
+          </Link>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          :disabled="form.processing"
+          class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+        >
+          {{ t('auth.sign_in') }}
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="flex items-center my-4">
+        <div class="flex-grow h-px bg-gray-200"></div>
+        <span class="px-3 text-sm text-gray-500">{{ t('auth.or') }}</span>
+        <div class="flex-grow h-px bg-gray-200"></div>
+      </div>
+
+      <!-- Google -->
+      <Link
+        :href="routeL('login.google')"
+        class="w-full inline-flex justify-center items-center gap-2 py-2 border rounded-md hover:bg-gray-50"
+      >
+        <img src="https://www.google.com/favicon.ico" alt="G" class="w-4 h-4" />
+        {{ t('auth.sign_in_with_google') }}
+      </Link>
+
+      <!-- Register link -->
+      <div class="text-center mt-4 text-sm text-gray-700">
+        {{ t('auth.no_account') }}
+        <Link :href="routeL('register')" class="text-blue-600 hover:underline">
+          {{ t('auth.register_here') }}
+        </Link>
+      </div>
+    </div>
+  </div>
+</template>

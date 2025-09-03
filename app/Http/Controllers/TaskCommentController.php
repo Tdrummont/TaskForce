@@ -10,7 +10,7 @@ use Inertia\Inertia;
 
 class TaskCommentController extends Controller
 {
-    public function store(Request $request, Task $task)
+    public function store(Request $request, $locale, Task $task)
     {
         $request->validate([
             'content' => 'required|string|max:1000',
@@ -32,7 +32,7 @@ class TaskCommentController extends Controller
         ]);
     }
 
-    public function update(Request $request, TaskComment $comment)
+    public function update(Request $request, $locale, TaskComment $comment)
     {
         if (!$comment->canEdit(Auth::user())) {
             abort(403, 'Você não tem permissão para editar este comentário');
@@ -56,7 +56,7 @@ class TaskCommentController extends Controller
         ]);
     }
 
-    public function destroy(TaskComment $comment)
+    public function destroy($locale, TaskComment $comment)
     {
         if (!$comment->canDelete(Auth::user())) {
             abort(403, 'Você não tem permissão para excluir este comentário');
@@ -70,7 +70,7 @@ class TaskCommentController extends Controller
         ]);
     }
 
-    public function togglePin(TaskComment $comment)
+    public function togglePin($locale, TaskComment $comment)
     {
         if (!$comment->canEdit(Auth::user())) {
             abort(403, 'Você não tem permissão para fixar este comentário');
@@ -85,7 +85,7 @@ class TaskCommentController extends Controller
         ]);
     }
 
-    public function index(Task $task)
+    public function index($locale, Task $task)
     {
         $comments = $task->comments()->with('user')->get();
 

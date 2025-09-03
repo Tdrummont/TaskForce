@@ -5,6 +5,9 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { useLocale } from '@/Components/useLocale';
+
+const { routeL } = useLocale();
 
 const passwordInput = ref(null);
 const currentPasswordInput = ref(null);
@@ -16,7 +19,7 @@ const form = useForm({
 });
 
 const updatePassword = () => {
-    form.put(route('password.update'), {
+    form.put(routeL('password.update'), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
         onError: () => {

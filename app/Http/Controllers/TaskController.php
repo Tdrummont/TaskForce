@@ -22,7 +22,7 @@ use Carbon\Carbon;
 
 class TaskController extends Controller
 {
-    public function index(Request $request)
+    public function index($locale, Request $request)
     {
         $query = Task::query()
             ->where('created_by', Auth::id())
@@ -115,30 +115,30 @@ class TaskController extends Controller
         ]);
     }
 
-    public function create()
+    public function create($locale)
     {
         $users = User::all();
         $parentTasks = Task::where('created_by', Auth::id())
             ->whereNull('parent_task_id')
             ->get();
 
-        // Categorias predefinidas
+        // Categorias predefinidas (chaves de tradução)
         $predefinedCategories = [
-            'Desenvolvimento',
-            'Design',
-            'Marketing',
-            'Vendas',
-            'Suporte',
-            'Administrativo',
-            'Financeiro',
-            'Recursos Humanos',
-            'Operações',
-            'Qualidade',
-            'Pesquisa',
-            'Treinamento',
-            'Manutenção',
-            'Infraestrutura',
-            'Segurança'
+            'development',
+            'design',
+            'marketing',
+            'sales',
+            'support',
+            'administrative',
+            'financial',
+            'human_resources',
+            'operations',
+            'quality',
+            'research',
+            'training',
+            'maintenance',
+            'infrastructure',
+            'security'
         ];
 
         // Categorias existentes no banco
@@ -159,7 +159,7 @@ class TaskController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store($locale, Request $request)
     {
         Log::info('Task creation attempt', [
             'user_id' => Auth::id(),
@@ -404,7 +404,7 @@ class TaskController extends Controller
                 ]);
             }
 
-            return redirect()->route('tasks.index')->with('success', 'Tarefa criada com sucesso!');
+            return redirect()->route('tasks.index', ['locale' => $locale])->with('success', 'Tarefa criada com sucesso!');
         } catch (\Exception $e) {
             Log::error('Error creating task', [
                 'error' => $e->getMessage(),
@@ -414,7 +414,57 @@ class TaskController extends Controller
         }
     }
 
-    public function update(Request $request, Task $task)
+    public function edit($locale, Task $task)
+    {
+        if (!$task->canEdit(Auth::user())) {
+            return back()->with('error', 'Você não tem permissão para editar esta tarefa.');
+        }
+
+        $users = User::all();
+        $parentTasks = Task::where('created_by', Auth::id())
+            ->whereNull('parent_task_id')
+            ->where('id', '!=', $task->id)
+            ->get();
+
+        // Categorias predefinidas (chaves de tradução)
+        $predefinedCategories = [
+            'development',
+            'design',
+            'marketing',
+            'sales',
+            'support',
+            'administrative',
+            'financial',
+            'human_resources',
+            'operations',
+            'quality',
+            'research',
+            'training',
+            'maintenance',
+            'infrastructure',
+            'security'
+        ];
+
+        // Categorias existentes no banco
+        $existingCategories = Task::where('created_by', Auth::id())
+            ->whereNotNull('category')
+            ->distinct()
+            ->pluck('category')
+            ->toArray();
+
+        // Combinar categorias predefinidas com existentes
+        $allCategories = array_unique(array_merge($predefinedCategories, $existingCategories));
+        sort($allCategories);
+
+        return Inertia::render('Tasks/Edit', [
+            'task' => $task,
+            'users' => $users,
+            'parentTasks' => $parentTasks,
+            'categories' => $allCategories
+        ]);
+    }
+
+    public function update(Request $request, $locale, Task $task)
     {
         if (!$task->canEdit(Auth::user())) {
             return back()->with('error', 'Você não tem permissão para editar esta tarefa.');
@@ -594,10 +644,10 @@ class TaskController extends Controller
             }
         }
 
-        return redirect()->route('tasks.index')->with('success', 'Tarefa atualizada com sucesso!');
+        return redirect()->route('tasks.index', ['locale' => $locale])->with('success', 'Tarefa atualizada com sucesso!');
     }
 
-    public function updateStatus(Request $request, Task $task)
+    public function updateStatus(Request $request, $locale, Task $task)
     {
         try {
             // Log de debug
@@ -678,7 +728,7 @@ class TaskController extends Controller
 
             // Para requisições normais, redirecionar com mensagem de sucesso
             Log::info('📤 Retornando redirecionamento para requisição normal');
-            return redirect()->route('tasks.index')->with('success', 'Status da tarefa atualizado com sucesso!');
+            return redirect()->route('tasks.index', ['locale' => $locale])->with('success', 'Status da tarefa atualizado com sucesso!');
 
         } catch (\Exception $e) {
             Log::error('❌ Erro ao atualizar status da tarefa', [
@@ -699,7 +749,7 @@ class TaskController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder($locale, Request $request)
     {
         $request->validate([
             'tasks' => 'required|array',
@@ -722,10 +772,10 @@ class TaskController extends Controller
             ]);
         }
 
-        return redirect()->route('tasks.index')->with('success', 'Ordem das tarefas atualizada!');
+        return redirect()->route('tasks.index', ['locale' => $locale])->with('success', 'Ordem das tarefas atualizada!');
     }
 
-    public function destroy(Task $task)
+    public function destroy($locale, Task $task)
     {
         if (!$task->canDelete(Auth::user())) {
             return back()->with('error', 'Você não tem permissão para excluir esta tarefa.');
@@ -733,10 +783,10 @@ class TaskController extends Controller
 
         $task->delete();
 
-        return redirect()->route('tasks.index')->with('success', 'Tarefa excluída com sucesso!');
+        return redirect()->route('tasks.index', ['locale' => $locale])->with('success', 'Tarefa excluída com sucesso!');
     }
 
-    public function deleteAll()
+    public function deleteAll($locale)
     {
         // Verificar se o usuário tem permissão para excluir todas as tarefas
         $user = Auth::user();
@@ -744,10 +794,10 @@ class TaskController extends Controller
         // Excluir todas as tarefas do usuário
         $deletedCount = Task::where('created_by', $user->id)->delete();
 
-        return redirect()->route('tasks.index')->with('success', "Todas as {$deletedCount} tarefas foram excluídas com sucesso!");
+        return redirect()->route('tasks.index', ['locale' => $locale])->with('success', "Todas as {$deletedCount} tarefas foram excluídas com sucesso!");
     }
 
-    public function exportCsv(Request $request)
+    public function exportCsv($locale, Request $request)
     {
         $query = Task::where('created_by', Auth::id());
 
@@ -808,7 +858,7 @@ class TaskController extends Controller
         ])->deleteFileAfterSend();
     }
 
-    public function backup(Request $request)
+    public function backup($locale, Request $request)
     {
         $query = Task::where('created_by', Auth::id());
         
@@ -840,7 +890,7 @@ class TaskController extends Controller
         ])->deleteFileAfterSend();
     }
 
-    public function restore(Request $request)
+    public function restore($locale, Request $request)
     {
         $request->validate([
             'backup_file' => 'required|file|mimes:json|max:10240'
@@ -870,7 +920,7 @@ class TaskController extends Controller
         ]);
     }
 
-    public function dashboard()
+    public function dashboard($locale)
     {
         $userId = Auth::id();
         $now = Carbon::now();
@@ -1069,5 +1119,247 @@ class TaskController extends Controller
             ->max('order');
         
         return ($maxOrder ?? 0) + 1;
+    }
+
+    // ========================================
+    // MÉTODOS DA API
+    // ========================================
+
+    /**
+     * API: Listar tarefas
+     */
+    public function apiIndex(Request $request)
+    {
+        $query = Task::query()
+            ->where('created_by', Auth::id())
+            ->with(['assignedTo', 'subtasks', 'attachments', 'comments'])
+            ->orderBy('order')
+            ->orderBy('created_at', 'desc');
+
+        // Aplicar filtros
+        if ($request->filled('status')) {
+            $query->byStatus($request->status);
+        }
+
+        if ($request->filled('priority')) {
+            $query->byPriority($request->priority);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $tasks = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'tasks' => $tasks
+        ]);
+    }
+
+    /**
+     * API: Criar tarefa
+     */
+    public function apiStore(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'due_date' => 'nullable|date',
+            'priority' => 'nullable|in:low,medium,high',
+            'status' => 'nullable|in:pending,in_progress,completed',
+            'category' => 'nullable|string|max:100',
+            'tags' => 'nullable|array',
+            'assigned_to' => 'nullable|exists:users,id',
+            'parent_task_id' => 'nullable|exists:tasks,id',
+        ]);
+
+        $validated['created_by'] = Auth::id();
+        $validated['order'] = $this->getNextOrder($validated['parent_task_id'] ?? null);
+
+        $task = Task::create($validated);
+
+        // Notificar usuário designado
+        if ($task->assigned_to && $task->assigned_to !== Auth::id()) {
+            event(new TaskAssigned($task));
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tarefa criada com sucesso!',
+            'task' => $task->load(['assignedTo', 'subtasks', 'attachments', 'comments'])
+        ], 201);
+    }
+
+    /**
+     * API: Mostrar tarefa
+     */
+    public function apiShow(Task $task)
+    {
+        if ($task->created_by !== Auth::id()) {
+            return response()->json(['error' => 'Não autorizado'], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'task' => $task->load(['assignedTo', 'subtasks', 'attachments', 'comments'])
+        ]);
+    }
+
+    /**
+     * API: Atualizar tarefa
+     */
+    public function apiUpdate(Request $request, Task $task)
+    {
+        if ($task->created_by !== Auth::id()) {
+            return response()->json(['error' => 'Não autorizado'], 403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'due_date' => 'nullable|date',
+            'priority' => 'nullable|in:low,medium,high',
+            'status' => 'nullable|in:pending,in_progress,completed',
+            'category' => 'nullable|string|max:100',
+            'tags' => 'nullable|array',
+            'assigned_to' => 'nullable|exists:users,id',
+        ]);
+
+        $task->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tarefa atualizada com sucesso!',
+            'task' => $task->load(['assignedTo', 'subtasks', 'attachments', 'comments'])
+        ]);
+    }
+
+    /**
+     * API: Atualizar status da tarefa
+     */
+    public function apiUpdateStatus(Request $request, Task $task)
+    {
+        if ($task->created_by !== Auth::id()) {
+            return response()->json(['error' => 'Não autorizado'], 403);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:pending,in_progress,completed',
+        ]);
+
+        $task->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status da tarefa atualizado com sucesso!',
+            'task' => $task
+        ]);
+    }
+
+    /**
+     * API: Excluir tarefa
+     */
+    public function apiDestroy(Task $task)
+    {
+        if ($task->created_by !== Auth::id()) {
+            return response()->json(['error' => 'Não autorizado'], 403);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tarefa excluída com sucesso!'
+        ]);
+    }
+
+    /**
+     * API: Dashboard
+     */
+    public function apiDashboard()
+    {
+        $userId = Auth::id();
+        $now = Carbon::now();
+
+        // Estatísticas básicas
+        $totalTasks = Task::where('created_by', $userId)->count();
+        $completedTasks = Task::where('created_by', $userId)->byStatus('completed')->count();
+        $pendingTasks = Task::where('created_by', $userId)->byStatus('pending')->count();
+        $inProgressTasks = Task::where('created_by', $userId)->byStatus('in_progress')->count();
+        $overdueTasks = Task::where('created_by', $userId)->overdue()->count();
+
+        // Produtividade da semana
+        $weekStart = $now->copy()->startOfWeek();
+        $weekEnd = $now->copy()->endOfWeek();
+        $weekCompleted = Task::where('created_by', $userId)
+            ->byStatus('completed')
+            ->whereBetween('updated_at', [$weekStart, $weekEnd])
+            ->count();
+
+        // Tarefas recentes
+        $recentTasks = Task::where('created_by', $userId)
+            ->with('assignedTo')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'metrics' => [
+                'total_tasks' => $totalTasks,
+                'completed_tasks' => $completedTasks,
+                'pending_tasks' => $pendingTasks,
+                'in_progress_tasks' => $inProgressTasks,
+                'overdue_tasks' => $overdueTasks,
+                'week_completed' => $weekCompleted,
+            ],
+            'recent_tasks' => $recentTasks,
+        ]);
+    }
+
+    /**
+     * Obter categorias disponíveis
+     */
+    public function getCategories($locale)
+    {
+        // Categorias predefinidas (chaves de tradução)
+        $predefinedCategories = [
+            'development',
+            'design',
+            'marketing',
+            'sales',
+            'support',
+            'administrative',
+            'financial',
+            'human_resources',
+            'operations',
+            'quality',
+            'research',
+            'training',
+            'maintenance',
+            'infrastructure',
+            'security'
+        ];
+
+        // Categorias existentes no banco
+        $existingCategories = Task::where('created_by', Auth::id())
+            ->whereNotNull('category')
+            ->distinct()
+            ->pluck('category')
+            ->toArray();
+
+        // Combinar categorias predefinidas com existentes
+        $allCategories = array_unique(array_merge($predefinedCategories, $existingCategories));
+        sort($allCategories);
+
+        return response()->json([
+            'success' => true,
+            'categories' => $allCategories
+        ]);
     }
 }

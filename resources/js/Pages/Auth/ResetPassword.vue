@@ -5,6 +5,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import { useLocale } from '@/Components/useLocale';
 
 const props = defineProps({
     email: {
@@ -17,6 +18,8 @@ const props = defineProps({
     },
 });
 
+const { routeL } = useLocale();
+
 const form = useForm({
     token: props.token,
     email: props.email,
@@ -25,7 +28,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('password.store'), {
+    form.post(routeL('password.store'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };

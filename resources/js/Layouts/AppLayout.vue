@@ -1,12 +1,15 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
+import { useLocale } from '@/Components/useLocale'
 
 const props = defineProps({
   user: Object
 })
 
+const { routeL } = useLocale()
+
 const logout = () => {
-  useForm().post(route('logout'))
+  useForm().post(routeL('logout'))
 }
 </script> 
 
@@ -33,13 +36,13 @@ const logout = () => {
           prepend-icon="mdi-view-dashboard" 
           title="Dashboard" 
           value="dashboard"
-          :to="route('dashboard')"
+          :to="routeL('dashboard')"
         ></v-list-item>
         <v-list-item 
           prepend-icon="mdi-format-list-checks" 
           title="Tarefas" 
           value="tasks"
-          :to="route('tasks.index')"
+          :to="routeL('tasks.index')"
         ></v-list-item>
         <v-list-item 
           prepend-icon="mdi-account-multiple" 

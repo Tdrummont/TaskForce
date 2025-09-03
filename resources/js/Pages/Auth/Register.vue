@@ -1,7 +1,11 @@
 <template>
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
+        <div class="absolute top-4 right-6">
+            <AuthLangToggle />
+        </div>
+        
         <div>
-            <Link href="/">
+            <Link :href="routeL('welcome')">
                 <h2 class="text-2xl font-bold text-gray-900">Sistema de Tarefas</h2>
             </Link>
         </div>
@@ -73,7 +77,7 @@
 
                 <div class="flex items-center justify-end mt-4">
                     <Link
-                        :href="route('login')"
+                        :href="routeL('login')"
                         class="underline text-sm text-gray-600 hover:text-gray-900"
                     >
                         Já tem conta?
@@ -94,6 +98,10 @@
 
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3';
+import { useLocale } from '@/Components/useLocale';
+import AuthLangToggle from '@/Components/AuthLangToggle.vue';
+
+const { routeL } = useLocale();
 
 const form = useForm({
     name: '',
@@ -103,7 +111,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('register'), {
+    form.post(routeL('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };

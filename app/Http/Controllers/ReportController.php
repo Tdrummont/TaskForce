@@ -302,7 +302,7 @@ class ReportController extends Controller
     /**
      * Exportar relatório em PDF
      */
-    public function exportPdf(Request $request)
+    public function exportPdf($locale, Request $request)
     {
         $userId = Auth::user()->id;
         $period = $request->get('period', 'month'); // week, month, year
@@ -324,7 +324,7 @@ class ReportController extends Controller
     /**
      * Exportar relatório em CSV
      */
-    public function exportCsv(Request $request)
+    public function exportCsv($locale, Request $request)
     {
         $userId = Auth::user()->id;
         $period = $request->get('period', 'month');
@@ -400,5 +400,29 @@ class ReportController extends Controller
             'high' => '#EF4444',
             default => '#6B7280'
         };
+    }
+
+    /**
+     * API: Relatórios
+     */
+    public function apiIndex()
+    {
+        $userId = Auth::id();
+        
+        // Estatísticas gerais
+        $stats = $this->getGeneralStats($userId);
+        
+        // Dados para gráficos
+        $productivityData = $this->getProductivityData($userId);
+        $tasksByCategory = $this->getTasksByCategory($userId);
+        $completionTimeData = $this->getCompletionTimeData($userId);
+
+        return response()->json([
+            'success' => true,
+            'stats' => $stats,
+            'productivityData' => $productivityData,
+            'tasksByCategory' => $tasksByCategory,
+            'completionTimeData' => $completionTimeData,
+        ]);
     }
 } 

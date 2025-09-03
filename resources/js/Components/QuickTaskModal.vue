@@ -1,275 +1,242 @@
-<template>
-  <Transition
-    enter-active-class="ease-out duration-300"
-    enter-from-class="opacity-0"
-    enter-to-class="opacity-100"
-    leave-active-class="ease-in duration-200"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
-  >
-    <div v-if="show" class="fixed inset-0 z-[9999] overflow-y-auto">
-      <!-- Overlay -->
-      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="closeModal"></div>
-      
-      <!-- Modal -->
-      <div class="flex min-h-full items-center justify-center p-4">
-        <Transition
-          enter-active-class="ease-out duration-300"
-          enter-from-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          enter-to-class="opacity-100 translate-y-0 sm:scale-100"
-          leave-active-class="ease-in duration-200"
-          leave-from-class="opacity-100 translate-y-0 sm:scale-100"
-          leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-        >
-          <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-auto transform transition-all">
-        <!-- Header -->
-        <div class="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">
-            Nova Tarefa Rápida
-          </h3>
-          <button
-            @click="closeModal"
-            class="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Form -->
-        <form @submit.prevent="submitForm" class="p-6">
-          <!-- Título -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Título *
-            </label>
-            <input
-              v-model="form.title"
-              type="text"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Digite o título da tarefa"
-            />
-            <div v-if="form.errors.title" class="text-red-500 text-sm mt-1">
-              {{ form.errors.title }}
-            </div>
-          </div>
-
-          <!-- Descrição -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Descrição
-            </label>
-            <textarea
-              v-model="form.description"
-              rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Descreva brevemente a tarefa..."
-            ></textarea>
-            <div v-if="form.errors.description" class="text-red-500 text-sm mt-1">
-              {{ form.errors.description }}
-            </div>
-          </div>
-
-          <!-- Prioridade e Categoria -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Prioridade
-              </label>
-              <select
-                v-model="form.priority"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="low">Baixa</option>
-                <option value="medium">Média</option>
-                <option value="high">Alta</option>
-              </select>
-              <div v-if="form.errors.priority" class="text-red-500 text-sm mt-1">
-                {{ form.errors.priority }}
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Categoria
-              </label>
-              <select
-                v-model="form.category"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Selecione uma categoria</option>
-                <option value="Desenvolvimento">Desenvolvimento</option>
-                <option value="Design">Design</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Vendas">Vendas</option>
-                <option value="Suporte">Suporte</option>
-                <option value="Administrativo">Administrativo</option>
-                <option value="Financeiro">Financeiro</option>
-                <option value="Recursos Humanos">Recursos Humanos</option>
-                <option value="Operações">Operações</option>
-                <option value="Qualidade">Qualidade</option>
-                <option value="Pesquisa">Pesquisa</option>
-                <option value="Treinamento">Treinamento</option>
-                <option value="Manutenção">Manutenção</option>
-                <option value="Infraestrutura">Infraestrutura</option>
-                <option value="Segurança">Segurança</option>
-              </select>
-              <div v-if="form.errors.category" class="text-red-500 text-sm mt-1">
-                {{ form.errors.category }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Data de Vencimento -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Data de Vencimento
-            </label>
-            <div class="flex space-x-2 mb-2">
-              <button
-                type="button"
-                @click="setDueDate('today')"
-                class="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
-              >
-                Hoje
-              </button>
-              <button
-                type="button"
-                @click="setDueDate('tomorrow')"
-                class="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
-              >
-                Amanhã
-              </button>
-              <button
-                type="button"
-                @click="setDueDate('next_week')"
-                class="px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors"
-              >
-                Próxima Semana
-              </button>
-            </div>
-            <input
-              v-model="form.due_date"
-              type="date"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div v-if="form.errors.due_date" class="text-red-500 text-sm mt-1">
-              {{ form.errors.due_date }}
-            </div>
-          </div>
-
-          <!-- Botões -->
-          <div class="flex items-center justify-end space-x-3">
-            <button
-              type="button"
-              @click="closeModal"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              :disabled="form.processing"
-              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span v-if="form.processing">Criando...</span>
-              <span v-else>Criar Tarefa</span>
-            </button>
-          </div>
-        </form>
-          </div>
-        </Transition>
-      </div>
-    </div>
-  </Transition>
-</template>
-
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
+import { useLocale } from '@/Components/useLocale'
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false
-  }
+  show: { type: Boolean, default: false },
+  onClose: { type: Function, default: () => {} },
+  categories: { type: Array, default: () => [] },
+  // passe do layout/controller: $user->state ?? 'SP'
+  userState: { type: String, default: 'SP' }
 })
 
-const emit = defineEmits(['close'])
+// Categorias predefinidas como fallback (chaves de tradução)
+const defaultCategories = [
+  'development',
+  'design',
+  'marketing',
+  'sales',
+  'support',
+  'administrative',
+  'financial',
+  'human_resources',
+  'operations',
+  'quality',
+  'research',
+  'training',
+  'maintenance',
+  'infrastructure',
+  'security'
+]
+
+// Usar categorias passadas como prop ou as predefinidas
+const availableCategories = computed(() => {
+  return props.categories.length > 0 ? props.categories : defaultCategories
+})
+
+const emit = defineEmits(['close', 'created'])
+
+const { routeL, t } = useLocale()
 
 const form = useForm({
   title: '',
   description: '',
   priority: 'medium',
-  due_date: '',
-  status: 'pending',
   category: '',
-  tags: [],
-  estimated_hours: '',
-  assigned_to: '',
-  parent_task_id: ''
+  due_date: ''
 })
 
-const closeModal = () => {
-  form.reset()
+const holiday = ref(null)
+const checkingHoliday = ref(false)
+const stateUF = ref(props.userState || 'SP')
+
+const isOpen = computed(() => props.show)
+
+function close() {
   emit('close')
+  // limpa (opcional)
+  form.reset()
+  holiday.value = null
 }
 
-const submitForm = () => {
-  console.log('Submitting form with data:', form.data())
-  
-  form.post('/tasks', {
+async function checkHoliday() {
+  holiday.value = null
+  if (!form.due_date) return
+  try {
+    checkingHoliday.value = true
+    const r = await fetch(`/api/holidays/check?date=${encodeURIComponent(form.due_date)}&state=${encodeURIComponent(stateUF.value)}`, {
+      headers: { 'Accept': 'application/json' }
+    })
+    if (!r.ok) throw new Error('holiday request failed')
+    const data = await r.json()
+    holiday.value = data.is_holiday ? data.holiday : null
+  } catch (e) {
+    console.error('holiday check error', e)
+  } finally {
+    checkingHoliday.value = false
+  }
+}
+
+watch(() => form.due_date, checkHoliday)
+
+async function submit() {
+  await form.post(routeL('tasks.store'), {
     onSuccess: () => {
-      console.log('Task created successfully')
-      closeModal()
-    },
-    onError: (errors) => {
-      console.error('Error creating task:', errors)
+      emit('created')
+      close()
     }
   })
 }
 
-const setDueDate = (type) => {
-  const today = new Date()
+function setQuickDue(days) {
+  // days: 0 (hoje), 1 (amanhã), 7 (próx semana) etc.
+  const d = new Date()
+  d.setDate(d.getDate() + days)
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  form.due_date = `${yyyy}-${mm}-${dd}`
+}
+
+function getCategoryDisplayName(category) {
+  // Se a categoria for uma chave de tradução (ex: 'sales'), traduz
+  const translationKey = `categories.${category}`
+  const translation = t(translationKey)
   
-  switch (type) {
-    case 'today':
-      form.due_date = today.toISOString().split('T')[0]
-      break
-    case 'tomorrow':
-      const tomorrow = new Date(today)
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      form.due_date = tomorrow.toISOString().split('T')[0]
-      break
-    case 'next_week':
-      const nextWeek = new Date(today)
-      nextWeek.setDate(nextWeek.getDate() + 7)
-      form.due_date = nextWeek.toISOString().split('T')[0]
-      break
+  if (translation !== translationKey) {
+    return translation
   }
+  
+  // Se não for uma chave de tradução, retorna a categoria como está
+  return category
 }
+</script>
 
-// Reset form when modal opens
-watch(() => props.show, (newValue) => {
-  if (newValue) {
-    form.reset()
-  }
-})
+<template>
+  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
+    <!-- backdrop -->
+    <div class="fixed inset-0 bg-black/40" @click="close"></div>
 
-// Handle ESC key to close modal
-const handleKeydown = (event) => {
-  if (event.key === 'Escape' && props.show) {
-    closeModal()
-  }
-}
+    <div class="relative w-full max-w-lg bg-white rounded-xl shadow-xl p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold">
+          {{ t('quick.new_quick_task') /* "Nova Tarefa Rápida" / "New Quick Task" */ }}
+        </h3>
+        <button @click="close" class="text-gray-500 hover:text-gray-700">✕</button>
+      </div>
 
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
+      <form @submit.prevent="submit" class="space-y-4">
+        <!-- Título -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t('task.title_label') }} *
+          </label>
+          <input
+            v-model="form.title"
+            type="text"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            :placeholder="t('task.title_placeholder')"
+          />
+          <div v-if="form.errors.title" class="text-red-500 text-sm mt-1">{{ form.errors.title }}</div>
+        </div>
 
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
-</script> 
+        <!-- Descrição -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t('task.description_label') }}
+          </label>
+          <textarea
+            v-model="form.description"
+            rows="3"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            :placeholder="t('task.description_quick_placeholder')"
+          ></textarea>
+          <div v-if="form.errors.description" class="text-red-500 text-sm mt-1">{{ form.errors.description }}</div>
+        </div>
+
+        <!-- Prioridade / Categoria -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ t('task.priority_label') }}
+            </label>
+            <select
+              v-model="form.priority"
+              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="low">{{ t('priority.low') }}</option>
+              <option value="medium">{{ t('priority.medium') }}</option>
+              <option value="high">{{ t('priority.high') }}</option>
+            </select>
+            <div v-if="form.errors.priority" class="text-red-500 text-sm mt-1">{{ form.errors.priority }}</div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ t('task.category_label') }}
+            </label>
+            <select
+              v-model="form.category"
+              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">{{ t('task.category_placeholder') }}</option>
+              <option v-for="c in availableCategories" :key="c" :value="c">
+                {{ getCategoryDisplayName(c) }}
+              </option>
+            </select>
+            <div v-if="form.errors.category" class="text-red-500 text-sm mt-1">{{ form.errors.category }}</div>
+          </div>
+        </div>
+
+        <!-- Data de vencimento -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t('task.due_date_label') }}
+          </label>
+
+          <!-- atalhos -->
+          <div class="flex items-center gap-2 mb-2">
+            <button type="button" class="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200" @click="setQuickDue(0)">
+              {{ t('quick.today') }}
+            </button>
+            <button type="button" class="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200" @click="setQuickDue(1)">
+              {{ t('quick.tomorrow') }}
+            </button>
+            <button type="button" class="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200" @click="setQuickDue(7)">
+              {{ t('quick.next_week') }}
+            </button>
+          </div>
+
+          <input
+            v-model="form.due_date"
+            type="date"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+
+          <!-- alerta de feriado -->
+          <div
+            v-if="holiday"
+            class="mt-2 rounded-md border border-yellow-300 bg-yellow-50 p-2 text-xs text-yellow-900"
+          >
+            <strong>{{ t('holidays.alert') }}:</strong>
+            {{ t('holidays.on_date') }}
+            <span class="font-medium">{{ holiday.name }}</span>
+          </div>
+
+          <div v-if="form.errors.due_date" class="text-red-500 text-sm mt-1">{{ form.errors.due_date }}</div>
+        </div>
+
+        <!-- ações -->
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" @click="close" class="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600">
+            {{ t('common.cancel') }}
+          </button>
+          <button type="submit" :disabled="form.processing" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">
+            {{ form.processing ? t('common.saving') : t('quick.create_task') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template> 

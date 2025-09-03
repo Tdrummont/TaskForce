@@ -2,11 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TaskController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
+use App\Http\Controllers\HolidayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +35,7 @@ Route::get('/test', function () {
 });
 
 // Rotas protegidas da API (requerem JWT)
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     // Usuário autenticado
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -74,11 +76,16 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/comments/{comment}', [TaskCommentController::class, 'apiUpdate']);
     Route::delete('/comments/{comment}', [TaskCommentController::class, 'apiDestroy']);
     
-    // Notificações
-    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'apiIndex']);
-    Route::post('/notifications/{id}/mark-read', [App\Http\Controllers\NotificationController::class, 'apiMarkAsRead']);
-    Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'apiMarkAllAsRead']);
-    Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'apiDelete']);
-    Route::delete('/notifications/clear-all', [App\Http\Controllers\NotificationController::class, 'apiClearAll']);
-    Route::get('/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'apiUnreadCount']);
+    // Notificações (movidas para routes/web.php com locale)
 }); 
+
+// API para internacionalização (Vue.js) - SEM middleware de autenticação
+use App\Http\Controllers\LanguageController;
+
+Route::post('/language/{locale}', [LanguageController::class, 'switch'])->name('api.lang.switch');
+Route::get('/language/current', [LanguageController::class, 'current'])->name('api.lang.current');
+Route::get('/language/translations/{locale}', [LanguageController::class, 'translations'])->name('api.lang.translations');
+
+// Verificação de feriados (pública)
+Route::get('/holidays/check', [HolidayController::class, 'check'])
+    ->name('api.holidays.check');

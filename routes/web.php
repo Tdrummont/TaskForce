@@ -5,108 +5,143 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
-use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\SocialLoginController;
-use App\Http\Controllers\LanguageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Middleware\LocaleFromUrl;
+use Illuminate\Http\Request;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-// Rotas de idioma
-Route::get('/language/{locale}', [LanguageController::class, 'changeLanguage'])->name('language.change');
-Route::get('/api/language/current', [LanguageController::class, 'getCurrentLanguage'])->name('language.current');
-
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+// Redireciona raiz para /{locale} com base no idioma preferido do navegador
+Route::get('/', function (Request $request) {
+    // Detecta o idioma do navegador entre pt/en; se não achar, usa 'pt'
+    $pref = $request->getPreferredLanguage(['pt', 'en']) ?: 'pt';
+    // Se você QUISER forçar sempre PT, troque a linha acima por: $pref = 'pt';
+    return redirect("/{$pref}");
 });
+// Redireciona acessos sem locale para auth no default
+Route::redirect('/login', '/pt/login');
+Route::redirect('/register', '/pt/register');
+Route::redirect('/dashboard', '/pt/dashboard');
+Route::redirect('/tasks', '/pt/tasks');
+Route::redirect('/reports', '/pt/reports');
 
-Route::get('/dashboard', [TaskController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
+// Agrupa tudo que é web sob /{locale} e garante LocaleFromUrl
+Route::group([
+    'prefix' => '{locale}',
+    'where' => ['locale' => 'pt|en'],
+    'middleware' => ['web'], // LocaleFromUrl já roda no stack web
+], function () {
 
-// Rota de debug (apenas para desenvolvimento)
-Route::get('/debug-broadcasting', function () {
-    return view('debug-broadcasting');
-})->middleware(['auth'])->name('debug.broadcasting');
+    Route::get('/', function () {
+        return Inertia::render('Welcome', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'laravelVersion' => Application::VERSION,
+            'phpVersion' => PHP_VERSION,
+        ]);
+    })->name('welcome');
 
-// Rotas de notificações (web)
-Route::middleware('auth')->group(function () {
-    // Rotas web para notificações
-    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
-    Route::patch('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-    Route::delete('/notifications/clear-all', [App\Http\Controllers\NotificationController::class, 'clearAll'])->name('notifications.clearAll');
-    
-    // Rotas API para notificações
-    Route::get('/api/notifications', [App\Http\Controllers\NotificationController::class, 'apiIndex'])->name('api.notifications.index');
-    Route::post('/api/notifications/{id}/mark-read', [App\Http\Controllers\NotificationController::class, 'apiMarkAsRead'])->name('api.notifications.markRead');
-    Route::post('/api/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'apiMarkAllAsRead'])->name('api.notifications.markAllRead');
-    Route::delete('/api/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'apiDelete'])->name('api.notifications.delete');
-    Route::delete('/api/notifications/clear-all', [App\Http\Controllers\NotificationController::class, 'apiClearAll'])->name('api.notifications.clearAll');
-    Route::get('/api/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'apiUnreadCount'])->name('api.notifications.unreadCount');
+    Route::get('/dashboard', [TaskController::class, 'dashboard'])
+        ->middleware(['auth', 'verified'])
+        ->name('dashboard');
+
+    // Debug
+    Route::get('/debug-broadcasting', fn () => view('debug-broadcasting'))
+        ->middleware(['auth'])
+        ->name('debug.broadcasting');
+
+    // Google Auth (mantidas dentro do prefixo para manter idioma ao voltar p/ a SPA)
+    Route::get('/auth/google', [SocialLoginController::class, 'redirectToGoogle'])->name('login.google');
+    Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('google.callback');
+    Route::get('/auth/google/callback-page', fn () => Inertia::render('Auth/GoogleCallback'))
+        ->name('google.callback.page');
+
+    // Área logada
+    Route::middleware('auth')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+        // Tarefas
+        Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+        Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+        Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+        Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+        Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+        Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+        Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+        Route::delete('/tasks', [TaskController::class, 'deleteAll'])->name('tasks.deleteAll');
+        Route::post('/tasks/reorder', [TaskController::class, 'reorder'])->name('tasks.reorder');
+
+        // Export/Backup
+        Route::get('/tasks/export/csv', [TaskController::class, 'exportCsv'])->name('tasks.export.csv');
+        Route::get('/tasks/backup', [TaskController::class, 'backup'])->name('tasks.backup');
+        Route::post('/tasks/restore', [TaskController::class, 'restore'])->name('tasks.restore');
+        
+        // Categorias
+        Route::get('/tasks/categories', [TaskController::class, 'getCategories'])->name('tasks.categories');
+
+        // Anexos
+        Route::get('/tasks/{task}/attachments', [TaskAttachmentController::class, 'index'])->name('tasks.attachments.index');
+        Route::post('/tasks/{task}/attachments', [TaskAttachmentController::class, 'store'])->name('tasks.attachments.store');
+        Route::get('/attachments/{attachment}/download', [TaskAttachmentController::class, 'download'])->name('tasks.attachments.download');
+        Route::delete('/attachments/{attachment}', [TaskAttachmentController::class, 'destroy'])->name('tasks.attachments.destroy');
+
+        // Comentários
+        Route::get('/tasks/{task}/comments', [TaskCommentController::class, 'index'])->name('tasks.comments.index');
+        Route::post('/tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('tasks.comments.store');
+        Route::put('/comments/{comment}', [TaskCommentController::class, 'update'])->name('tasks.comments.update');
+        Route::delete('/comments/{comment}', [TaskCommentController::class, 'destroy'])->name('tasks.comments.destroy');
+        Route::patch('/comments/{comment}/pin', [TaskCommentController::class, 'togglePin'])->name('tasks.comments.togglePin');
+
+        // Relatórios
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
+        Route::get('/reports/export/csv', [ReportController::class, 'exportCsv'])->name('reports.export.csv');
+
+        // Notifications API (dentro do grupo {locale} para manter locale)
+        Route::get('/api/notifications', [App\Http\Controllers\NotificationController::class, 'apiIndex'])->name('api.notifications.index');
+        Route::get('/api/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'apiUnreadCount'])->name('api.notifications.unreadCount');
+        Route::post('/api/notifications/{id}/mark-read', [App\Http\Controllers\NotificationController::class, 'apiMarkAsRead'])->name('api.notifications.markRead');
+        Route::post('/api/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'apiMarkAllAsRead'])->name('api.notifications.markAllRead');
+        Route::delete('/api/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'apiDelete'])->name('api.notifications.delete');
+        Route::delete('/api/notifications/clear-all', [App\Http\Controllers\NotificationController::class, 'apiClearAll'])->name('api.notifications.clearAll');
+    });
+
+    // Auth scaffolding (incluído no grupo de idioma)
+    Route::middleware('guest')->group(function () {
+        Route::get('register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'create'])
+                    ->name('register');
+        Route::post('register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store']);
+        Route::get('login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])
+                    ->name('login');
+        Route::post('login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
+        Route::get('forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])
+                    ->name('password.request');
+        Route::post('forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store'])
+                    ->name('password.email');
+        Route::get('reset-password/{token}', [App\Http\Controllers\Auth\NewPasswordController::class, 'create'])
+                    ->name('password.reset');
+        Route::post('reset-password', [App\Http\Controllers\Auth\NewPasswordController::class, 'store'])
+                    ->name('password.store');
+    });
+
+    Route::middleware('auth')->group(function () {
+        Route::get('verify-email', App\Http\Controllers\Auth\EmailVerificationPromptController::class)
+                    ->name('verification.notice');
+        Route::get('verify-email/{id}/{hash}', App\Http\Controllers\Auth\VerifyEmailController::class)
+                    ->middleware(['signed', 'throttle:6,1'])
+                    ->name('verification.verify');
+        Route::post('email/verification-notification', [App\Http\Controllers\Auth\EmailVerificationNotificationController::class, 'store'])
+                    ->middleware('throttle:6,1')
+                    ->name('verification.send');
+        Route::get('confirm-password', [App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'show'])
+                    ->name('password.confirm');
+        Route::post('confirm-password', [App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
+        Route::put('password', [App\Http\Controllers\Auth\PasswordController::class, 'update'])
+                    ->name('password.update');
+        Route::post('logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
+                    ->name('logout');
+    });
 });
-
-// Rotas de autenticação Google
-Route::get('/auth/google', [SocialLoginController::class, 'redirectToGoogle'])->name('login.google');
-Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('google.callback');
-
-// Página de callback do Google (frontend)
-Route::get('/auth/google/callback-page', function () {
-    return Inertia::render('Auth/GoogleCallback');
-})->name('google.callback.page');
-
-
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Rotas de Tarefas
-    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-    Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-    Route::delete('/tasks', [TaskController::class, 'deleteAll'])->name('tasks.deleteAll');
-    Route::post('/tasks/reorder', [TaskController::class, 'reorder'])->name('tasks.reorder');
-
-    // Rotas de Exportação e Backup
-    Route::get('/tasks/export/csv', [TaskController::class, 'exportCsv'])->name('tasks.export.csv');
-    Route::get('/tasks/backup', [TaskController::class, 'backup'])->name('tasks.backup');
-    Route::post('/tasks/restore', [TaskController::class, 'restore'])->name('tasks.restore');
-
-    // Rotas de Anexos
-    Route::get('/tasks/{task}/attachments', [TaskAttachmentController::class, 'index'])->name('tasks.attachments.index');
-    Route::post('/tasks/{task}/attachments', [TaskAttachmentController::class, 'store'])->name('tasks.attachments.store');
-    Route::get('/attachments/{attachment}/download', [TaskAttachmentController::class, 'download'])->name('tasks.attachments.download');
-    Route::delete('/attachments/{attachment}', [TaskAttachmentController::class, 'destroy'])->name('tasks.attachments.destroy');
-
-    // Rotas de Comentários
-    Route::get('/tasks/{task}/comments', [TaskCommentController::class, 'index'])->name('tasks.comments.index');
-    Route::post('/tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('tasks.comments.store');
-    Route::put('/comments/{comment}', [TaskCommentController::class, 'update'])->name('tasks.comments.update');
-    Route::delete('/comments/{comment}', [TaskCommentController::class, 'destroy'])->name('tasks.comments.destroy');
-    Route::patch('/comments/{comment}/pin', [TaskCommentController::class, 'togglePin'])->name('tasks.comments.togglePin');
-
-    // Rotas de Relatórios
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
-    Route::get('/reports/export/csv', [ReportController::class, 'exportCsv'])->name('reports.export.csv');
-});
-
-require __DIR__.'/auth.php';

@@ -5,13 +5,16 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import { useLocale } from '@/Components/useLocale';
+
+const { routeL } = useLocale();
 
 const form = useForm({
     password: '',
 });
 
 const submit = () => {
-    form.post(route('password.confirm'), {
+    form.post(routeL('password.confirm'), {
         onFinish: () => form.reset(),
     });
 };

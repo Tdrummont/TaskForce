@@ -4,6 +4,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { useLocale } from '@/Components/useLocale';
 
 defineProps({
     mustVerifyEmail: {
@@ -15,6 +16,7 @@ defineProps({
 });
 
 const user = usePage().props.auth.user;
+const { routeL } = useLocale();
 
 const form = useForm({
     name: user.name,
@@ -35,7 +37,7 @@ const form = useForm({
         </header>
 
         <form
-            @submit.prevent="form.patch(route('profile.update'))"
+            @submit.prevent="form.patch(routeL('profile.update'))"
             class="mt-6 space-y-6"
         >
             <div>
@@ -73,7 +75,7 @@ const form = useForm({
                 <p class="mt-2 text-sm text-gray-800">
                     Your email address is unverified.
                     <Link
-                        :href="route('verification.send')"
+                        :href="routeL('verification.send')"
                         method="post"
                         as="button"
                         class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"

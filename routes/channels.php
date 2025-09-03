@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
+// Registra a rota de autenticação de broadcasting
+Broadcast::routes(['middleware' => ['web', 'auth']]);
+
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels

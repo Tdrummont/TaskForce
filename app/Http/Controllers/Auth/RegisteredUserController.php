@@ -46,6 +46,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        $locale = $request->attributes->get('locale', app()->getLocale() ?: config('app.locale', 'pt'));
+        return redirect(route('dashboard', ['locale' => $locale], false));
     }
 }

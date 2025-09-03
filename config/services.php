@@ -41,4 +41,9 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'invertexto' => [
+        'base'  => env('INVERTEXTO_BASE', 'https://api.invertexto.com'),
+        'token' => env('INVERTEXTO_TOKEN'),
+    ],
+
 ];

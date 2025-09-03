@@ -16,7 +16,7 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): Response
+    public function edit($locale, Request $request): Response
     {
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
@@ -27,7 +27,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update($locale, ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
 
@@ -37,13 +37,13 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit');
+        return Redirect::route('profile.edit', ['locale' => $locale]);
     }
 
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy($locale, Request $request): RedirectResponse
     {
         $request->validate([
             'password' => ['required', 'current_password'],
@@ -59,5 +59,36 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * API: Show user profile
+     */
+    public function apiShow(Request $request)
+    {
+        return response()->json([
+            'user' => $request->user()
+        ]);
+    }
+
+    /**
+     * API: Update user profile
+     */
+    public function apiUpdate(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $request->user()->id,
+        ]);
+
+        $user = $request->user();
+        $user->fill($request->validated());
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Perfil atualizado com sucesso!',
+            'user' => $user
+        ]);
     }
 }

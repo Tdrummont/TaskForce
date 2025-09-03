@@ -249,4 +249,4 @@ watch(() => props.show, (newValue) => {
 .email-snackbar.closing {
     animation: slideOut 0.3s ease-in;
 }
-</style> 
+</style>

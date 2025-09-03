@@ -5,6 +5,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import { useLocale } from '@/Components/useLocale';
 
 defineProps({
     status: {
@@ -12,12 +13,14 @@ defineProps({
     },
 });
 
+const { routeL } = useLocale();
+
 const form = useForm({
     email: '',
 });
 
 const submit = () => {
-    form.post(route('password.email'));
+    form.post(routeL('password.email'));
 };
 </script>
 

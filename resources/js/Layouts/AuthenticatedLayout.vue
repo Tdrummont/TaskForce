@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import QuickTaskModal from '@/Components/QuickTaskModal.vue';
-import RealTimeNotifications from '@/Components/RealTimeNotifications.vue';
+
 import EmailNotificationSnackbar from '@/Components/EmailNotificationSnackbar.vue';
 import LanguageSelector from '@/Components/LanguageSelector.vue';
 import { Link, useForm, router, usePage } from '@inertiajs/vue3';
+import { useLocale } from '@/Components/useLocale';
 
 const props = defineProps({
     showingNavigation: {
@@ -16,8 +17,14 @@ const props = defineProps({
     }
 });
 
+// Tipagem opcional dos slots para TS (suporta <template #header>)
+const slots = defineSlots<{
+    header?: () => any
+}>()
+
 // Inertia page
 const $page = usePage();
+const { routeL, t } = useLocale();
 
 const showingNavigationDropdown = ref(false);
 const showUserMenu = ref(false);
@@ -27,6 +34,7 @@ const showQuickTaskModal = ref(false);
 const showNotifications = ref(false);
 const notifications = ref([]);
 const unreadCount = ref(0);
+const categories = ref([]);
 
 // Sincronizar com a prop externa
 watch(() => props.showingNavigation, (newValue) => {
@@ -42,25 +50,26 @@ const toggleUserMenu = () => {
 };
 
 const logout = () => {
-    useForm().post(route('logout'))
+    const form = useForm({})
+    form.post(routeL('logout'))
 };
 
 const performSearch = () => {
     if (searchQuery.value.trim()) {
         // Se estiver na página de tarefas, usar filtros locais
-        if (route().current('tasks.*')) {
+        if (window.location.pathname.includes('/tasks')) {
             // Emitir evento para a página de tarefas
             window.dispatchEvent(new CustomEvent('search-tasks', {
                 detail: { query: searchQuery.value }
             }));
         } else {
             // Navegar para a página de tarefas com a pesquisa
-            router.get(route('tasks.index'), { search: searchQuery.value });
+            router.get(routeL('tasks.index'), { search: searchQuery.value });
         }
     }
 };
 
-const handleSearchKeydown = (event) => {
+const handleSearchKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
         performSearch();
     }
@@ -76,13 +85,14 @@ const toggleFab = () => {
 const openNewTaskModal = () => {
     console.log('Opening new task modal');
     showFabMenu.value = false;
-    console.log('Navigating to:', route('tasks.create'));
-    router.get(route('tasks.create'));
+    console.log('Navigating to:', routeL('tasks.create'));
+    router.get(routeL('tasks.create'));
 };
 
-const openQuickTaskModal = () => {
+const openQuickTaskModal = async () => {
     console.log('Opening quick task modal');
     showFabMenu.value = false;
+    await loadCategories();
     showQuickTaskModal.value = true;
 };
 
@@ -90,11 +100,31 @@ const closeQuickTaskModal = () => {
     showQuickTaskModal.value = false;
 };
 
+const loadCategories = async () => {
+    try {
+        const response = await fetch(routeL('tasks.categories'), {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                categories.value = data.categories;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+    }
+};
+
 const goToTasks = () => {
     console.log('Going to tasks');
     showFabMenu.value = false;
-    console.log('Navigating to:', route('tasks.index'));
-    router.get(route('tasks.index'));
+    console.log('Navigating to:', routeL('tasks.index'));
+    router.get(routeL('tasks.index'));
 };
 
 // Funções de notificações
@@ -121,7 +151,7 @@ const loadNotifications = async () => {
         console.log('🔍 Carregando notificações...');
         console.log('👤 Usuário logado:', $page.props.auth.user);
         
-        const response = await fetch('/api/notifications', {
+        const response = await fetch(routeL('api.notifications.index'), {
             credentials: 'same-origin',
             headers: {
                 'Accept': 'application/json',
@@ -160,7 +190,7 @@ const loadNotifications = async () => {
 const loadUnreadCount = async () => {
     try {
         console.log('🔍 Carregando contagem de não lidas...');
-        const response = await fetch('/api/notifications/unread-count', {
+        const response = await fetch(routeL('api.notifications.unreadCount'), {
             credentials: 'same-origin',
             headers: {
                 'Accept': 'application/json',
@@ -189,7 +219,7 @@ const loadUnreadCount = async () => {
 const markAsRead = async (notificationId) => {
     try {
         console.log('🔍 Marcando notificação como lida:', notificationId);
-        const response = await fetch(`/api/notifications/${notificationId}/mark-read`, {
+        const response = await fetch(routeL('api.notifications.markRead', { id: notificationId }), {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
@@ -214,7 +244,7 @@ const markAsRead = async (notificationId) => {
 const markAllAsRead = async () => {
     try {
         console.log('🔍 Marcando todas como lidas...');
-        const response = await fetch('/api/notifications/mark-all-read', {
+        const response = await fetch(routeL('api.notifications.markAllRead'), {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
@@ -238,7 +268,7 @@ const markAllAsRead = async () => {
 const deleteNotification = async (notificationId) => {
     try {
         console.log('🔍 Deletando notificação:', notificationId);
-        const response = await fetch(`/api/notifications/${notificationId}`, {
+        const response = await fetch(routeL('api.notifications.delete', { id: notificationId }), {
             method: 'DELETE',
             credentials: 'same-origin',
             headers: {
@@ -338,7 +368,7 @@ onUnmounted(() => {
                         <div class="flex items-center space-x-3">
                             <div class="text-white">
                                 <h1 class="text-xl font-bold">TaskForce</h1>
-                                <p class="text-blue-100 text-xs">Gerenciamento de Tarefas</p>
+                                <p class="text-blue-100 text-xs">{{ t('navbar.subtitle') }}</p>
                             </div>
                         </div>
                     </div>
@@ -352,7 +382,7 @@ onUnmounted(() => {
                                 </svg>
                             </div>
                             <input type="text" 
-                                   placeholder="Pesquisar tarefas..." 
+                                   :placeholder="t('navbar.search_ph')" 
                                    class="block w-full pl-10 pr-12 py-2 border border-blue-300 rounded-md leading-5 bg-white bg-opacity-20 text-white placeholder-blue-200 focus:outline-none focus:bg-white focus:text-gray-900 focus:border-white transition-all duration-200 backdrop-blur-sm"
                                    v-model="searchQuery"
                                    @keydown="handleSearchKeydown">
@@ -369,20 +399,20 @@ onUnmounted(() => {
                     <div class="flex items-center space-x-3">
                         <!-- Navigation Links -->
                         <div class="hidden md:flex items-center space-x-2">
-                            <Link :href="route('dashboard')" 
+                            <Link :href="routeL('dashboard')" 
                                   class="text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
                                   :class="route().current('dashboard') ? 'bg-white bg-opacity-20' : ''">
                                 Dashboard
                             </Link>
-                            <Link :href="route('tasks.index')" 
+                            <Link :href="routeL('tasks.index')" 
                                   class="text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
                                   :class="route().current('tasks.*') ? 'bg-white bg-opacity-20' : ''">
-                                Tarefas
+                                {{ t('navbar.tasks') }}
                             </Link>
-                            <Link :href="route('reports.index')" 
+                            <Link :href="routeL('reports.index')" 
                                   class="text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
                                   :class="route().current('reports.*') ? 'bg-white bg-opacity-20' : ''">
-                                Relatórios
+                                {{ t('navbar.reports') }}
                             </Link>
                         </div>
 
@@ -393,13 +423,13 @@ onUnmounted(() => {
 
                             <!-- Create Task Button -->
                             <button 
-                                @click="router.get(route('tasks.create'))"
+                                @click="router.get(routeL('tasks.create'))"
                                 class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-2 backdrop-blur-sm"
                             >
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
-                                <span>Nova Tarefa</span>
+                                <span>{{ t('navbar.new_task') }}</span>
                             </button>
 
                             <!-- Notifications -->
@@ -422,10 +452,10 @@ onUnmounted(() => {
                                     <!-- Header -->
                                     <div class="px-4 py-2 border-b border-gray-200">
                                         <div class="flex items-center justify-between">
-                                            <h3 class="text-sm font-semibold text-gray-900">Notificações</h3>
+                                            <h3 class="text-sm font-semibold text-gray-900">{{ t('notifications.title') }}</h3>
                                             <button @click="markAllAsRead" 
                                                     class="text-xs text-blue-600 hover:text-blue-800">
-                                                Marcar todas como lidas
+                                                {{ t('notifications.mark_all') }}
                                             </button>
                                         </div>
                                     </div>
@@ -478,13 +508,13 @@ onUnmounted(() => {
                                         <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.83 2.17a1 1 0 00-1.66 0L1 4v16a1 1 0 001 1h16a1 1 0 001-1V4l-2.17-1.83a1 1 0 00-1.66 0L4.83 2.17z"></path>
                                         </svg>
-                                        <p class="text-sm text-gray-500">Nenhuma notificação</p>
+                                        <p class="text-sm text-gray-500">{{ t('notifications.none') }}</p>
                                     </div>
 
                                     <!-- Footer -->
                                     <div class="px-4 py-2 border-t border-gray-200">
                                         <Link href="#" class="text-xs text-blue-600 hover:text-blue-800 block text-center">
-                                            Ver todas as notificações
+                                            {{ t('notifications.view_all') }}
                                         </Link>
                                     </div>
                                 </div>
@@ -507,13 +537,13 @@ onUnmounted(() => {
                                 <!-- User Dropdown Menu -->
                                 <div v-if="showUserMenu" 
                                      class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                                    <Link :href="route('profile.edit')" 
+                                    <Link :href="routeL('profile.edit')" 
                                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        Perfil
+                                        {{ t('navbar.profile') }}
                                     </Link>
                                     <button @click="logout" 
                                             class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        Sair
+                                        {{ t('navbar.logout') }}
                                     </button>
                                 </div>
                             </div>
@@ -552,22 +582,22 @@ onUnmounted(() => {
         <div v-if="showingNavigationDropdown" 
              class="md:hidden bg-white border-b border-gray-200">
             <div class="px-4 py-2 space-y-1">
-                <Link :href="route('dashboard')" 
+                <Link :href="routeL('dashboard')" 
                       class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                       :class="route().current('dashboard') ? 'bg-gray-100 text-gray-900' : ''">
                     Dashboard
                 </Link>
-                <Link :href="route('tasks.index')" 
+                <Link :href="routeL('tasks.index')" 
                       class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                       :class="route().current('tasks.*') ? 'bg-gray-100 text-gray-900' : ''">
                     Tarefas
                 </Link>
-                <Link :href="route('reports.index')" 
+                <Link :href="routeL('reports.index')" 
                       class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                       :class="route().current('reports.*') ? 'bg-gray-100 text-gray-900' : ''">
                     Relatórios
                 </Link>
-                <Link :href="route('profile.edit')" 
+                <Link :href="routeL('profile.edit')" 
                       class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                       :class="route().current('profile.*') ? 'bg-gray-100 text-gray-900' : ''">
                     Perfil
@@ -576,6 +606,13 @@ onUnmounted(() => {
         </div>
 
         <!-- Page Content -->
+        <!-- Page Header (renderiza slot nomeado 'header' quando fornecido) -->
+        <header v-if="$slots.header" class="bg-white shadow">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <slot name="header" />
+            </div>
+        </header>
+
         <main>
             <slot />
         </main>
@@ -594,7 +631,7 @@ onUnmounted(() => {
                 <!-- Botão Nova Tarefa -->
                 <div class="flex items-center">
                     <div class="bg-white rounded-lg shadow-lg px-4 py-2 mr-3 whitespace-nowrap">
-                        <span class="text-sm font-medium text-gray-700">Nova Tarefa</span>
+                        <span class="text-sm font-medium text-gray-700">{{ t('fab.new_task') }}</span>
                     </div>
                     <button
                         @click="openNewTaskModal"
@@ -609,7 +646,7 @@ onUnmounted(() => {
                 <!-- Botão Nova Tarefa Rápida -->
                 <div class="flex items-center">
                     <div class="bg-white rounded-lg shadow-lg px-4 py-2 mr-3 whitespace-nowrap">
-                        <span class="text-sm font-medium text-gray-700">Tarefa Rápida</span>
+                        <span class="text-sm font-medium text-gray-700">{{ t('fab.quick_task') }}</span>
                     </div>
                     <button
                         @click="openQuickTaskModal"
@@ -624,7 +661,7 @@ onUnmounted(() => {
                 <!-- Botão Ir para Tarefas -->
                 <div class="flex items-center">
                     <div class="bg-white rounded-lg shadow-lg px-4 py-2 mr-3 whitespace-nowrap">
-                        <span class="text-sm font-medium text-gray-700">Ver Tarefas</span>
+                        <span class="text-sm font-medium text-gray-700">{{ t('fab.view_tasks') }}</span>
                     </div>
                     <button
                         @click="goToTasks"
@@ -655,21 +692,14 @@ onUnmounted(() => {
         <!-- Modal de Tarefa Rápida -->
         <QuickTaskModal 
             :show="showQuickTaskModal" 
+            :categories="categories"
             @close="closeQuickTaskModal" 
         />
 
-        <!-- Componente de Notificações em Tempo Real -->
-        <RealTimeNotifications 
-            v-if="$page.props.auth.user"
-            :user-id="$page.props.auth.user.id"
-        />
+
         
-        <!-- Snackbar de Notificação de Email -->
-        <EmailNotificationSnackbar />
+
         
-        <!-- Debug: Informações do usuário -->
-        <div v-if="$page.props.auth.user" class="fixed bottom-4 left-4 bg-blue-100 p-2 rounded text-xs">
-            Debug: User ID: {{ $page.props.auth.user.id }}
-        </div>
+
     </div>
 </template>
