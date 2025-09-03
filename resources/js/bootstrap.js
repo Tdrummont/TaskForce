@@ -14,15 +14,17 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
    console.warn('⚠️ CSRF meta tag não encontrada. Confira seu Blade base.');
  }
 // Configuração do Laravel Echo para WebSockets
-// Só inicializar o Pusher se as variáveis de ambiente estiverem disponíveis
+window.Pusher = Pusher;
+
+// Verificar se as variáveis de ambiente estão disponíveis
 const pusherKey = import.meta.env.VITE_PUSHER_APP_KEY;
 const pusherCluster = import.meta.env.VITE_PUSHER_APP_CLUSTER;
 
-if (pusherKey && pusherKey !== 'null' && pusherKey !== 'undefined') {
+if (!pusherKey) {
+    console.warn('⚠️ VITE_PUSHER_APP_KEY não está configurado. WebSockets não funcionarão.');
+    console.warn('📝 Configure no arquivo .env: VITE_PUSHER_APP_KEY=your_app_key');
+} else {
     console.log('✅ Pusher configurado:', { key: pusherKey, cluster: pusherCluster });
-    
-    // Só definir window.Pusher se tivermos uma chave válida
-    window.Pusher = Pusher;
     
     window.Echo = new Echo({
         broadcaster: 'pusher',
@@ -74,30 +76,4 @@ if (pusherKey && pusherKey !== 'null' && pusherKey !== 'undefined') {
             };
         }
     });
-} else {
-    console.warn('⚠️ VITE_PUSHER_APP_KEY não está configurado. WebSockets não funcionarão.');
-    console.warn('📝 Configure no arquivo .env: VITE_PUSHER_APP_KEY=your_app_key');
-    console.log('🚀 Aplicação funcionará sem WebSockets (modo estático)');
-    
-    // Criar um Echo mock para evitar erros
-    window.Echo = {
-        channel: () => ({
-            listen: () => ({
-                listen: () => null
-            }),
-            subscribed: () => false
-        }),
-        private: () => ({
-            listen: () => ({
-                listen: () => null
-            }),
-            subscribed: () => false
-        }),
-        join: () => ({
-            listen: () => ({
-                listen: () => null
-            }),
-            subscribed: () => false
-        })
-    };
 }
