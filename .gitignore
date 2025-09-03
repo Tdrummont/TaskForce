@@ -31,7 +31,8 @@ yarn-error.log
 /storage/debugbar/*
 
 # Cache
-/bootstrap/cache/*
+/bootstrap/cache/*.php
+/bootstrap/cache/*.txt
 /bootstrap/providers.php
 
 # IDE

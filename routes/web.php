@@ -145,3 +145,9 @@ Route::group([
                     ->name('logout');
     });
 });
+
+// Rota SPA (fallback) - captura todas as rotas do frontend
+// IMPORTANTE: Deve ser a ÚLTIMA rota para não interferir com as rotas da API
+Route::get('/{any?}', function () {
+    return view('app');
+})->where('any', '.*')->name('spa.fallback');
