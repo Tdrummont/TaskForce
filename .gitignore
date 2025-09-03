@@ -33,6 +33,7 @@ yarn-error.log
 # Cache
 /bootstrap/cache/*.php
 /bootstrap/cache/*.txt
+/bootstrap/cache/*.cache
 /bootstrap/providers.php
 
 # IDE
