@@ -7,6 +7,7 @@ use App\Events\TaskDelegated;
 use App\Notifications\TaskAssignedNotification;
 use App\Notifications\TaskDelegatedNotification;
 use App\Notifications\TaskCreatedNotification;
+use App\Notifications\TaskEditedNotification;
 use App\Models\Task;
 use App\Models\User;
 use App\Services\NotificationService;
@@ -274,7 +275,9 @@ class TaskController extends Controller
                         
                         // Disparar evento para WebSocket (delegação)
                         try {
-                            event(new TaskDelegated($task, Auth::user(), $assignedTo));
+                            $event = new TaskDelegated($task, Auth::user(), $assignedTo);
+                            event($event);
+                            
                             Log::info('📡 Evento TaskDelegated disparado com sucesso', [
                                 'event_class' => TaskDelegated::class,
                                 'channel' => 'user.' . $assignedTo->id
@@ -333,7 +336,9 @@ class TaskController extends Controller
                         
                         // Disparar evento para WebSocket (atribuição normal)
                         try {
-                            event(new TaskAssigned($task, Auth::user(), $assignedTo));
+                            $event = new TaskAssigned($task, Auth::user(), $assignedTo);
+                            event($event);
+                            
                             Log::info('📡 Evento TaskAssigned disparado com sucesso', [
                                 'event_class' => TaskAssigned::class,
                                 'channel' => 'user.' . $assignedTo->id
@@ -460,7 +465,8 @@ class TaskController extends Controller
             'task' => $task,
             'users' => $users,
             'parentTasks' => $parentTasks,
-            'categories' => $allCategories
+            'categories' => $allCategories,
+            'userState' => 'SP' // Estado padrão para verificação de feriados
         ]);
     }
 
@@ -493,8 +499,114 @@ class TaskController extends Controller
         $oldAssignedTo = $task->assigned_to;
         $oldStatus = $task->status;
         $oldPriority = $task->priority;
+        $oldTitle = $task->title;
+        $oldDescription = $task->description;
+        $oldDueDate = $task->due_date;
         
         $task->update($request->all());
+        
+        // Detectar mudanças para notificação
+        $changes = [];
+        
+        // Log para debug
+        Log::info('🔍 Verificando mudanças na tarefa', [
+            'task_id' => $task->id,
+            'old_title' => $oldTitle,
+            'new_title' => $request->title,
+            'old_status' => $oldStatus,
+            'new_status' => $request->status,
+            'old_priority' => $oldPriority,
+            'new_priority' => $request->priority,
+            'old_assigned_to' => $oldAssignedTo,
+            'new_assigned_to' => $request->assigned_to,
+            'old_due_date' => $oldDueDate,
+            'new_due_date' => $request->due_date
+        ]);
+        
+        if ($request->title !== $oldTitle) {
+            $changes['title'] = ['old' => $oldTitle, 'new' => $request->title];
+        }
+        if ($request->description !== $oldDescription) {
+            $changes['description'] = ['old' => $oldDescription ?: 'Sem descrição', 'new' => $request->description ?: 'Sem descrição'];
+        }
+        if ($request->status !== $oldStatus) {
+            $changes['status'] = ['old' => $this->getStatusDisplayName($oldStatus), 'new' => $this->getStatusDisplayName($request->status)];
+        }
+        if ($request->priority !== $oldPriority) {
+            $changes['priority'] = ['old' => $this->getPriorityDisplayName($oldPriority), 'new' => $this->getPriorityDisplayName($request->priority)];
+        }
+        if ($request->due_date !== $oldDueDate) {
+            $changes['due_date'] = [
+                'old' => $oldDueDate ? $oldDueDate->format('d/m/Y') : 'Não definida',
+                'new' => $request->due_date ? \Carbon\Carbon::parse($request->due_date)->format('d/m/Y') : 'Não definida'
+            ];
+        }
+        if ($request->assigned_to != $oldAssignedTo) { // Usar != em vez de !== para comparar string com int
+            $oldUser = $oldAssignedTo ? User::find($oldAssignedTo) : null;
+            $newUser = $request->assigned_to ? User::find($request->assigned_to) : null;
+            $changes['assigned_to'] = [
+                'old' => $oldUser ? $oldUser->name : 'Não atribuída',
+                'new' => $newUser ? $newUser->name : 'Não atribuída'
+            ];
+        }
+        
+        Log::info('🔍 Mudanças detectadas', [
+            'task_id' => $task->id,
+            'changes_count' => count($changes),
+            'changes' => $changes
+        ]);
+        
+        // Enviar notificação de edição se houver mudanças
+        if (!empty($changes)) {
+            try {
+                // Notificar o criador da tarefa (se não for quem editou)
+                if ($task->created_by !== Auth::id()) {
+                    $creator = User::find($task->created_by);
+                    if ($creator) {
+                        $creator->notify(new TaskEditedNotification($task, Auth::user(), $creator, $changes));
+                        Log::info('📧 Notificação de edição enviada para o criador', [
+                            'task_id' => $task->id,
+                            'creator_id' => $creator->id,
+                            'changes_count' => count($changes)
+                        ]);
+                    }
+                }
+                
+                // Notificar o usuário atribuído (se existir e não for quem editou)
+                if ($task->assigned_to && $task->assigned_to !== Auth::id()) {
+                    $assignedUser = User::find($task->assigned_to);
+                    if ($assignedUser && $assignedUser->id !== $task->created_by) {
+                        $assignedUser->notify(new TaskEditedNotification($task, Auth::user(), $assignedUser, $changes));
+                        Log::info('📧 Notificação de edição enviada para o usuário atribuído', [
+                            'task_id' => $task->id,
+                            'assigned_user_id' => $assignedUser->id,
+                            'changes_count' => count($changes)
+                        ]);
+                    }
+                }
+                
+                // Adicionar mensagem de sucesso para o snackbar
+                session()->flash('email_sent', [
+                    'type' => 'success',
+                    'title' => 'Tarefa Editada!',
+                    'message' => "Tarefa '{$task->title}' editada com sucesso e notificações enviadas"
+                ]);
+                
+            } catch (\Exception $e) {
+                Log::error('❌ Erro ao enviar notificação de edição', [
+                    'task_id' => $task->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
+                // Adicionar mensagem de erro para o snackbar
+                session()->flash('email_error', [
+                    'type' => 'error',
+                    'title' => 'Erro na Notificação',
+                    'message' => 'Tarefa editada, mas não foi possível enviar as notificações'
+                ]);
+            }
+        }
         
         // Notificar mudanças de status
         if ($request->status !== $oldStatus) {
@@ -1119,6 +1231,26 @@ class TaskController extends Controller
             ->max('order');
         
         return ($maxOrder ?? 0) + 1;
+    }
+
+    private function getStatusDisplayName(string $status): string
+    {
+        return match ($status) {
+            'pending' => 'Pendente',
+            'in_progress' => 'Em Progresso',
+            'completed' => 'Concluída',
+            default => $status,
+        };
+    }
+
+    private function getPriorityDisplayName(string $priority): string
+    {
+        return match ($priority) {
+            'low' => 'Baixa',
+            'medium' => 'Média',
+            'high' => 'Alta',
+            default => $priority,
+        };
     }
 
     // ========================================

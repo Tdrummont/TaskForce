@@ -6,6 +6,7 @@ import { useLocale } from '@/Components/useLocale'
 
 const props = defineProps({
   task: Object,
+  users: Array,
   // passe isso do controller: $user->state ?? 'SP'
   userState: { type: String, default: 'SP' }
 })
@@ -37,6 +38,11 @@ async function checkHoliday() {
     if (!r.ok) throw new Error('holiday request failed')
     const data = await r.json()
     holiday.value = data.is_holiday ? data.holiday : null
+    
+    // Mostrar snackbar se for feriado
+    if (data.is_holiday && data.holiday && window.$holidayToast) {
+      window.$holidayToast.show(data.holiday, 8000)
+    }
   } catch (e) {
     console.error('holiday check error', e)
   } finally {
@@ -67,14 +73,23 @@ function submit() {
               {{ t('tasks.edit.page_title') }}
             </h1>
 
-            <!-- Alerta de feriado -->
+            <!-- Alerta de Feriado Sutil -->
             <div
               v-if="holiday"
-              class="rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900"
+              class="p-3 rounded-md border-l-2 border-rose-300 bg-rose-25"
             >
-              <strong>{{ t('holidays.alert') }}:</strong>
-              {{ t('holidays.on_date') }}
-              <span class="font-medium">{{ holiday.name }}</span>
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <svg class="h-4 w-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-2">
+                  <span class="text-sm font-medium text-rose-700">
+                    🎉 {{ holiday.name }} - {{ holiday.type === 'feriado' ? 'Feriado' : 'Ponto Facultativo' }}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <form @submit.prevent="submit" class="space-y-6">
@@ -150,12 +165,19 @@ function submit() {
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                   {{ t('tasks.form.assignee') }}
                 </label>
-                <input
+                <select
                   v-model="form.assigned_to"
-                  type="number"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  :placeholder="t('tasks.form.assignee_none')"
-                />
+                >
+                  <option value="">{{ t('tasks.form.assignee_none') }}</option>
+                  <option 
+                    v-for="user in users" 
+                    :key="user.id" 
+                    :value="user.id"
+                  >
+                    {{ user.name }} ({{ user.email }})
+                  </option>
+                </select>
                 <div v-if="form.errors.assigned_to" class="text-red-500 text-sm mt-1">{{ form.errors.assigned_to }}</div>
               </div>
 

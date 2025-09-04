@@ -47,7 +47,9 @@ const newCategory = ref('')
 // 🔔 Feriados
 const stateUF = ref(props.userState || 'SP')
 const holidayInfo = ref(null) // { name, date } | null
+const startDateHoliday = ref(null) // { name, date } | null
 const checkingHoliday = ref(false)
+const checkingStartHoliday = ref(false)
 
 async function checkHoliday() {
   holidayInfo.value = null
@@ -68,6 +70,11 @@ async function checkHoliday() {
     }
     const data = await res.json()
     holidayInfo.value = data.is_holiday ? data.holiday : null
+    
+    // Mostrar snackbar se for feriado
+    if (data.is_holiday && data.holiday && window.$holidayToast) {
+      window.$holidayToast.show(data.holiday, 8000)
+    }
   } catch (e) {
     console.warn('holiday check error:', e)
   } finally {
@@ -75,8 +82,41 @@ async function checkHoliday() {
   }
 }
 
+async function checkStartDateHoliday() {
+  startDateHoliday.value = null
+  if (!form.start_date || !stateUF.value) return
+
+  try {
+    checkingStartHoliday.value = true
+    const params = new URLSearchParams({
+      date: form.start_date,
+      state: stateUF.value
+    })
+    const res = await fetch(`/api/holidays/check?${params.toString()}`, {
+      headers: { 'Accept': 'application/json' }
+    })
+    if (!res.ok) {
+      console.warn('start date holiday check failed', res.status)
+      return
+    }
+    const data = await res.json()
+    startDateHoliday.value = data.is_holiday ? data.holiday : null
+    
+    // Mostrar snackbar se for feriado
+    if (data.is_holiday && data.holiday && window.$holidayToast) {
+      window.$holidayToast.show(data.holiday, 8000)
+    }
+  } catch (e) {
+    console.warn('start date holiday check error:', e)
+  } finally {
+    checkingStartHoliday.value = false
+  }
+}
+
 watch(() => form.due_date, checkHoliday)
+watch(() => form.start_date, checkStartDateHoliday)
 watch(stateUF, checkHoliday)
+watch(stateUF, checkStartDateHoliday)
 
 // helpers de opções traduzidas
 const statusOptions = [
@@ -203,6 +243,26 @@ function clearForm() {
                     type="date" 
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
                   />
+                  
+                  <!-- Alerta de Feriado para Data de Início -->
+                  <div
+                    v-if="startDateHoliday"
+                    class="mt-1 p-2 rounded-md border-l-2 border-amber-300 bg-amber-25"
+                  >
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0">
+                        <svg class="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                      <div class="ml-2">
+                        <span class="text-xs font-medium text-amber-700">
+                          📅 {{ startDateHoliday.name }} - {{ startDateHoliday.type === 'feriado' ? 'Feriado' : 'Ponto Facultativo' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div v-if="form.errors.start_date" class="text-red-500 text-sm mt-1">{{ form.errors.start_date }}</div>
                 </div>
 
@@ -215,6 +275,26 @@ function clearForm() {
                     type="date" 
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
                   />
+                  
+                  <!-- Alerta de Feriado Sutil -->
+                  <div
+                    v-if="holidayInfo"
+                    class="mt-1 p-2 rounded-md border-l-2 border-rose-300 bg-rose-25"
+                  >
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0">
+                        <svg class="h-3 w-3 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                      <div class="ml-2">
+                        <span class="text-xs font-medium text-rose-700">
+                          🎉 {{ holidayInfo.name }} - {{ holidayInfo.type === 'feriado' ? 'Feriado' : 'Ponto Facultativo' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div v-if="form.errors.due_date" class="text-red-500 text-sm mt-1">{{ form.errors.due_date }}</div>
                 </div>
               </div>

@@ -4,12 +4,13 @@ namespace App\Notifications;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Mail\TaskDelegatedMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TaskDelegatedNotification extends Notification
+class TaskDelegatedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -40,17 +41,9 @@ class TaskDelegatedNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(object $notifiable): TaskDelegatedMail
     {
-        $url = route('tasks.index');
-
-        return (new MailMessage)
-            ->subject("🔄 Tarefa Delegada: {$this->task->title}")
-            ->view('emails.tasks.delegated', [
-                'task' => $this->task,
-                'delegatedBy' => $this->delegatedBy,
-                'delegatedTo' => $this->delegatedTo
-            ]);
+        return new TaskDelegatedMail($this->task, $this->delegatedBy, $this->delegatedTo);
     }
 
     /**

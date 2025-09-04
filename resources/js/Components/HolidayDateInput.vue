@@ -174,6 +174,12 @@ const validateDate = async (date: string) => {
         const result = await checkHoliday(date, props.state);
         
         if (result.is_holiday && result.holiday) {
+            // Mostrar snackbar automaticamente
+            showHolidayToast(result.holiday, { 
+                duration: 8000, 
+                showImmediately: true 
+            });
+            
             emit('holiday-detected', result.holiday);
         }
         

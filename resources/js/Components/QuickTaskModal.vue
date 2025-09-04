@@ -71,6 +71,11 @@ async function checkHoliday() {
     if (!r.ok) throw new Error('holiday request failed')
     const data = await r.json()
     holiday.value = data.is_holiday ? data.holiday : null
+    
+    // Mostrar snackbar se for feriado
+    if (data.is_holiday && data.holiday && window.$holidayToast) {
+      window.$holidayToast.show(data.holiday, 8000)
+    }
   } catch (e) {
     console.error('holiday check error', e)
   } finally {
@@ -214,14 +219,23 @@ function getCategoryDisplayName(category) {
             class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
 
-          <!-- alerta de feriado -->
+          <!-- Alerta de Feriado Sutil -->
           <div
             v-if="holiday"
-            class="mt-2 rounded-md border border-yellow-300 bg-yellow-50 p-2 text-xs text-yellow-900"
+            class="mt-1 p-2 rounded-md border-l-2 border-rose-300 bg-rose-25"
           >
-            <strong>{{ t('holidays.alert') }}:</strong>
-            {{ t('holidays.on_date') }}
-            <span class="font-medium">{{ holiday.name }}</span>
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-3 w-3 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-2">
+                <span class="text-xs font-medium text-rose-700">
+                  🎉 {{ holiday.name }} - {{ holiday.type === 'feriado' ? 'Feriado' : 'Ponto Facultativo' }}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div v-if="form.errors.due_date" class="text-red-500 text-sm mt-1">{{ form.errors.due_date }}</div>

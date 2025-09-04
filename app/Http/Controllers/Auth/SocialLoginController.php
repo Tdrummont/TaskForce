@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User; // Certifique-se de ter um modelo User
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialLoginController extends Controller
@@ -15,7 +16,7 @@ class SocialLoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function redirectToGoogle()
+    public function redirectToGoogle(Request $request)
     {
         return Socialite::driver('google')->redirect();
     }
@@ -25,7 +26,7 @@ class SocialLoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function handleGoogleCallback()
+    public function handleGoogleCallback(Request $request)
     {
         try {
             $googleUser = Socialite::driver('google')->user();

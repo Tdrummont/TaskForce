@@ -93,13 +93,13 @@ function submit() {
       </div>
 
       <!-- Google -->
-      <Link
-        :href="routeL('login.google')"
+      <a
+        :href="routeL('google.redirect')"
         class="w-full inline-flex justify-center items-center gap-2 py-2 border rounded-md hover:bg-gray-50"
       >
         <img src="https://www.google.com/favicon.ico" alt="G" class="w-4 h-4" />
         {{ t('auth.sign_in_with_google') }}
-      </Link>
+      </a>
 
       <!-- Register link -->
       <div class="text-center mt-4 text-sm text-gray-700">

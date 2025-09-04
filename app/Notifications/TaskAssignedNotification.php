@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TaskAssignedNotification extends Notification
+class TaskAssignedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -42,7 +42,7 @@ class TaskAssignedNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = route('tasks.index');
+        $url = config('app.url') . '/pt/tasks'; // URL absoluta para evitar problemas com locale
         $dueDate = $this->task->due_date ? $this->task->due_date->format('d/m/Y H:i') : 'Não definida';
         $priorityColor = $this->getPriorityColor($this->task->priority);
         $statusColor = $this->getStatusColor($this->task->status);

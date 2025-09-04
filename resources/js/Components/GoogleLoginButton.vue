@@ -96,8 +96,8 @@ const loginWithGoogle = async () => {
         isLoading.value = true;
         showLoadingModal.value = true;
 
-        // Redirecionar para o Google
-        window.location.href = routeL('login.google');
+        // Redirecionar para o Google via rota nomeada correta
+        window.location.href = routeL('google.redirect');
 
     } catch (error) {
         console.error('Erro ao iniciar login com Google:', error);

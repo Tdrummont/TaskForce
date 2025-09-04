@@ -59,8 +59,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useLocale } from '@/Components/useLocale';
 import { router } from '@inertiajs/vue3';
 
+const { routeL } = useLocale();
 const isLoading = ref(true);
 const isSuccess = ref(false);
 const error = ref(null);
@@ -75,7 +77,7 @@ const processCallback = async () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Fazer requisição para processar callback
-        const response = await fetch('/auth/google/callback', {
+        const response = await fetch(routeL('google.callback'), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

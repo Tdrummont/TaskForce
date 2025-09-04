@@ -52,6 +52,7 @@ Route::group([
         ->name('debug.broadcasting');
 
     // Google Auth (mantidas dentro do prefixo para manter idioma ao voltar p/ a SPA)
+    Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('google.redirect');
     Route::get('/auth/google', [SocialLoginController::class, 'redirectToGoogle'])->name('login.google');
     Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('google.callback');
     Route::get('/auth/google/callback-page', fn () => Inertia::render('Auth/GoogleCallback'))

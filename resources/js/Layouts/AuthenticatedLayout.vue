@@ -6,6 +6,8 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import QuickTaskModal from '@/Components/QuickTaskModal.vue';
 
 import EmailNotificationSnackbar from '@/Components/EmailNotificationSnackbar.vue';
+import HolidayAutoDetector from '@/Components/HolidayAutoDetector.vue';
+import HolidayToastManager from '@/Components/HolidayToastManager.vue';
 import LanguageSelector from '@/Components/LanguageSelector.vue';
 import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 import { useLocale } from '@/Components/useLocale';
@@ -310,6 +312,27 @@ const getNotificationColor = (type) => {
     return colors[type] || colors.info;
 };
 
+// Função para mostrar toast de notificação
+const showToast = (message, type = 'info') => {
+    // Criar elemento de toast
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 
+        type === 'warning' ? 'bg-yellow-500' : 
+        'bg-blue-500'
+    }`;
+    toast.textContent = message;
+    
+    // Adicionar ao DOM
+    document.body.appendChild(toast);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+};
+
 // Fechar dropdowns quando clicar fora
 const handleClickOutside = (event) => {
     if (showNotifications.value || showUserMenu.value) {
@@ -330,6 +353,49 @@ onMounted(() => {
     // Carregar contagem de notificações não lidas
     console.log('🔍 Iniciando carregamento de notificações...');
     loadUnreadCount();
+    
+    // Configurar listener do Pusher para notificações em tempo real
+    if (window.Echo && $page.props.auth.user) {
+        const userId = $page.props.auth.user.id;
+        console.log('🔊 Configurando listener Pusher para usuário:', userId);
+        
+        // Escutar canal privado do usuário
+        window.Echo.private(`user.${userId}`)
+            .listen('task.assigned', (e) => {
+                console.log('📨 Notificação recebida - Tarefa atribuída:', e);
+                // Adicionar notificação à lista
+                notifications.value.unshift({
+                    id: Date.now(),
+                    type: 'task_assigned',
+                    title: 'Nova Tarefa Atribuída',
+                    message: e.message,
+                    data: e,
+                    read_at: null,
+                    created_at: e.timestamp
+                });
+                // Atualizar contagem
+                unreadCount.value++;
+                // Mostrar toast
+                showToast('Nova tarefa atribuída!', 'success');
+            })
+            .listen('task.delegated', (e) => {
+                console.log('📨 Notificação recebida - Tarefa delegada:', e);
+                // Adicionar notificação à lista
+                notifications.value.unshift({
+                    id: Date.now(),
+                    type: 'task_delegated',
+                    title: 'Tarefa Delegada',
+                    message: e.message,
+                    data: e,
+                    read_at: null,
+                    created_at: e.timestamp
+                });
+                // Atualizar contagem
+                unreadCount.value++;
+                // Mostrar toast
+                showToast('Nova tarefa delegada!', 'info');
+            });
+    }
     
     // Atualizar contagem a cada 30 segundos
     setInterval(() => {
@@ -696,10 +762,11 @@ onUnmounted(() => {
             @close="closeQuickTaskModal" 
         />
 
-
+        <!-- Gerenciador de Notificações de Feriados -->
+        <HolidayToastManager />
         
-
-        
+        <!-- Detector Automático de Feriados -->
+        <HolidayAutoDetector />
 
     </div>
 </template>

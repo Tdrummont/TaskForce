@@ -1,331 +1,217 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova Tarefa Atribuída - Iron Force Tasks</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #1f2937;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .container {
-            background-color: #ffffff;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            position: relative;
-            overflow: hidden;
-        }
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            position: relative;
-        }
-        .header h1 {
-            color: #1e40af;
-            margin: 0;
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .header .subtitle {
-            color: #6b7280;
-            font-size: 18px;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-        .greeting {
-            font-size: 20px;
-            color: #374151;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border-radius: 12px;
-            border-left: 4px solid #3b82f6;
-        }
-        .task-details {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            border-radius: 16px;
-            padding: 30px;
-            margin: 30px 0;
-            border: 1px solid #e2e8f0;
-        }
-        .task-details h3 {
-            color: #1e40af;
-            margin-top: 0;
-            font-size: 22px;
-            border-bottom: 2px solid #dbeafe;
-            padding-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-            align-items: center;
-        }
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        .detail-label {
-            font-weight: 600;
-            color: #475569;
-            font-size: 16px;
-        }
-        .detail-value {
-            color: #1f2937;
-            font-weight: 500;
-            text-align: right;
-            max-width: 60%;
-        }
-        .priority-high { 
-            color: #dc2626; 
-            font-weight: 700; 
-            background: #fef2f2;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .priority-medium { 
-            color: #d97706; 
-            font-weight: 700; 
-            background: #fffbeb;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .priority-low { 
-            color: #059669; 
-            font-weight: 700; 
-            background: #f0fdf4;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .status-pending { 
-            color: #d97706; 
-            font-weight: 700; 
-            background: #fffbeb;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .status-in_progress { 
-            color: #2563eb; 
-            font-weight: 700; 
-            background: #eff6ff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .status-completed { 
-            color: #059669; 
-            font-weight: 700; 
-            background: #f0fdf4;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        .action-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: #ffffff;
-            padding: 16px 32px;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 18px;
-            margin: 30px 0;
-            text-align: center;
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
-            transition: all 0.3s ease;
-        }
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4);
-        }
-        .next-steps {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border: 1px solid #86efac;
-            border-radius: 16px;
-            padding: 25px;
-            margin: 30px 0;
-        }
-        .next-steps h4 {
-            color: #166534;
-            margin-top: 0;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .next-steps ul {
-            color: #166534;
-            margin: 15px 0;
-            padding-left: 25px;
-        }
-        .next-steps li {
-            margin: 10px 0;
-            font-weight: 500;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 2px solid #e5e7eb;
-            color: #6b7280;
-            font-size: 14px;
-        }
-        .contact-info {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            border: 1px solid #fcd34d;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: center;
-        }
-        .contact-info p {
-            color: #92400e;
-            margin: 8px 0;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        .emoji {
-            font-size: 20px;
-            margin-right: 8px;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width"><meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Tarefa Atribuída • Iron Force Tasks</title>
+  <!--[if mso]><style>* { font-family: Arial, sans-serif !important; }</style><![endif]-->
+  <style>
+    /* Mobile-first para Gmail iOS/Android e Apple Mail */
+    @media (max-width:600px){
+      .container{ width:100% !important; }
+      .px{ padding-left:20px !important; padding-right:20px !important; }
+      .py{ padding-top:20px !important; padding-bottom:20px !important; }
+      .h1{ font-size:22px !important; line-height:1.35 !important; }
+      .lead{ font-size:15px !important; }
+      .btn{ display:block !important; width:100% !important; }
+    }
+    /* Dark mode "amigável" */
+    @media (prefers-color-scheme: dark){
+      .bg-body { background:#0b0b0c !important; }
+      .bg-card { background:#151517 !important; }
+      .text, .muted, .h1 { color:#e6e6e6 !important; }
+      .rule { border-color:#2a2a2a !important; }
+      .kv-label { color:#a8b2c1 !important; }
+    }
+    /* Neutraliza autolink do iOS */
+    a[x-apple-data-detectors], u + #body a, #MessageViewBody a {
+      color: inherit !important; text-decoration: none !important;
+      font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important;
+    }
+    .ExternalClass { width:100%; } .ExternalClass, .ExternalClass * { line-height:100%; }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎯 Nova Tarefa Atribuída</h1>
-            <div class="subtitle">Iron Force Tasks</div>
-        </div>
+<body id="body" class="bg-body" style="margin:0; padding:0; background:#f6f8fb;">
+  <!-- Preheader invisível -->
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; mso-hide:all;">
+    Uma nova tarefa foi atribuída para você. Acesse os detalhes e prossiga com os próximos passos.&nbsp;&zwnj;&nbsp;&zwnj;
+  </div>
 
-        <div class="greeting">
-            Olá <strong>{{ $assignedTo->name }}</strong>! 👋
-        </div>
+  <!-- Wrapper -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f6f8fb; border-collapse:collapse;">
+    <tr>
+      <td align="center" style="padding:28px;">
+        <!-- Card -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="container bg-card" style="width:600px; max-width:600px; background:#ffffff; border-radius:16px; overflow:hidden;">
+          <!-- Top bar discreta -->
+          <tr><td style="height:4px; background:#4338ca;"></td></tr>
 
-        <p style="font-size: 18px; color: #374151; margin-bottom: 30px;">
-            Você recebeu uma nova tarefa atribuída por <strong>{{ $assignedBy->name }}</strong>. 
-            Esta é uma oportunidade para demonstrar suas habilidades! 💪
-        </p>
+          <!-- Cabeçalho -->
+          <tr>
+            <td class="px py" style="padding:24px 28px; border-bottom:1px solid #eef1f6;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td align="left" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:#0f172a; font-size:14px; font-weight:700;">
+                    <!-- Opcional: logo -->
+                    <!-- <img src="https://SEU-LOGO.png" width="130" alt="Iron Force Tasks" style="display:block; border:0;"> -->
+                    Iron Force Tasks
+                  </td>
+                  <td align="right" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:#6b7280; font-size:12px;">
+                    {{ now()->format('d/m/Y H:i') }}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-        <div class="task-details">
-            <h3><span class="emoji">📋</span>Detalhes da Tarefa</h3>
-            
-            <div class="detail-row">
-                <span class="detail-label">Título:</span>
-                <span class="detail-value">{{ $task->title }}</span>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-label">Descrição:</span>
-                <span class="detail-value">{{ $task->description ?: 'Não fornecida' }}</span>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-label">Prioridade:</span>
-                <span class="detail-value priority-{{ $task->priority }}">
+          <!-- Título + resumo -->
+          <tr>
+            <td class="px" style="padding:28px;">
+              <h1 class="h1" style="margin:0 0 8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-weight:700; font-size:24px; line-height:1.3; color:#0f172a;">
+                Tarefa atribuída
+              </h1>
+              <p class="lead" style="margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:16px; line-height:1.6; color:#374151;">
+                Olá <strong style="color:#111827;">{{ $assignedTo->name }}</strong>, você foi designado(a) para conduzir a atividade abaixo.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Contexto (quem atribuiu / ref) -->
+          <tr>
+            <td class="px" style="padding:0 28px 6px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f9fbfd; border:1px solid #e7ecf3; border-radius:12px;">
+                <tr>
+                  <td style="padding:14px 16px;">
+                    <table role="presentation" width="100%">
+                      <tr>
+                        <td class="text" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#374151;">
+                          <strong>Atribuído por</strong> {{ $assignedBy->name }}
+                        </td>
+                        <td align="right" class="text" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#374151;">
+                          <strong>Ref.</strong> #{{ $task->id }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" style="padding-top:6px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:13px; color:#4b5563;">
+                          Finalidade: direcionar a execução com prioridade e clareza de responsabilidade.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Regra -->
+          <tr><td class="px" style="padding:18px 28px 0;"><hr class="rule" style="border:0; border-top:1px solid #eef1f6; margin:0;"></td></tr>
+
+          <!-- Detalhes (kv list) -->
+          <tr>
+            <td class="px" style="padding:18px 28px 0;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td class="kv-label" style="padding:8px 0; width:36%; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#6b7280;">Título</td>
+                  <td align="right" class="text" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:15px; color:#111827;">{{ $task->title }}</td>
+                </tr>
+                <tr>
+                  <td class="kv-label" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#6b7280;">Descrição</td>
+                  <td align="right" class="text" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:15px; color:#111827;">{{ $task->description ?: '—' }}</td>
+                </tr>
+                <tr>
+                  <td class="kv-label" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#6b7280;">Prioridade</td>
+                  <td align="right" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px;">
                     @switch($task->priority)
-                        @case('high')
-                            🔴 Alta
-                            @break
-                        @case('medium')
-                            🟡 Média
-                            @break
-                        @case('low')
-                            🟢 Baixa
-                            @break
-                        @default
-                            ⚪ {{ ucfirst($task->priority) }}
+                      @case('high')   <span style="display:inline-block; padding:4px 10px; border-radius:999px; background:#fbeaea; color:#b91c1c; font-weight:700;">Alta</span> @break
+                      @case('medium') <span style="display:inline-block; padding:4px 10px; border-radius:999px; background:#fff4e8; color:#b45309; font-weight:700;">Média</span> @break
+                      @case('low')    <span style="display:inline-block; padding:4px 10px; border-radius:999px; background:#eefaf5; color:#047857; font-weight:700;">Baixa</span> @break
+                      @default        <span style="color:#6b7280;">{{ ucfirst($task->priority) }}</span>
                     @endswitch
-                </span>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-label">Status:</span>
-                <span class="detail-value status-{{ $task->status }}">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="kv-label" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#6b7280;">Status</td>
+                  <td align="right" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px;">
                     @switch($task->status)
-                        @case('pending')
-                            🟡 Pendente
-                            @break
-                        @case('in_progress')
-                            🔵 Em Progresso
-                            @break
-                        @case('completed')
-                            🟢 Concluída
-                            @break
-                        @default
-                            ⚪ {{ ucfirst($task->status) }}
+                      @case('pending')     <span style="display:inline-block; padding:4px 10px; border-radius:6px; background:#f3f6fa; color:#4b5563; font-weight:700;">Pendente</span> @break
+                      @case('in_progress') <span style="display:inline-block; padding:4px 10px; border-radius:6px; background:#eef3ff; color:#1d4ed8; font-weight:700;">Em progresso</span> @break
+                      @case('completed')   <span style="display:inline-block; padding:4px 10px; border-radius:6px; background:#eefaf5; color:#047857; font-weight:700;">Concluída</span> @break
+                      @default             <span style="color:#6b7280;">{{ ucfirst($task->status) }}</span>
                     @endswitch
-                </span>
-            </div>
-            
-            @if($task->due_date)
-            <div class="detail-row">
-                <span class="detail-label">Data de Vencimento:</span>
-                <span class="detail-value">⏰ {{ \Carbon\Carbon::parse($task->due_date)->format('d/m/Y H:i') }}</span>
-            </div>
-            @endif
-            
-            @if($task->tags)
-            <div class="detail-row">
-                <span class="detail-label">Tags:</span>
-                <span class="detail-value">🏷️ {{ $task->tags }}</span>
-            </div>
-            @endif
-        </div>
+                  </td>
+                </tr>
+                @if($task->category)
+                <tr>
+                  <td class="kv-label" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#6b7280;">Categoria</td>
+                  <td align="right" class="text" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:15px; color:#111827;">{{ $task->category }}</td>
+                </tr>
+                @endif
+                @if($task->due_date)
+                <tr>
+                  <td class="kv-label" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#6b7280;">Vencimento</td>
+                  <td align="right" class="text" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:15px; color:#111827;">{{ $task->due_date->format('d/m/Y H:i') }}</td>
+                </tr>
+                @endif
+                @if($task->estimated_hours)
+                <tr>
+                  <td class="kv-label" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; color:#6b7280;">Estimativa</td>
+                  <td align="right" class="text" style="padding:8px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:15px; color:#111827;">{{ $task->estimated_hours }}h</td>
+                </tr>
+                @endif
+              </table>
+            </td>
+          </tr>
 
-        <div class="next-steps">
-            <h4><span class="emoji">🚀</span>Próximos Passos</h4>
-            <ul>
-                <li><strong>Revisar</strong> os detalhes da tarefa cuidadosamente</li>
-                <li><strong>Atualizar</strong> o status conforme necessário</li>
-                <li><strong>Adicionar</strong> comentários ou anexos se precisar</li>
-                <li><strong>Comunicar</strong> progresso para a equipe</li>
-            </ul>
-        </div>
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding:28px;">
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="10%" fillcolor="#4338ca" strokecolor="#4338ca" strokeweight="1px" style="height:48px;v-text-anchor:middle;width:280px;">
+                <v:textbox inset="0,0,0,0">
+                  <center style="color:#ffffff; font-family:Arial, sans-serif; font-size:16px; font-weight:700;">
+                    Abrir tarefa
+                  </center>
+                </v:textbox>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-- -->
+              <a href="{{ config('app.url') }}/pt/tasks"
+                 class="btn"
+                 aria-label="Abrir tarefa no sistema"
+                 style="background:#4338ca; border-radius:10px; color:#ffffff; display:inline-block; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:16px; font-weight:700; line-height:48px; text-align:center; text-decoration:none; width:280px; -webkit-text-size-adjust:none;">
+                 Abrir tarefa
+              </a>
+              <!--<![endif]-->
+              <p class="muted" style="margin:10px 0 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:12px; color:#6b7280;">
+                Se o botão não funcionar, acesse: {{ config('app.url') }}/pt/tasks
+              </p>
+            </td>
+          </tr>
 
-        <div style="text-align: center;">
-            <a href="{{ $taskUrl }}" class="action-button">
-                📋 Ver Tarefa Completa
-            </a>
-        </div>
+          <!-- Rodapé -->
+          <tr>
+            <td class="px py" style="padding:16px 28px 28px; border-top:1px solid #eef1f6;">
+              <table role="presentation" width="100%">
+                <tr>
+                  <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:12px; color:#6b7280;">
+                    Atenciosamente,<br>
+                    <span style="color:#4338ca; font-weight:700;">Equipe Iron Force Tasks</span>
+                  </td>
+                  <td align="right" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:12px; color:#9ca3af;">
+                    <a href="{{ config('app.url') }}/pt/suporte" style="color:#6b7280; text-decoration:none;">Suporte</a>
+                  </td>
+                </tr>
+              </table>
+              <p class="muted" style="margin:10px 0 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:11px; color:#9ca3af;">
+                Este é um e-mail automático. Não responda a esta mensagem.
+              </p>
+            </td>
+          </tr>
 
-        <div class="contact-info">
-            <p>💡 <strong>Precisa de ajuda?</strong></p>
-            <p>Entre em contato com {{ $assignedBy->name }} ou responda a este email</p>
-        </div>
-
-        <div class="footer">
-            <p><strong>Atenciosamente,</strong></p>
-            <p style="font-size: 18px; color: #1e40af; font-weight: 600;">Equipe Iron Force Tasks</p>
-            <p>Este é um email automático, não responda diretamente.</p>
-        </div>
-    </div>
+        </table>
+        <!-- /Card -->
+      </td>
+    </tr>
+  </table>
 </body>
-</html> 
+</html>

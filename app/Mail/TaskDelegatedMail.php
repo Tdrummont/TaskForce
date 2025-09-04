@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,22 +11,22 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TaskAssignedMail extends Mailable
+class TaskDelegatedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     public $task;
-    public $assignedBy;
-    public $assignedTo;
+    public $delegatedBy;
+    public $delegatedTo;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($task, User $assignedBy, User $assignedTo)
+    public function __construct(Task $task, User $delegatedBy, User $delegatedTo)
     {
         $this->task = $task;
-        $this->assignedBy = $assignedBy;
-        $this->assignedTo = $assignedTo;
+        $this->delegatedBy = $delegatedBy;
+        $this->delegatedTo = $delegatedTo;
     }
 
     /**
@@ -34,7 +35,7 @@ class TaskAssignedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Nova Tarefa Atribuída: {$this->task->title}",
+            subject: "🔄 Tarefa Delegada: {$this->task->title}",
         );
     }
 
@@ -44,12 +45,11 @@ class TaskAssignedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.tasks.assigned',
+            view: 'emails.tasks.delegated',
             with: [
                 'task' => $this->task,
-                'assignedBy' => $this->assignedBy,
-                'assignedTo' => $this->assignedTo,
-                'taskUrl' => config('app.url') . '/pt/tasks', // URL absoluta
+                'delegatedBy' => $this->delegatedBy,
+                'delegatedTo' => $this->delegatedTo,
             ],
         );
     }
