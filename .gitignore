@@ -73,6 +73,8 @@ yarn.lock
 .env.local
 .env.staging
 .env.testing
+.env.backup*
+.env.*.backup
 
 # Database
 *.sqlite
