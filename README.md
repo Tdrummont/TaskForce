@@ -54,7 +54,7 @@ https://drive.google.com/drive/u/1/folders/1eJM90U87wXfCHhIf92VttS_jwhiRuvV0
 
 ### **Backend**
 - **Laravel 10** - Framework PHP robusto e elegante
-- **MySQL/PostgreSQL** - Banco de dados relacional
+- **SQLite/PostgreSQL** - Banco de dados relacional
 - **Redis** - Cache e sessões
 - **Pusher** - WebSockets para notificações em tempo real
 - **Laravel Sanctum** - Autenticação API
