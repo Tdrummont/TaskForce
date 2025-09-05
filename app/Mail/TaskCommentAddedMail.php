@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -11,22 +12,24 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TaskDelegatedMail extends Mailable implements ShouldQueue
+class TaskCommentAddedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     public $task;
-    public $delegatedBy;
-    public $delegatedTo;
+    public $user;
+    public $comment;
+    public $taskUrl;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Task $task, User $delegatedBy, User $delegatedTo)
+    public function __construct(Task $task, User $user, Comment $comment)
     {
         $this->task = $task;
-        $this->delegatedBy = $delegatedBy;
-        $this->delegatedTo = $delegatedTo;
+        $this->user = $user;
+        $this->comment = $comment;
+        $this->taskUrl = config('app.url') . "/pt/tasks/{$task->id}";
     }
 
     /**
@@ -35,8 +38,7 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "🔄 Tarefa Delegada: {$this->task->title}",
-            to: $this->delegatedTo->email,
+            subject: "💬 Novo Comentário: {$this->task->title}",
         );
     }
 
@@ -46,11 +48,12 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.tasks.delegated',
+            view: 'emails.tasks.comment-added',
             with: [
                 'task' => $this->task,
-                'delegatedBy' => $this->delegatedBy,
-                'delegatedTo' => $this->delegatedTo,
+                'user' => $this->user,
+                'comment' => $this->comment,
+                'taskUrl' => $this->taskUrl,
             ],
         );
     }

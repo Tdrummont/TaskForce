@@ -19,7 +19,7 @@ class SocialLoginController extends Controller
      */
     public function redirectToGoogle(Request $request)
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        return Socialite::driver('google')->redirect();
     }
 
     /**
@@ -42,7 +42,7 @@ class SocialLoginController extends Controller
                 return redirect('/pt/login')->withErrors(['google_error' => 'Autorização negada pelo Google.']);
             }
 
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            $googleUser = Socialite::driver('google')->user();
             Log::info('Usuário Google obtido', ['user' => $googleUser->email]);
 
             // Verifica se o usuário já existe no nosso banco de dados
@@ -71,20 +71,8 @@ class SocialLoginController extends Controller
             Auth::login($user);
             Log::info('Usuário logado com sucesso', ['user_id' => $user->id]);
 
-            // Retorna uma resposta HTML simples que redireciona para o dashboard
-            return response('<!DOCTYPE html>
-<html>
-<head>
-    <title>Redirecionando...</title>
-    <meta charset="utf-8">
-    <script>
-        window.location.href = "/pt/dashboard";
-    </script>
-</head>
-<body>
-    <p>Redirecionando para o dashboard...</p>
-</body>
-</html>');
+            // Redireciona para o dashboard usando a rota localizada
+            return redirect('/pt/dashboard');
 
         } catch (\Exception $e) {
             Log::error('Erro no callback do Google', [
@@ -92,19 +80,7 @@ class SocialLoginController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
-            return response('<!DOCTYPE html>
-<html>
-<head>
-    <title>Erro de Login</title>
-    <meta charset="utf-8">
-    <script>
-        window.location.href = "/pt/login?error=google_auth";
-    </script>
-</head>
-<body>
-    <p>Erro na autenticação. Redirecionando...</p>
-</body>
-</html>');
+            return redirect('/pt/login')->withErrors(['google_error' => 'Erro na autenticação com Google.']);
         }
     }
 }

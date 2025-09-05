@@ -20,8 +20,7 @@ Route::get('/', function (Request $request) {
     return redirect("/{$pref}");
 });
 // Redireciona acessos sem locale para auth no default
-Route::get('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
+Route::redirect('/login', '/pt/login');
 Route::redirect('/register', '/pt/register');
 Route::redirect('/dashboard', '/pt/dashboard');
 Route::redirect('/tasks', '/pt/tasks');
@@ -112,42 +111,29 @@ Route::group([
         Route::delete('/api/notifications/clear-all', [App\Http\Controllers\NotificationController::class, 'apiClearAll'])->name('api.notifications.clearAll');
     });
 
-    // Auth scaffolding (incluído no grupo de idioma)
-    Route::middleware('guest')->group(function () {
-        Route::get('register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'create'])
-                    ->name('register');
-        Route::post('register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store']);
-        Route::get('forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])
-                    ->name('password.request');
-        Route::post('forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store'])
-                    ->name('password.email');
-        Route::get('reset-password/{token}', [App\Http\Controllers\Auth\NewPasswordController::class, 'create'])
-                    ->name('password.reset');
-        Route::post('reset-password', [App\Http\Controllers\Auth\NewPasswordController::class, 'store'])
-                    ->name('password.store');
-    });
+    // Rota SPA (fallback) - captura rotas específicas que não existem
+    // IMPORTANTE: Deve ser a ÚLTIMA rota para não interferir com as rotas da API
+    Route::get('/{any}', function () {
+        return Inertia::render('Welcome', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'laravelVersion' => Application::VERSION,
+            'phpVersion' => PHP_VERSION,
+        ]);
+    })->where('any', '^(?!login|register|dashboard|tasks|reports|profile|forgot-password|reset-password|verify-email|confirm-password|debug-broadcasting|api).*$')->name('spa.fallback');
 
-    Route::middleware('auth')->group(function () {
-        Route::get('verify-email', App\Http\Controllers\Auth\EmailVerificationPromptController::class)
-                    ->name('verification.notice');
-        Route::get('verify-email/{id}/{hash}', App\Http\Controllers\Auth\VerifyEmailController::class)
-                    ->middleware(['signed', 'throttle:6,1'])
-                    ->name('verification.verify');
-        Route::post('email/verification-notification', [App\Http\Controllers\Auth\EmailVerificationNotificationController::class, 'store'])
-                    ->middleware('throttle:6,1')
-                    ->name('verification.send');
-        Route::get('confirm-password', [App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'show'])
-                    ->name('password.confirm');
-        Route::post('confirm-password', [App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
-        Route::put('password', [App\Http\Controllers\Auth\PasswordController::class, 'update'])
-                    ->name('password.update');
-        Route::post('logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
-                    ->name('logout');
-    });
 });
 
-// Rota SPA (fallback) - captura todas as rotas do frontend
-// IMPORTANTE: Deve ser a ÚLTIMA rota para não interferir com as rotas da API
-Route::get('/{any?}', function () {
-    return view('app');
-})->where('any', '.*')->name('spa.fallback');
+// Rotas de teste (antes da rota SPA)
+Route::get('/test', function () {
+    return 'Test route working';
+});
+
+Route::get('/test-callback', function (Request $request) {
+    return response('Callback test working - Error: ' . $request->get('error', 'none'));
+});
+
+// Rota de teste para Google Auth sem Socialite
+Route::get('/test-google', function () {
+    return response('Google Auth test working');
+});

@@ -344,7 +344,9 @@ const showToast = (message, type = 'info') => {
     
     // Remover após 3 segundos
     setTimeout(() => {
-        toast.remove();
+        if (toast.parentElement) {
+            toast.remove();
+        }
     }, 3000);
 };
 
@@ -482,17 +484,17 @@ onUnmounted(() => {
                         <div class="hidden md:flex items-center space-x-2">
                             <Link :href="routeL('dashboard')" 
                                   class="text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
-                                  :class="route().current('dashboard') ? 'bg-white bg-opacity-20' : ''">
+                                  :class="$page.url.startsWith('/dashboard') ? 'bg-white bg-opacity-20' : ''">
                                 Dashboard
                             </Link>
                             <Link :href="routeL('tasks.index')" 
                                   class="text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
-                                  :class="route().current('tasks.*') ? 'bg-white bg-opacity-20' : ''">
+                                  :class="$page.url.startsWith('/tasks') ? 'bg-white bg-opacity-20' : ''">
                                 {{ t('navbar.tasks') }}
                             </Link>
                             <Link :href="routeL('reports.index')" 
                                   class="text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
-                                  :class="route().current('reports.*') ? 'bg-white bg-opacity-20' : ''">
+                                  :class="$page.url.startsWith('/reports') ? 'bg-white bg-opacity-20' : ''">
                                 {{ t('navbar.reports') }}
                             </Link>
                         </div>
@@ -633,30 +635,6 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <!-- Info Bar -->
-            <div class="px-6 py-2 bg-gray-50 border-t border-gray-200">
-                <div class="flex items-center justify-between text-xs text-gray-600">
-                    <div class="flex items-center space-x-4">
-                        <span class="flex items-center space-x-1">
-                            <svg class="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span>Sistema online</span>
-                        </span>
-                        <span class="flex items-center space-x-1">
-                            <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span>{{ new Date().toLocaleString('pt-BR') }}</span>
-                        </span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                            Ativo
-                        </span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Mobile Navigation Menu -->
@@ -665,34 +643,28 @@ onUnmounted(() => {
             <div class="px-4 py-2 space-y-1">
                 <Link :href="routeL('dashboard')" 
                       class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                      :class="route().current('dashboard') ? 'bg-gray-100 text-gray-900' : ''">
+                      :class="$page.url.startsWith('/dashboard') ? 'bg-gray-100 text-gray-900' : ''">
                     Dashboard
                 </Link>
                 <Link :href="routeL('tasks.index')" 
                       class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                      :class="route().current('tasks.*') ? 'bg-gray-100 text-gray-900' : ''">
+                      :class="$page.url.startsWith('/tasks') ? 'bg-gray-100 text-gray-900' : ''">
                     Tarefas
                 </Link>
                 <Link :href="routeL('reports.index')" 
                       class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                      :class="route().current('reports.*') ? 'bg-gray-100 text-gray-900' : ''">
+                      :class="$page.url.startsWith('/reports') ? 'bg-gray-100 text-gray-900' : ''">
                     Relatórios
                 </Link>
                 <Link :href="routeL('profile.edit')" 
                       class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                      :class="route().current('profile.*') ? 'bg-gray-100 text-gray-900' : ''">
+                      :class="$page.url.startsWith('/profile') ? 'bg-gray-100 text-gray-900' : ''">
                     Perfil
                 </Link>
             </div>
         </div>
 
         <!-- Page Content -->
-        <!-- Page Header (renderiza slot nomeado 'header' quando fornecido) -->
-        <header v-if="$slots.header" class="bg-white shadow">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <slot name="header" />
-            </div>
-        </header>
 
         <main>
             <slot />

@@ -11,22 +11,22 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TaskDelegatedMail extends Mailable implements ShouldQueue
+class TaskCreatedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     public $task;
-    public $delegatedBy;
-    public $delegatedTo;
+    public $creator;
+    public $user;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Task $task, User $delegatedBy, User $delegatedTo)
+    public function __construct(Task $task, User $creator, User $user)
     {
         $this->task = $task;
-        $this->delegatedBy = $delegatedBy;
-        $this->delegatedTo = $delegatedTo;
+        $this->creator = $creator;
+        $this->user = $user;
     }
 
     /**
@@ -35,8 +35,8 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "🔄 Tarefa Delegada: {$this->task->title}",
-            to: $this->delegatedTo->email,
+            to: $this->user->email,
+            subject: "🎯 Nova Tarefa Criada: {$this->task->title}",
         );
     }
 
@@ -46,11 +46,11 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.tasks.delegated',
+            view: 'emails.tasks.created',
             with: [
                 'task' => $this->task,
-                'delegatedBy' => $this->delegatedBy,
-                'delegatedTo' => $this->delegatedTo,
+                'creator' => $this->creator,
+                'user' => $this->user,
             ],
         );
     }

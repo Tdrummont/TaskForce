@@ -11,22 +11,24 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TaskDelegatedMail extends Mailable implements ShouldQueue
+class TaskEditedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     public $task;
-    public $delegatedBy;
-    public $delegatedTo;
+    public $editedBy;
+    public $recipient;
+    public $changes;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Task $task, User $delegatedBy, User $delegatedTo)
+    public function __construct(Task $task, User $editedBy, User $recipient, array $changes = [])
     {
         $this->task = $task;
-        $this->delegatedBy = $delegatedBy;
-        $this->delegatedTo = $delegatedTo;
+        $this->editedBy = $editedBy;
+        $this->recipient = $recipient;
+        $this->changes = $changes;
     }
 
     /**
@@ -35,8 +37,7 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "🔄 Tarefa Delegada: {$this->task->title}",
-            to: $this->delegatedTo->email,
+            subject: "Tarefa '{$this->task->title}' foi editada",
         );
     }
 
@@ -46,11 +47,12 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.tasks.delegated',
+            view: 'emails.tasks.edited',
             with: [
                 'task' => $this->task,
-                'delegatedBy' => $this->delegatedBy,
-                'delegatedTo' => $this->delegatedTo,
+                'editedBy' => $this->editedBy,
+                'recipient' => $this->recipient,
+                'changes' => $this->changes,
             ],
         );
     }

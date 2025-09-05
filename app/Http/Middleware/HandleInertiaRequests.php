@@ -22,7 +22,13 @@ class HandleInertiaRequests extends Middleware
     public function handle(Request $request, \Closure $next)
     {
         // Exclui o callback do Google do middleware do Inertia
-        if ($request->is('auth/google/callback')) {
+        if ($request->is('auth/google/callback') || $request->is('*/auth/google/callback')) {
+            return $next($request);
+        }
+
+        // Verifica se a rota tem locale definido
+        $locale = $request->route('locale');
+        if ($locale && !in_array($locale, ['pt', 'en'], true)) {
             return $next($request);
         }
 

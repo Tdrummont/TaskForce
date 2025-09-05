@@ -11,22 +11,26 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TaskDelegatedMail extends Mailable implements ShouldQueue
+class TaskStatusUpdatedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     public $task;
-    public $delegatedBy;
-    public $delegatedTo;
+    public $user;
+    public $oldStatus;
+    public $newStatus;
+    public $taskUrl;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Task $task, User $delegatedBy, User $delegatedTo)
+    public function __construct(Task $task, User $user, string $oldStatus, string $newStatus)
     {
         $this->task = $task;
-        $this->delegatedBy = $delegatedBy;
-        $this->delegatedTo = $delegatedTo;
+        $this->user = $user;
+        $this->oldStatus = $oldStatus;
+        $this->newStatus = $newStatus;
+        $this->taskUrl = config('app.url') . "/pt/tasks/{$task->id}";
     }
 
     /**
@@ -35,8 +39,7 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "🔄 Tarefa Delegada: {$this->task->title}",
-            to: $this->delegatedTo->email,
+            subject: "🔄 Status Atualizado: {$this->task->title}",
         );
     }
 
@@ -46,11 +49,13 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.tasks.delegated',
+            view: 'emails.tasks.status-updated',
             with: [
                 'task' => $this->task,
-                'delegatedBy' => $this->delegatedBy,
-                'delegatedTo' => $this->delegatedTo,
+                'user' => $this->user,
+                'oldStatus' => $this->oldStatus,
+                'newStatus' => $this->newStatus,
+                'taskUrl' => $this->taskUrl,
             ],
         );
     }

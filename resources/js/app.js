@@ -1,4 +1,5 @@
 import './bootstrap'
+import './trusted-types'
 import '../css/app.css'
 
 import { createApp, h } from 'vue'
@@ -22,7 +23,7 @@ createInertiaApp({
     // if (i18n?.global?.locale) {
     //   i18n.global.locale.value = initialLocale
     // }
-    document.documentElement.lang = initialLocale
+    document.documentElement.setAttribute('lang', initialLocale)
 
     const app = createApp({ render: () => h(App, props) })
       .use(plugin)
