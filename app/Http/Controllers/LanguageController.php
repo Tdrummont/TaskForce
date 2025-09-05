@@ -13,7 +13,7 @@ class LanguageController extends Controller
     /**
      * Lista de idiomas suportados
      */
-    protected $supportedLocales = ['en', 'pt'];
+    protected $supportedLocales = ['en', 'pt', 'es'];
 
     /**
      * Alterar idioma da aplicação

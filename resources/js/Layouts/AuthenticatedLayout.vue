@@ -5,6 +5,7 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import QuickTaskModal from '@/Components/QuickTaskModal.vue';
 import HolidaySnackbar from '@/Components/HolidaySnackbar.vue';
+import LanguageSelector from '@/Components/LanguageSelector.vue';
 
 import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 import { useLocale } from '@/Components/useLocale';
@@ -498,6 +499,9 @@ onUnmounted(() => {
 
                         <!-- Action Buttons -->
                         <div class="flex items-center space-x-2">
+                            <!-- Language Selector -->
+                            <LanguageSelector />
+
                             <!-- Create Task Button -->
                             <button 
                                 @click="router.get(routeL('tasks.create'))"

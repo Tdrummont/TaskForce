@@ -1,6 +1,7 @@
 import { usePage } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
 
-type Locale = 'pt' | 'en'
+type Locale = 'pt' | 'en' | 'es'
 
 const messages: Record<Locale, Record<string, string>> = {
   en: {
@@ -567,6 +568,288 @@ const messages: Record<Locale, Record<string, string>> = {
     'holidays.alert': 'Alerta de Feriado',
     'holidays.on_date': 'A data selecionada é feriado:',
   },
+  es: {
+    // Welcome
+    'app.title': 'Sistema de Tareas',
+    'app.subtitle': 'Organiza tus tareas de forma simple y práctica.',
+    'auth.login': 'Iniciar Sesión',
+    'auth.register': 'Registrarse',
+
+    // Auth (login page)
+    'auth.title': 'Sistema de Tareas',
+    'auth.email': 'Correo',
+    'auth.password': 'Contraseña',
+    'auth.remember': 'Recordarme',
+    'auth.forgot': '¿Olvidaste tu contraseña?',
+    'auth.sign_in': 'Iniciar Sesión',
+    'auth.or': 'o',
+    'auth.sign_in_with_google': 'Iniciar sesión con Google',
+    'auth.no_account': '¿No tienes cuenta?',
+    'auth.register_here': 'Regístrate',
+    'auth.signing_in': 'Iniciando sesión...',
+    'auth.authenticating': 'Autenticando con Google',
+    'auth.please_wait': 'Por favor espera mientras procesamos tu inicio de sesión...',
+
+    // Common
+    'common.refresh': 'Actualizar',
+    'common.days': 'días',
+
+    // Dashboard
+    'dashboard.title': 'Panel - Métricas y KPIs',
+    'dashboard.week_productivity': 'Productividad Semanal',
+    'dashboard.productivity_streak': 'Racha de Productividad',
+    'dashboard.overdue_tasks': 'Tareas Vencidas',
+    'dashboard.avg_time': 'Tiempo Promedio',
+    'dashboard.daily_goal': 'Meta Diaria vs Logrado',
+    'dashboard.weekly_goal': 'Meta Semanal vs Logrado',
+    'dashboard.progress': 'Progreso',
+    'dashboard.of_daily_goal': '% de la meta diaria',
+    'dashboard.of_weekly_goal': '% de la meta semanal',
+    'dashboard.last_7_days': 'Productividad de los Últimos 7 Días',
+    'dashboard.overdue_highlight': 'Tareas Vencidas',
+    'dashboard.mark_completed': 'Marcar como Completada',
+    'dashboard.status_breakdown': 'Estado de las Tareas',
+    'dashboard.by_priority': 'Por Prioridad',
+    'dashboard.top_categories': 'Categorías Más Productivas',
+    'dashboard.recent_tasks': 'Tareas Recientes',
+    'dashboard.no_recent_tasks': 'No hay tareas recientes.',
+    'dashboard.upcoming_tasks': 'Próximas Tareas',
+    'dashboard.no_upcoming_tasks': 'No hay tareas próximas.',
+    'dashboard.due_on': 'Vence el',
+    'dashboard.days_overdue_suffix': 'días de retraso',
+
+    // Reports
+    'reports.title': 'Reportes y Estadísticas',
+    'reports.header': 'Reportes',
+    'reports.subtitle': 'Análisis de datos y estadísticas',
+    'reports.realtime': 'Datos actualizados en tiempo real',
+    'reports.last_update': 'Última actualización',
+    'reports.tasks': 'tareas',
+    'reports.productivity': 'productividad',
+    'reports.overview': 'Estadísticas Generales',
+    'reports.total_tasks': 'Total de Tareas',
+    'reports.completed': 'Completadas',
+    'reports.productivity_rate': 'Tasa de Productividad',
+    'reports.avg_time': 'Tiempo Promedio',
+    'reports.productivity_30d': 'Productividad (Últimos 30 días)',
+    'reports.by_status': 'Tareas por Estado',
+    'reports.completion_time': 'Tiempo de Finalización',
+    'reports.avg': 'Promedio',
+    'reports.median': 'Mediana',
+    'reports.fastest': 'Más Rápida',
+    'reports.slowest': 'Más Lenta',
+    'reports.weekly': 'Reporte Semanal',
+    'reports.monthly': 'Reporte Mensual',
+    'reports.period': 'Período',
+    'reports.completion_rate': 'Tasa de Finalización',
+    'reports.daily_activity': 'Actividad Diaria',
+    'reports.created': 'Creadas',
+    'reports.tasks_count': 'Cantidad de Tareas',
+    'reports.growth': 'Crecimiento',
+    'reports.avg_per_day': 'Promedio por Día',
+    'reports.activity_history': 'Historial de Actividades',
+    'reports.no_activity': 'No hay actividad registrada.',
+
+    // Status
+    'status.pending': 'Pendiente',
+    'status.in_progress': 'En Progreso',
+    'status.completed': 'Completada',
+
+    // Priority
+    'priority.low': 'Baja',
+    'priority.medium': 'Media',
+    'priority.high': 'Alta',
+
+    // Tasks (Index.vue)
+    'tasks.my_tasks': 'Mis Tareas',
+    'tasks.create.page_title': 'Nueva Tarea',
+    'tasks.create.header': 'Crear Nueva Tarea',
+    'tasks.edit.page_title': 'Editar Tarea',
+    'tasks.form.title': 'Título',
+    'tasks.form.required': '*',
+    'tasks.form.title_ph': 'Ingresa el título de la tarea',
+    'tasks.form.description': 'Descripción',
+    'tasks.form.description_ph': 'Describe la tarea...',
+    'tasks.form.start_date': 'Fecha de Inicio',
+    'tasks.form.end_date': 'Fecha de Vencimiento',
+    'tasks.form.status': 'Estado',
+    'tasks.form.priority': 'Prioridad',
+    'tasks.form.category': 'Categoría',
+    'tasks.form.category_ph': 'Selecciona una categoría',
+    'tasks.form.estimated_hours': 'Horas Estimadas',
+    'tasks.form.estimated_hours_ph': 'Ej: 8',
+    'tasks.form.parent_task': 'Tarea Padre',
+    'tasks.form.parent_task_none': 'Ninguna (tarea principal)',
+    'tasks.form.assignee': 'Asignar a',
+    'tasks.form.assignee_none': 'Nadie',
+    'tasks.form.actions.clear': 'Limpiar',
+    'tasks.form.actions.cancel': 'Cancelar',
+    'tasks.form.actions.create': 'Crear Tarea',
+    'tasks.form.actions.update': 'Actualizar',
+    'tasks.backup': 'Respaldo',
+    // Navbar & header
+    'navbar.subtitle': 'Gestión de Tareas',
+    'navbar.tasks': 'Tareas',
+    'navbar.reports': 'Reportes',
+    'navbar.new_task': 'Nueva Tarea',
+    'navbar.search_ph': 'Buscar tareas...',
+    'navbar.profile': 'Perfil',
+    'navbar.logout': 'Cerrar Sesión',
+    // Notifications
+    'notifications.title': 'Notificaciones',
+    'notifications.mark_all': 'Marcar todas como leídas',
+    'notifications.view_all': 'Ver todas las notificaciones',
+    'notifications.login_detected': 'Inicio de sesión detectado para',
+    'notifications.task_delegated': "La tarea '{task}' fue delegada a ti por {user}",
+    'notifications.none': 'No hay notificaciones',
+    'tasks.restore': 'Restaurar',
+    'tasks.delete_all': 'Eliminar Todas',
+
+    'tasks.search_placeholder': 'Buscar tareas por título, descripción o etiquetas...',
+    'filters.all_status': 'Todos los Estados',
+    'filters.all_priorities': 'Todas las Prioridades',
+    'filters.all_categories': 'Todas las Categorías',
+    'filters.clear': 'Limpiar',
+    'filters.clear_filters': 'Limpiar filtros',
+    'categories.work': 'Trabajo',
+    'categories.personal': 'Personal',
+    'categories.study': 'Estudio',
+    'categories.health': 'Salud',
+    'categories.finance': 'Finanzas',
+    'categories.leisure': 'Ocio',
+    
+    // Task Categories
+    'categories.development': 'Desarrollo',
+    'categories.design': 'Diseño',
+    'categories.marketing': 'Marketing',
+    'categories.sales': 'Ventas',
+    'categories.support': 'Soporte',
+    'categories.administrative': 'Administrativo',
+    'categories.financial': 'Financiero',
+    'categories.human_resources': 'Recursos Humanos',
+    'categories.operations': 'Operaciones',
+    'categories.quality': 'Calidad',
+    'categories.research': 'Investigación',
+    'categories.training': 'Capacitación',
+    'categories.maintenance': 'Mantenimiento',
+    'categories.infrastructure': 'Infraestructura',
+    'categories.security': 'Seguridad',
+    
+    'tasks.found': 'tarea(s) encontrada(s)',
+    'tasks.for_query': 'para',
+    'tasks.organize': 'Organizar Tareas',
+    'tasks.drag_help': 'Arrastra las tareas entre columnas para organizarlas fácilmente',
+    'tasks.list_title': 'Lista de Tareas',
+    'tasks.none_found': 'No se encontraron tareas.',
+    'tasks.status': 'Estado',
+    'tasks.priority': 'Prioridad',
+    'tasks.due': 'Vencimiento',
+    'tasks.created_by': 'Creado por',
+    'tasks.you': 'Tú',
+    'tasks.assigned_to': 'Asignado a',
+    'tasks.edit': 'Editar',
+    'tasks.delete': 'Eliminar',
+    'tasks.restore_backup': 'Restaurar Respaldo',
+    'tasks.select_backup_file': 'Selecciona el archivo de respaldo (.json)',
+    'common.cancel': 'Cancelar',
+    'common.attention': '¡Atención!',
+    'tasks.cannot_undo': 'Esta acción no se puede deshacer',
+    'tasks.delete_all_warn1': 'Todas las tareas serán eliminadas permanentemente',
+    'tasks.delete_all_warn2': 'Esta acción no se puede deshacer',
+    'tasks.delete_all_warn3': 'Los registros de actividad se mantendrán',
+    'tasks.delete_all_warn4': 'Recomendamos hacer un respaldo primero',
+    'tasks.confirm_delete_all': '¿Estás seguro de que quieres eliminar TODAS las tareas permanentemente?',
+    'tasks.confirm_delete': '¿Estás seguro de que quieres eliminar esta tarea?',
+    'common.error_try_again': 'Error. Por favor intenta de nuevo.',
+    'tasks.restore_error': 'Error al restaurar respaldo',
+    'tasks.update_status_error': 'Error al actualizar estado de la tarea',
+
+    // Due labels
+    'due.completed': 'Completada',
+    'due.overdue': 'Vencida',
+    'due.today': 'Vence hoy',
+    'due.soon': 'Vence pronto',
+    'due.normal': 'Normal',
+    'due.tomorrow': 'Mañana',
+    'due.next_week': 'Próxima Semana',
+
+    // Quick Task
+    'quick_task.title': 'Nueva Tarea Rápida',
+    'quick.new_quick_task': 'Nueva Tarea Rápida',
+    'quick.today': 'Hoy',
+    'quick.tomorrow': 'Mañana',
+    'quick.next_week': 'Próxima Semana',
+    'quick.create_task': 'Crear Tarea',
+
+    // Form
+    'form.title': 'Título',
+    'form.description': 'Descripción',
+    'form.priority': 'Prioridad',
+    'form.category': 'Categoría',
+    'form.due_date': 'Fecha de Vencimiento',
+    
+    // Task Form
+    'task.title_label': 'Título',
+    'task.description_label': 'Descripción',
+    'task.priority_label': 'Prioridad',
+    'task.category_label': 'Categoría',
+    'task.due_date_label': 'Fecha de Vencimiento',
+    'task.title_placeholder': 'Ingresa el título de la tarea',
+    'task.description_quick_placeholder': 'Describe brevemente la tarea...',
+    'task.category_placeholder': 'Selecciona una categoría',
+
+    // Placeholders
+    'form.placeholder.title': 'Ingresa el título de la tarea',
+    'form.placeholder.description_quick': 'Describe brevemente la tarea...',
+    'form.select_category': 'Selecciona una categoría',
+
+    // Actions
+    'actions.cancel': 'Cancelar',
+    'actions.create_task': 'Crear Tarea',
+    'actions.creating': 'Creando...',
+    
+    // Common
+    'common.saving': 'Guardando...',
+
+    // Floating Action Button
+    'fab.new_task': 'Nueva Tarea',
+    'fab.quick_task': 'Tarea Rápida',
+    'fab.view_tasks': 'Ver Tareas',
+
+    // Toasts / Alerts
+    'toast.task_created': '¡Tarea creada exitosamente!',
+    'toast.task_updated': '¡Tarea actualizada exitosamente!',
+    'toast.task_deleted': '¡Tarea eliminada exitosamente!',
+    'toast.task_deleted_all': '¡Todas las tareas fueron eliminadas exitosamente!',
+    'toast.task_restored': '¡Respaldo restaurado exitosamente!',
+    'toast.error': 'Algo salió mal. Por favor intenta de nuevo.',
+
+    // Validation
+    'validation.required': 'Este campo es obligatorio.',
+    'validation.email': 'Por favor, ingresa un correo válido.',
+    'validation.min': 'El valor es muy corto.',
+    'validation.max': 'El valor es muy largo.',
+    'validation.date': 'Por favor, ingresa una fecha válida.',
+    'validation.number': 'Por favor, ingresa un número válido.',
+    'validation.confirmed': 'La confirmación no coincide.',
+    'validation.unique': 'Este valor ya ha sido utilizado.',
+    'validation.password': 'La contraseña debe contener al menos 8 caracteres, incluyendo una letra mayúscula, un número y un carácter especial.',
+    'validation.invalid_priority': 'Por favor, selecciona una prioridad válida.',
+    'validation.invalid_status': 'Por favor, selecciona un estado válido.',
+    'validation.invalid_category': 'Por favor, selecciona una categoría válida.',
+    'validation.file_too_large': 'El archivo es muy grande.',
+    'validation.invalid_file_type': 'Tipo de archivo inválido.',
+
+    // Holiday alerts
+    'holiday.alert.title': '¡Atención!',
+    'holiday.alert.body': 'La fecha de vencimiento seleccionada es feriado: {name}.',
+    'holiday.alert.generic': 'La fecha de vencimiento seleccionada es feriado.',
+    'holiday.state.label': 'Estado (UF)',
+    
+    // Holidays
+    'holidays.alert': 'Alerta de Feriado',
+    'holidays.on_date': 'La fecha seleccionada es feriado:',
+  },
 }
 
 export function useLocale() {
@@ -576,7 +859,7 @@ export function useLocale() {
   const t = (key: string): string => messages[locale][key] ?? key
 
   const formatDate = (date: string | number | Date): string => {
-    const loc = locale === 'pt' ? 'pt-BR' : 'en-US'
+    const loc = locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es-ES' : 'en-US'
     try {
       return new Intl.DateTimeFormat(loc).format(new Date(date))
     } catch {
@@ -588,5 +871,36 @@ export function useLocale() {
     return route(name, { locale, ...params }, absolute, config)
   }
 
-  return { locale, t, formatDate, routeL }
+  // Adicionar suporte para currentLocale e switchLocale
+  const currentLocale = computed(() => locale)
+  
+  const switchLocale = async (newLocale: Locale) => {
+    try {
+      const response = await fetch(`/api/language/${newLocale}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to switch language')
+      }
+      
+      return response.json()
+    } catch (error) {
+      console.error('Error switching language:', error)
+      throw error
+    }
+  }
+
+  return { 
+    locale, 
+    currentLocale, 
+    switchLocale, 
+    t, 
+    formatDate, 
+    routeL 
+  }
 }

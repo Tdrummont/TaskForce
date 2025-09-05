@@ -1,71 +1,75 @@
 # 🚀 TaskForce - Sistema de Gerenciamento de Tarefas
 
-[![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
-[![Vue.js](https://img.shields.io/badge/Vue.js-3.x-green.svg)](https://vuejs.org)
-[![Inertia.js](https://img.shields.io/badge/Inertia.js-2.x-blue.svg)](https://inertiajs.com)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC.svg)](https://tailwindcss.com)
-
-## 📋 **Descrição**
+## 📋 **Descrição do Projeto**
 
 **TaskForce** é um sistema completo de gerenciamento de tarefas desenvolvido com Laravel 10, Vue.js 3 e Inertia.js. O sistema oferece uma interface moderna e intuitiva para gerenciar projetos, com funcionalidades avançadas como drag & drop, notificações em tempo real, e integração com Google OAuth.
 
-## ✨ **Funcionalidades Principais**
+## ✨ **Funcionalidades Implementadas**
 
 ### 🎯 **Gestão de Tarefas**
-- ✅ **Kanban Board** com drag & drop
-- ✅ **Sistema de prioridades** (Baixa, Média, Alta)
-- ✅ **Categorização** e tags
-- ✅ **Prazos** com alertas automáticos
-- ✅ **Subtarefas** e dependências
-- ✅ **Anexos** e comentários
+- ✅ **CRUD Completo** - Criação, edição, visualização e exclusão de tarefas
+- ✅ **Sistema de Prioridades** - Baixa, Média e Alta
+- ✅ **Categorização** - Organização por categorias
+- ✅ **Prazos e Datas** - Sistema de vencimento com alertas
+- ✅ **Status de Tarefas** - Pending, In Progress, Completed
 
-### 🔐 **Autenticação e Segurança**
-- ✅ **Login tradicional** com email/senha
-- ✅ **Google OAuth** integrado
-- ✅ **Verificação de email**
-- ✅ **Sistema de permissões** baseado em roles
-- ✅ **Proteção CSRF** e validações
+### 🔐 **Sistema de Autenticação**
+- ✅ **Login Tradicional** - Email e senha
+- ✅ **Google OAuth** - Integração completa com Google
+- ✅ **Proteção de Rotas** - Middleware de autenticação
+- ✅ **Sessões Seguras** - Gerenciamento de sessões
 
 ### 📱 **Interface Moderna**
-- ✅ **Design responsivo** para todos os dispositivos
-- ✅ **Tema escuro/claro** (em desenvolvimento)
-- ✅ **Animações suaves** e feedback visual
-- ✅ **Atalhos de teclado** para produtividade
-- ✅ **Interface intuitiva** com UX otimizada
+- ✅ **Design Responsivo** - Adaptável a todos os dispositivos
+- ✅ **Interface Intuitiva** - UX otimizada
+- ✅ **Animações Suaves** - Feedback visual
+- ✅ **Tema Consistente** - Design system unificado
 
-### 🔔 **Notificações e Comunicação**
-- ✅ **Notificações em tempo real** via WebSockets
-- ✅ **Emails automáticos** para mudanças importantes
-- ✅ **Sistema de alertas** para prazos
-- ✅ **Histórico de atividades** completo
+### 🔔 **Sistema de Notificações**
+- ✅ **Notificações em Tempo Real** - Via WebSockets
+- ✅ **Emails Automáticos** - Para mudanças importantes
+- ✅ **Sistema de Alertas** - Para prazos e atualizações
+- ✅ **Histórico de Atividades** - Log completo de ações
 
-### 📊 **Relatórios e Analytics**
-- ✅ **Dashboard** com métricas em tempo real
-- ✅ **Relatórios personalizáveis** (PDF/CSV)
-- ✅ **Gráficos** de produtividade
-- ✅ **Exportação de dados** para análise
+### 🎨 **Interface Kanban**
+- ✅ **Board Visual** - Organização por colunas
+- ✅ **Drag & Drop** - Movimentação intuitiva
+- ✅ **Filtros Avançados** - Por status, prioridade, categoria
+- ✅ **Busca Inteligente** - Pesquisa em tempo real
+
+### 📊 **Dashboard e Analytics**
+- ✅ **Métricas em Tempo Real** - KPIs principais
+- ✅ **Gráficos de Produtividade** - Visualização de dados
+- ✅ **Relatórios** - Exportação de informações
+- ✅ **Estatísticas** - Análise de performance
+
+### 🗓️ **Sistema de Feriados**
+- ✅ **Detecção Automática** - Verificação de feriados nacionais
+- ✅ **API Integrada** - Consulta em tempo real
+- ✅ **Notificações Visuais** - Snackbar informativo
+- ✅ **Fallback Local** - Feriados nacionais fixos
 
 ## 🛠️ **Tecnologias Utilizadas**
 
 ### **Backend**
-- **Laravel 10** - Framework PHP robusto e elegante
-- **MySQL/PostgreSQL** - Banco de dados relacional
+- **Laravel 10** - Framework PHP robusto
+- **MySQL/SQLite** - Banco de dados
 - **Redis** - Cache e sessões
-- **Pusher** - WebSockets para notificações em tempo real
+- **Pusher** - WebSockets para notificações
 - **Laravel Sanctum** - Autenticação API
 
 ### **Frontend**
 - **Vue.js 3** - Framework JavaScript progressivo
 - **Inertia.js** - SPA sem complexidade
 - **Tailwind CSS** - Framework CSS utilitário
-- **Vue Draggable** - Drag & drop funcional
-- **Alpine.js** - Interatividade leve
+- **TypeScript** - Tipagem estática
+- **Vite** - Build tool moderna
 
-### **DevOps & Ferramentas**
-- **Vite** - Build tool rápida
-- **Laravel Mix** - Compilação de assets
-- **PHPUnit** - Testes automatizados
-- **Docker** - Containerização (opcional)
+### **Integrações**
+- **Google OAuth** - Autenticação social
+- **API de Feriados** - Invertexto API
+- **Sistema de Emails** - SMTP configurável
+- **WebSockets** - Notificações em tempo real
 
 ## 🚀 **Instalação e Configuração**
 
@@ -73,8 +77,8 @@
 - PHP 8.1+
 - Composer 2.0+
 - Node.js 16+
-- MySQL 8.0+ ou PostgreSQL 13+
-- Redis 6.0+
+- MySQL 8.0+ ou SQLite
+- Redis 6.0+ (opcional)
 
 ### **1. Clone o repositório**
 ```bash
@@ -100,6 +104,8 @@ php artisan key:generate
 ### **4. Configure o banco de dados**
 ```env
 DB_CONNECTION=sqlite
+# ou
+DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=taskforce
@@ -113,7 +119,7 @@ php artisan migrate
 php artisan db:seed
 ```
 
-### **6. Configure o Google OAuth (opcional)**
+### **6. Configure o Google OAuth**
 ```env
 GOOGLE_CLIENT_ID=seu_client_id
 GOOGLE_CLIENT_SECRET=seu_client_secret
@@ -166,34 +172,46 @@ php artisan test
 php artisan test --filter=TaskTest
 ```
 
-### **Testes manuais**
-- Teste o drag & drop no Kanban
-- Verifique notificações em tempo real
-- Teste login com Google
-- Valide responsividade mobile
-
 ## 📁 **Estrutura do Projeto**
 
 ```
 taskforce/
-├── app/
-│   ├── Http/Controllers/    # Controllers da aplicação
-│   ├── Models/             # Modelos Eloquent
-│   ├── Events/             # Eventos do sistema
-│   ├── Notifications/      # Notificações
-│   └── Services/           # Serviços de negócio
-├── resources/
-│   ├── js/                 # Componentes Vue.js
-│   ├── css/                # Estilos Tailwind
-│   └── views/              # Templates Blade
-├── database/
-│   ├── migrations/         # Migrações do banco
-│   ├── seeders/            # Dados iniciais
-│   └── factories/          # Fábricas para testes
-├── routes/                  # Definição de rotas
-├── config/                  # Configurações
-└── tests/                   # Testes automatizados
+├── app/                    # Aplicação Laravel completa
+│   ├── Http/Controllers/   # Controllers da aplicação
+│   ├── Models/            # Modelos Eloquent
+│   ├── Events/            # Eventos do sistema
+│   ├── Notifications/     # Notificações
+│   └── Services/          # Serviços de negócio
+├── screenshots/           # Prints de tela das funcionalidades
+├── video/                 # Vídeo de demonstração
+│   └── demonstracao.mp4   # Vídeo explicativo (máx. 8 min)
+├── curriculo/             # Documentos pessoais
+│   ├── curriculo.pdf      # Currículo atualizado
+│   └── programathor.txt   # Link do perfil Programathor
+├── resources/             # Recursos da aplicação
+│   ├── js/               # Componentes Vue.js
+│   ├── css/              # Estilos Tailwind
+│   └── views/            # Templates Blade
+├── database/             # Banco de dados
+│   ├── migrations/       # Migrações
+│   ├── seeders/          # Dados iniciais
+│   └── factories/        # Fábricas para testes
+├── routes/               # Definição de rotas
+├── config/               # Configurações
+└── tests/                # Testes automatizados
 ```
+
+## 🎥 **Demonstração**
+
+### **Vídeo de Demonstração**
+- **Localização**: `/video/demonstracao.mp4`
+- **Duração**: Máximo 8 minutos
+- **Conteúdo**: Explicação completa de todas as funcionalidades
+
+### **Screenshots**
+- **Localização**: `/screenshots/`
+- **Conteúdo**: Prints de tela das principais funcionalidades
+- **Formato**: PNG/JPG de alta qualidade
 
 ## 🔧 **Configurações Avançadas**
 
@@ -244,42 +262,23 @@ php artisan view:cache
 - **Compressão gzip** habilitada
 - **Cache de headers** configurado
 
-### **3. Monitoramento**
-- **Logs** estruturados
-- **Métricas** de performance
-- **Alertas** automáticos
-- **Backup** automático
-
-## 🤝 **Contribuindo**
-
-### **1. Fork o projeto**
-### **2. Crie uma branch**
-```bash
-git checkout -b feature/nova-funcionalidade
-```
-### **3. Commit suas mudanças**
-```bash
-git commit -m 'Adiciona nova funcionalidade'
-```
-### **4. Push para a branch**
-```bash
-git push origin feature/nova-funcionalidade
-```
-### **5. Abra um Pull Request**
-
 ## 📝 **Licença**
 
 Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## 👨‍💻 **Autor**
+## 👨‍💻 **Desenvolvedora**
 
-**Thalita Drummont]** - [tdrummontt@gmail.com](mailto:tdrummontt@gmail.com)
+**Thalita Drummont** - [tdrummontt@gmail.com](mailto:tdrummontt@gmail.com)
 
 - **GitHub**: [@tdrummontt](https://github.com/tdrummontt)
-- **LinkedIn**: [Thalita Drummont](https://www.linkedin.com/in/thalita-s-costa
+- **LinkedIn**: [Thalita Drummont](https://www.linkedin.com/in/thalita-s-costa)
+- **Programathor**: [Perfil](https://programathor.com.br/users/thalita-drummont)
 
-## 📞 **Suporte**
+## 📞 **Contato**
 
-- **Issues**: [GitHub Issues](https://github.com/tdrummontt/taskforce/issues)
 - **Email**: [tdrummontt@gmail.com](mailto:tdrummontt@gmail.com)
-- **Documentação**: [Wiki do Projeto](https://github.com/tdrummontt/taskforce/wiki)
+- **GitHub Issues**: [Reportar problemas](https://github.com/tdrummontt/taskforce/issues)
+
+---
+
+**Desenvolvido com ❤️ por Thalita Drummont**
