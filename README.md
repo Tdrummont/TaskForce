@@ -144,7 +144,7 @@ npm run dev
 
 ### **1. Acesse o sistema**
 ```
-http://localhost:8001
+http://localhost:8000
 ```
 
 ### **2. Faça login**
@@ -276,7 +276,7 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 **Thalita Drummont** - [tdrummontt@gmail.com](mailto:tdrummontt@gmail.com)
 
 - **GitHub**: [@tdrummontt](https://github.com/tdrummontt)
-- **LinkedIn**: [Thalita Drummont](https://www.linkedin.com/in/thalita-s-costa)
+- **LinkedIn**: [Thalita Costa](https://www.linkedin.com/in/thalita-s-costa)
 - **Programathor**: [Perfil](https://programathor.com.br/users/thalita-drummont)
 
 ## 📞 **Contato**
@@ -286,4 +286,4 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 
 ---
 
-**Desenvolvido com ❤️ por Thalita Drummont**
+**Desenvolvido por Thalita Costa**

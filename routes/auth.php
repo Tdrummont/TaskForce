@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     'prefix' => '{locale}',
     'where' => ['locale' => 'pt|en'],
-    'middleware' => ['web', \App\Http\Middleware\LocaleFromUrl::class],
+    'middleware' => ['web'],
 ], function () {
     Route::middleware('guest')->group(function () {
         Route::get('register', [RegisteredUserController::class, 'create'])
