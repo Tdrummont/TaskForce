@@ -7,7 +7,7 @@
 
 ## 📋 **Descrição**
 
-**TaskForce** é um sistema completo de gerenciamento de tarefas desenvolvido com Laravel 10, Vue.js 3 e Inertia.js. O sistema oferece uma interface moderna e intuitiva para gerenciar projetos, com funcionalidades avançadas como drag & drop, notificações em tempo real, e integração com Google OAuth.
+**TaskForce** é um sistema completo de gerenciamento de tarefas desenvolvido com Laravel 8.1+, Vue.js 3 e Inertia.js. O sistema oferece uma interface moderna e intuitiva para gerenciar projetos, com funcionalidades avançadas como drag & drop, notificações em tempo real, e integração com Google OAuth.
 
 ## ✨ **Funcionalidades Implementadas**
 
@@ -58,7 +58,7 @@
 
 ### **Backend**
 - **Laravel 10** - Framework PHP robusto e elegante
-- **MySQL/PostgreSQL** - Banco de dados relacional
+- **SQLite** - Banco de dados
 - **Redis** - Cache e sessões
 - **Pusher** - WebSockets para notificações
 - **Laravel Sanctum** - Autenticação API
@@ -82,7 +82,7 @@
 - PHP 8.1+
 - Composer 2.0+
 - Node.js 16+
-- MySQL 8.0+ ou PostgreSQL 13+
+- SQLite + ou PostgreSQL 13+
 - Redis 6.0+
 
 ### **1. Clone o repositório**
@@ -128,7 +128,7 @@ php artisan db:seed
 ```env
 GOOGLE_CLIENT_ID=seu_client_id
 GOOGLE_CLIENT_SECRET=seu_client_secret
-GOOGLE_REDIRECT_URI=http://localhost:8001/auth/google/callback
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
 ```
 
 ### **7. Inicie o servidor**
