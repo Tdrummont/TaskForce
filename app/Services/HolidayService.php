@@ -4,83 +4,89 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class HolidayService
 {
-    private string $base;
-    private string $token;
-
-    public function __construct()
-    {
-        $this->base  = rtrim(config('services.invertexto.base', env('INVERTEXTO_BASE', 'https://api.invertexto.com')), '/');
-        $this->token = config('services.invertexto.token', env('INVERTEXTO_TOKEN'));
-    }
-
-    /**
-     * Retorna lista de feriados (array) p/ ano + UF (opcional), com cache.
-     */
-    public function getHolidays(int $year, ?string $state = null): array
-    {
-        $state = $state ? Str::upper($state) : null;
-        $cacheKey = "holidays:{$year}:" . ($state ?: 'ALL');
-
-        // cache 24h (ajuste se quiser)
-        return Cache::remember($cacheKey, now()->addDay(), function () use ($year, $state) {
-            $endpoint = "{$this->base}/v1/holidays/{$year}";
-
-            $resp = Http::timeout(10)
-                ->retry(2, 300)
-                ->withToken($this->token) // envia como Bearer
-                ->get($endpoint, array_filter([
-                    'state' => $state, // SP, RJ, etc
-                ]));
-
-            if (!$resp->ok()) {
-                // Loga e retorna vazio pra não quebrar o fluxo
-                logger()->warning('Invertexto holidays API error', [
-                    'status' => $resp->status(),
-                    'body'   => $resp->body(),
-                ]);
-                return [];
-            }
-
-            $json = $resp->json();
-            // A API retorna array de objetos com "date", "name", "type", etc.
-            return is_array($json) ? $json : [];
-        });
-    }
+    private const CACHE_PREFIX = 'holidays_';
+    private const CACHE_TTL = 86400; // 24 horas
 
     /**
      * Verifica se uma data específica é feriado para a UF.
      */
     public function isHoliday(\DateTimeInterface $date, string $state): ?array
     {
-        $year = (int) $date->format('Y');
-        $list = $this->getHolidays($year, $state);
+        try {
+            $year = (int) $date->format('Y');
+            $list = $this->getHolidays($year, $state);
 
-        $target = (new \Carbon\CarbonImmutable($date))->toDateString();
+            $target = (new \Carbon\CarbonImmutable($date))->toDateString();
 
-        $found = collect($list)->firstWhere('date', $target);
+            $found = collect($list)->firstWhere('date', $target);
 
-        // Retorna ['date' => 'YYYY-MM-DD', 'name' => '...'] ou null
-        return $found ?: null;
+            // Retorna ['date' => 'YYYY-MM-DD', 'name' => '...'] ou null
+            return $found ?: null;
+        } catch (\Exception $e) {
+            Log::error('Erro ao verificar feriado específico', [
+                'error' => $e->getMessage(),
+                'date' => $date->format('Y-m-d'),
+                'state' => $state
+            ]);
+            return null;
+        }
     }
 
     /**
-     * Verifica se uma data (Y-m-d) é feriado para uma UF (opcional).
+     * Obtém lista de feriados para um ano e estado específicos.
      */
-    public function isHolidayByDate(string $dateYmd, ?string $state = null): ?array
+    public function getHolidays(int $year, string $state): array
     {
-        $date = Carbon::parse($dateYmd);
-        $list = $this->getHolidays((int)$date->format('Y'), $state);
+        $cacheKey = self::CACHE_PREFIX . "{$year}_{$state}";
 
-        foreach ($list as $h) {
-            if (!empty($h['date']) && Carbon::parse($h['date'])->isSameDay($date)) {
-                return $h; // retorna o objeto do feriado
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($year, $state) {
+            // Feriados nacionais fixos
+            $nationalHolidays = [
+                ['date' => "{$year}-01-01", 'name' => 'Confraternização Universal'],
+                ['date' => "{$year}-04-21", 'name' => 'Tiradentes'],
+                ['date' => "{$year}-05-01", 'name' => 'Dia do Trabalhador'],
+                ['date' => "{$year}-09-07", 'name' => 'Independência do Brasil'],
+                ['date' => "{$year}-10-12", 'name' => 'Nossa Senhora Aparecida'],
+                ['date' => "{$year}-11-02", 'name' => 'Finados'],
+                ['date' => "{$year}-11-15", 'name' => 'Proclamação da República'],
+                ['date' => "{$year}-12-25", 'name' => 'Natal'],
+            ];
+
+            try {
+                $response = Http::timeout(5)->get('https://api.invertexto.com/v1/holidays', [
+                    'token' => config('services.invertexto.token'),
+                    'state' => $state,
+                    'year' => $year,
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $apiHolidays = $data['holidays'] ?? [];
+                    // Combinar feriados nacionais com os da API
+                    return array_merge($nationalHolidays, $apiHolidays);
+                }
+
+                Log::warning('Falha ao obter feriados da API, usando feriados nacionais', [
+                    'status' => $response->status(),
+                    'response' => $response->body()
+                ]);
+
+                return $nationalHolidays;
+            } catch (\Exception $e) {
+                Log::warning('Erro ao consultar API de feriados, usando feriados nacionais', [
+                    'error' => $e->getMessage(),
+                    'year' => $year,
+                    'state' => $state
+                ]);
+
+                return $nationalHolidays;
             }
-        }
-        return null;
+        });
     }
 }

@@ -42,6 +42,37 @@ class TaskAssignedNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        // Usar nosso template que funciona
+        return (new MailMessage)
+            ->subject("Task Force • Nova Tarefa Atribuída: {$this->task->title}")
+            ->view('emails.taskforce.notification', [
+                'subject' => "Task Force • Nova Tarefa Atribuída: {$this->task->title}",
+                'title' => "Nova Tarefa Atribuída: {$this->task->title}",
+                'recipientName' => $notifiable->name,
+                'intro' => "Uma nova tarefa foi atribuída a você no sistema Task Force. Esta é uma excelente oportunidade para demonstrar suas habilidades e contribuir para o sucesso da equipe.",
+                'highlights' => [
+                    "✨ {$this->task->title}",
+                    "📊 Status: " . ucfirst($this->task->status),
+                    "🎯 Prioridade: " . ucfirst($this->task->priority)
+                ],
+                'infoItems' => [
+                    'Atribuída por' => $this->assignedBy->name,
+                    'Atribuída para' => $this->assignedTo->name,
+                    'Referência' => "#TF-{$this->task->id}",
+                    'Data de Criação' => $this->task->created_at->format('d/m/Y H:i'),
+                    'Prioridade' => ucfirst($this->task->priority),
+                    'Status' => ucfirst($this->task->status)
+                ],
+                'ctaUrl' => 'http://localhost:8001/pt/tasks/' . $this->task->id,
+                'ctaLabel' => 'Visualizar Tarefa',
+                'note' => 'Esta é uma notificação automática do sistema Task Force.',
+                'logoUrl' => 'https://via.placeholder.com/40x40/ffffff/4f46e5?text=TF',
+                'preheader' => "Nova tarefa atribuída: {$this->task->title}"
+            ]);
+    }
+
+    public function toMailOld(object $notifiable): MailMessage
+    {
         $url = config('app.url') . '/pt/tasks'; // URL absoluta para evitar problemas com locale
         $dueDate = $this->task->due_date ? $this->task->due_date->format('d/m/Y H:i') : 'Não definida';
         $priorityColor = $this->getPriorityColor($this->task->priority);

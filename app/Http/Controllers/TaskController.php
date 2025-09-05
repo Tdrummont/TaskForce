@@ -160,6 +160,25 @@ class TaskController extends Controller
         ]);
     }
 
+    public function show($locale, Task $task)
+    {
+        // Verificar se o usuário está autenticado
+        if (!Auth::check()) {
+            return redirect()->route('login', ['locale' => $locale]);
+        }
+
+        // Verificar se o usuário tem permissão para ver a tarefa
+        if ($task->created_by !== Auth::id() && $task->assigned_to !== Auth::id()) {
+            abort(403, 'Você não tem permissão para visualizar esta tarefa.');
+        }
+
+        $task->load(['assignedTo', 'subtasks', 'attachments', 'comments.user']);
+
+        return Inertia::render('Tasks/Show', [
+            'task' => $task
+        ]);
+    }
+
     public function store($locale, Request $request)
     {
         Log::info('Task creation attempt', [
@@ -189,6 +208,7 @@ class TaskController extends Controller
 
         if ($validator->fails()) {
             Log::error('Validation failed', ['errors' => $validator->errors()]);
+            
             return back()->withErrors($validator)->withInput();
         }
 
@@ -222,7 +242,9 @@ class TaskController extends Controller
                 Log::info('🔔 Notificação de tarefa criada salva no banco', ['task_id' => $task->id]);
                 
                 // Enviar email de notificação para o criador
-                Auth::user()->notify(new TaskCreatedNotification($task, Auth::user()));
+                /** @var \App\Models\User $user */
+                $user = Auth::user();
+                $user->notify(new TaskCreatedNotification($task, $user));
                 Log::info('📧 Email de notificação de tarefa criada enviado', ['task_id' => $task->id]);
                 
                 // Adicionar mensagem de sucesso para o snackbar
@@ -409,12 +431,14 @@ class TaskController extends Controller
                 ]);
             }
 
+            // Para requisições Inertia, fazer redirecionamento normal
             return redirect()->route('tasks.index', ['locale' => $locale])->with('success', 'Tarefa criada com sucesso!');
         } catch (\Exception $e) {
             Log::error('Error creating task', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+            
             return back()->withErrors(['error' => 'Erro ao criar tarefa: ' . $e->getMessage()])->withInput();
         }
     }
@@ -792,7 +816,7 @@ class TaskController extends Controller
             $validator = Validator::make($request->all(), [
                 'status' => ['required', Rule::in(['pending', 'in_progress', 'completed'])],
             ], [
-                'status.in' => 'O status deve ser: pendente, em progresso ou concluída.'
+                'status.in' => 'O status deve ser: pendente, em espera, em progresso, precisa revisão, aprovado ou concluída.'
             ]);
 
             if ($validator->fails()) {
@@ -1317,7 +1341,10 @@ class TaskController extends Controller
 
         // Notificar usuário designado
         if ($task->assigned_to && $task->assigned_to !== Auth::id()) {
-            event(new TaskAssigned($task));
+            $assignedTo = User::find($task->assigned_to);
+            if ($assignedTo) {
+                event(new TaskAssigned($task, Auth::user(), $assignedTo));
+            }
         }
 
         return response()->json([

@@ -44,7 +44,8 @@ const form = useForm({
   description: '',
   priority: 'medium',
   category: '',
-  due_date: ''
+  due_date: '',
+  status: 'pending'
 })
 
 const holiday = ref(null)
@@ -55,43 +56,116 @@ const isOpen = computed(() => props.show)
 
 function close() {
   emit('close')
-  // limpa (opcional)
+  // limpa o formulário
   form.reset()
+  form.clearErrors()
   holiday.value = null
 }
 
 async function checkHoliday() {
   holiday.value = null
   if (!form.due_date) return
+  
+  // Verificação simples e não-bloqueante
   try {
     checkingHoliday.value = true
+    
+    // Usar AbortController para timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 segundos timeout
+    
     const r = await fetch(`/api/holidays/check?date=${encodeURIComponent(form.due_date)}&state=${encodeURIComponent(stateUF.value)}`, {
-      headers: { 'Accept': 'application/json' }
+      headers: { 'Accept': 'application/json' },
+      signal: controller.signal
     })
-    if (!r.ok) throw new Error('holiday request failed')
+    
+    clearTimeout(timeoutId)
+    
+    if (!r.ok) {
+      console.warn('Holiday check failed, continuing anyway')
+      return
+    }
+    
     const data = await r.json()
     holiday.value = data.is_holiday ? data.holiday : null
     
-    // Mostrar snackbar se for feriado
-    if (data.is_holiday && data.holiday && window.$holidayToast) {
-      window.$holidayToast.show(data.holiday, 8000)
+    // Mostrar snackbar simples se for feriado
+    if (data.is_holiday && data.holiday) {
+      // Usar um snackbar simples sem dependências externas
+      showSimpleHolidayAlert(data.holiday)
     }
   } catch (e) {
-    console.error('holiday check error', e)
+    if (e.name !== 'AbortError') {
+      console.warn('Holiday check error, continuing anyway:', e)
+    }
+    // Não bloquear o processo se houver erro
   } finally {
     checkingHoliday.value = false
   }
 }
 
+// Função simples para mostrar alerta de feriado
+function showSimpleHolidayAlert(holidayData) {
+  // Criar um alerta simples sem dependências
+  const alertDiv = document.createElement('div')
+  alertDiv.className = 'fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded shadow-lg z-50 max-w-sm'
+  alertDiv.innerHTML = `
+    <div class="flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+      </svg>
+      <div>
+        <p class="font-medium">${holidayData.name || 'Feriado'}</p>
+        <p class="text-sm">A data selecionada é um feriado</p>
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-yellow-600 hover:text-yellow-800">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+        </svg>
+      </button>
+    </div>
+  `
+  
+  document.body.appendChild(alertDiv)
+  
+  // Remover automaticamente após 5 segundos
+  setTimeout(() => {
+    if (alertDiv.parentElement) {
+      alertDiv.remove()
+    }
+  }, 5000)
+}
+
 watch(() => form.due_date, checkHoliday)
 
 async function submit() {
-  await form.post(routeL('tasks.store'), {
-    onSuccess: () => {
-      emit('created')
-      close()
-    }
-  })
+  console.log('🚀 Enviando formulário:', form.data())
+  console.log('📍 Rota:', routeL('tasks.store'))
+  
+  try {
+    await form.post(routeL('tasks.store'), {
+      onSuccess: (page) => {
+        console.log('✅ Tarefa criada com sucesso!', page)
+        emit('created')
+        close()
+      },
+      onError: (errors) => {
+        console.error('❌ Erro ao criar tarefa:', errors)
+        console.error('📊 Dados do formulário:', form.data())
+        console.error('🔍 Erros detalhados:', form.errors)
+      },
+      onFinish: () => {
+        console.log('🏁 Requisição finalizada')
+        // Forçar fechamento do modal após a requisição
+        if (!form.hasErrors) {
+          emit('created')
+          close()
+        }
+      }
+    })
+  } catch (error) {
+    console.error('💥 Erro na requisição:', error)
+  }
 }
 
 function setQuickDue(days) {

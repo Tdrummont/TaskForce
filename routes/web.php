@@ -5,7 +5,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
-use App\Http\Controllers\Auth\SocialLoginController;
+use App\Http\Controllers\Auth\GoogleController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -51,10 +51,15 @@ Route::group([
         ->middleware(['auth'])
         ->name('debug.broadcasting');
 
+    // Exemplo de feriados
+    Route::get('/holiday-example', fn () => Inertia::render('Examples/HolidayExample'))
+        ->middleware(['auth'])
+        ->name('holiday.example');
+
     // Google Auth (mantidas dentro do prefixo para manter idioma ao voltar p/ a SPA)
-    Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('google.redirect');
-    Route::get('/auth/google', [SocialLoginController::class, 'redirectToGoogle'])->name('login.google');
-    Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('google.callback');
+    Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
+    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('login.google');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
     Route::get('/auth/google/callback-page', fn () => Inertia::render('Auth/GoogleCallback'))
         ->name('google.callback.page');
 
@@ -68,6 +73,7 @@ Route::group([
         Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
         Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
         Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+        Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
         Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
         Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
         Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');

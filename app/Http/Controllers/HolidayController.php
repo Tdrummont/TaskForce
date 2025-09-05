@@ -14,7 +14,7 @@ class HolidayController extends Controller
             'state' => ['nullable','string','size:2'],
         ]);
 
-        $hit = $holidays->isHolidayByDate($request->date, $request->state);
+        $hit = $holidays->isHoliday(\Carbon\Carbon::parse($request->date), $request->state ?: 'SP');
 
         return response()->json([
             'is_holiday' => (bool)$hit,

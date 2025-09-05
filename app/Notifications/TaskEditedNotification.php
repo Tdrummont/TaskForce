@@ -37,7 +37,7 @@ class TaskEditedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject("Tarefa '{$this->task->title}' foi editada")
-            ->view('emails.tasks.edited', [
+            ->view('emails.tasks.edited-gmail', [
                 'task' => $this->task,
                 'editedBy' => $this->editedBy,
                 'recipient' => $this->recipient,

@@ -4,11 +4,8 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import QuickTaskModal from '@/Components/QuickTaskModal.vue';
+import HolidaySnackbar from '@/Components/HolidaySnackbar.vue';
 
-import EmailNotificationSnackbar from '@/Components/EmailNotificationSnackbar.vue';
-import HolidayAutoDetector from '@/Components/HolidayAutoDetector.vue';
-import HolidayToastManager from '@/Components/HolidayToastManager.vue';
-import LanguageSelector from '@/Components/LanguageSelector.vue';
 import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 import { useLocale } from '@/Components/useLocale';
 
@@ -102,23 +99,40 @@ const closeQuickTaskModal = () => {
     showQuickTaskModal.value = false;
 };
 
+const handleTaskCreated = () => {
+    console.log('Tarefa criada com sucesso!');
+    // Opcional: recarregar a página ou atualizar dados
+    // router.reload();
+};
+
 const loadCategories = async () => {
     try {
+        console.log('🔄 Carregando categorias...');
+        console.log('📍 URL:', routeL('tasks.categories'));
+        
         const response = await fetch(routeL('tasks.categories'), {
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
         });
+        
+        console.log('📡 Resposta recebida:', response.status, response.statusText);
         
         if (response.ok) {
             const data = await response.json();
+            console.log('📊 Dados das categorias:', data);
             if (data.success) {
                 categories.value = data.categories;
+                console.log('✅ Categorias carregadas:', categories.value);
             }
+        } else {
+            console.error('❌ Erro ao carregar categorias:', response.status, response.statusText);
         }
     } catch (error) {
-        console.error('Erro ao carregar categorias:', error);
+        console.error('❌ Erro ao carregar categorias:', error);
     }
 };
 
@@ -484,9 +498,6 @@ onUnmounted(() => {
 
                         <!-- Action Buttons -->
                         <div class="flex items-center space-x-2">
-                            <!-- Language Selector -->
-                            <LanguageSelector />
-
                             <!-- Create Task Button -->
                             <button 
                                 @click="router.get(routeL('tasks.create'))"
@@ -759,14 +770,13 @@ onUnmounted(() => {
         <QuickTaskModal 
             :show="showQuickTaskModal" 
             :categories="categories"
-            @close="closeQuickTaskModal" 
+            :user-state="'SP'"
+            @close="closeQuickTaskModal"
+            @created="handleTaskCreated"
         />
 
-        <!-- Gerenciador de Notificações de Feriados -->
-        <HolidayToastManager />
-        
-        <!-- Detector Automático de Feriados -->
-        <HolidayAutoDetector />
+        <!-- Snackbar de Feriados -->
+        <HolidaySnackbar />
 
     </div>
 </template>

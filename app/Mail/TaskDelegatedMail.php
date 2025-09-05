@@ -45,7 +45,7 @@ class TaskDelegatedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.tasks.delegated',
+            view: 'emails.tasks.delegated-corporate',
             with: [
                 'task' => $this->task,
                 'delegatedBy' => $this->delegatedBy,

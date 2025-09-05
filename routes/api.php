@@ -9,6 +9,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\HolidayController;
+use App\Http\Controllers\Api\HolidayController as ApiHolidayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,3 +90,10 @@ Route::get('/language/translations/{locale}', [LanguageController::class, 'trans
 // Verificação de feriados (pública)
 Route::get('/holidays/check', [HolidayController::class, 'check'])
     ->name('api.holidays.check');
+
+// API de feriados
+Route::prefix('holidays')->group(function () {
+    Route::post('/check-date', [ApiHolidayController::class, 'checkDate'])->name('api.holidays.check-date');
+    Route::get('/year/{year}', [ApiHolidayController::class, 'getHolidays'])->name('api.holidays.year');
+    Route::post('/check-multiple', [ApiHolidayController::class, 'checkMultipleDates'])->name('api.holidays.check-multiple');
+});

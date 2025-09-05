@@ -17,6 +17,19 @@ class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     /**
+     * Exclui rotas específicas do middleware do Inertia
+     */
+    public function handle(Request $request, \Closure $next)
+    {
+        // Exclui o callback do Google do middleware do Inertia
+        if ($request->is('auth/google/callback')) {
+            return $next($request);
+        }
+
+        return parent::handle($request, $next);
+    }
+
+    /**
      * Determines the current asset version.
      *
      * @see https://inertiajs.com/asset-versioning

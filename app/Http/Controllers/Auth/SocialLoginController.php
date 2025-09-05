@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User; // Certifique-se de ter um modelo User
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
@@ -18,7 +19,7 @@ class SocialLoginController extends Controller
      */
     public function redirectToGoogle(Request $request)
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     /**
@@ -29,32 +30,81 @@ class SocialLoginController extends Controller
     public function handleGoogleCallback(Request $request)
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            Log::info('=== CALLBACK GOOGLE INICIADO ===', [
+                'url' => $request->fullUrl(),
+                'code' => $request->get('code'),
+                'state' => $request->get('state'),
+                'error' => $request->get('error')
+            ]);
+
+            if ($request->has('error')) {
+                Log::error('Erro do Google OAuth', ['error' => $request->get('error')]);
+                return redirect('/pt/login')->withErrors(['google_error' => 'Autorização negada pelo Google.']);
+            }
+
+            $googleUser = Socialite::driver('google')->stateless()->user();
+            Log::info('Usuário Google obtido', ['user' => $googleUser->email]);
 
             // Verifica se o usuário já existe no nosso banco de dados
             $user = User::where('google_id', $googleUser->id)->first();
 
-            if ($user) {
-                // Se o usuário existe, faça o login
-                Auth::login($user);
-                return redirect()->intended('/dashboard'); // Redireciona para o dashboard
-            } else {
-                // Se o usuário não existe, crie um novo registro
-                $newUser = User::create([
-                    'name' => $googleUser->name,
-                    'email' => $googleUser->email,
-                    'google_id' => $googleUser->id,
-                    'password' => bcrypt(Str::random(16)), // Senha aleatória para usuários do Google
-                ]);
-
-                Auth::login($newUser);
-                return redirect()->intended('/dashboard');
+            if (!$user) {
+                // Verifica se já existe usuário com mesmo email
+                $user = User::where('email', $googleUser->email)->first();
+                if ($user) {
+                    // Atualiza o google_id do usuário existente
+                    $user->update(['google_id' => $googleUser->id]);
+                    Log::info('Google ID adicionado ao usuário existente', ['user_id' => $user->id]);
+                } else {
+                    // Cria novo usuário
+                    $user = User::create([
+                        'name' => $googleUser->name,
+                        'email' => $googleUser->email,
+                        'google_id' => $googleUser->id,
+                        'password' => bcrypt(Str::random(16)),
+                        'email_verified_at' => now(),
+                    ]);
+                    Log::info('Novo usuário criado', ['user_id' => $user->id]);
+                }
             }
 
+            Auth::login($user);
+            Log::info('Usuário logado com sucesso', ['user_id' => $user->id]);
+
+            // Retorna uma resposta HTML simples que redireciona para o dashboard
+            return response('<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecionando...</title>
+    <meta charset="utf-8">
+    <script>
+        window.location.href = "/pt/dashboard";
+    </script>
+</head>
+<body>
+    <p>Redirecionando para o dashboard...</p>
+</body>
+</html>');
+
         } catch (\Exception $e) {
-            // Lidar com erros de autenticação
-            // dd($e->getMessage()); // Descomente para depurar o erro
-            return redirect('/login')->withErrors(['google_error' => 'Não foi possível fazer login com o Google. Tente novamente.']);
+            Log::error('Erro no callback do Google', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return response('<!DOCTYPE html>
+<html>
+<head>
+    <title>Erro de Login</title>
+    <meta charset="utf-8">
+    <script>
+        window.location.href = "/pt/login?error=google_auth";
+    </script>
+</head>
+<body>
+    <p>Erro na autenticação. Redirecionando...</p>
+</body>
+</html>');
         }
     }
 }

@@ -157,9 +157,22 @@
                     </button>
                   </div>
   
-                  <draggable v-model="pendingTasks" group="tasks" class="space-y-3 min-h-[200px]" item-key="id">
+                  <draggable 
+                    v-model="pendingTasks" 
+                    group="tasks" 
+                    class="space-y-3 min-h-[200px]" 
+                    item-key="id"
+                    :animation="200"
+                    :force-fallback="true"
+                    :fallback-class="'drag-fallback'"
+                    :ghost-class="'drag-ghost'"
+                    :chosen-class="'drag-chosen'"
+                    :drag-class="'drag-dragging'"
+                    @start="onDragStart"
+                    @end="onDragEnd"
+                  >
                     <template #item="{ element: task }">
-                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-yellow-400 hover:shadow-md transition-shadow cursor-move task-card">
+                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-yellow-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
                           <h5 class="font-semibold text-gray-800 text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
@@ -223,9 +236,22 @@
                     </button>
                   </div>
   
-                  <draggable v-model="inProgressTasks" group="tasks" class="space-y-3 min-h-[200px]" item-key="id">
+                  <draggable 
+                    v-model="inProgressTasks" 
+                    group="tasks" 
+                    class="space-y-3 min-h-[200px]" 
+                    item-key="id"
+                    :animation="200"
+                    :force-fallback="true"
+                    :fallback-class="'drag-fallback'"
+                    :ghost-class="'drag-ghost'"
+                    :chosen-class="'drag-chosen'"
+                    :drag-class="'drag-dragging'"
+                    @start="onDragStart"
+                    @end="onDragEnd"
+                  >
                     <template #item="{ element: task }">
-                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-orange-400 hover:shadow-md transition-shadow cursor-move task-card">
+                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-orange-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
                           <h5 class="font-semibold text-gray-800 text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
@@ -289,9 +315,22 @@
                     </button>
                   </div>
   
-                  <draggable v-model="completedTasks" group="tasks" class="space-y-3 min-h-[200px]" item-key="id">
+                  <draggable 
+                    v-model="completedTasks" 
+                    group="tasks" 
+                    class="space-y-3 min-h-[200px]" 
+                    item-key="id"
+                    :animation="200"
+                    :force-fallback="true"
+                    :fallback-class="'drag-fallback'"
+                    :ghost-class="'drag-ghost'"
+                    :chosen-class="'drag-chosen'"
+                    :drag-class="'drag-dragging'"
+                    @start="onDragStart"
+                    @end="onDragEnd"
+                  >
                     <template #item="{ element: task }">
-                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-400 hover:shadow-md transition-shadow cursor-move task-card">
+                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
                           <h5 class="font-semibold text-gray-800 text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
@@ -707,6 +746,36 @@
     window.removeEventListener('search-tasks', handleSearchFromLayout)
   })
   
+  // Drag & Drop functions
+  const onDragStart = (evt) => {
+    evt.item.classList.add('drag-start')
+    document.body.classList.add('dragging')
+  }
+  
+  const onDragEnd = (evt) => {
+    evt.item.classList.remove('drag-start')
+    document.body.classList.remove('dragging')
+    
+    // Update task status if moved to different column
+    const taskId = evt.item.querySelector('.task-card').getAttribute('data-task-id')
+    const newStatus = getStatusFromColumn(evt.to)
+    
+    if (newStatus && taskId) {
+      updateTaskStatus(taskId, newStatus)
+    }
+  }
+  
+  const getStatusFromColumn = (column) => {
+    if (column.closest('.kanban-column').querySelector('.bg-yellow-500')) {
+      return 'pending'
+    } else if (column.closest('.kanban-column').querySelector('.bg-orange-500')) {
+      return 'in_progress'
+    } else if (column.closest('.kanban-column').querySelector('.bg-green-500')) {
+      return 'completed'
+    }
+    return null
+  }
+
   const editTask = (task) => {
     router.get(routeL('tasks.edit', { task: task.id }))
   }
@@ -743,13 +812,100 @@
   
   <style scoped>
   .line-clamp-2 {line-clamp:2; -webkit-line-clamp:2; box-orient:vertical; -webkit-box-orient:vertical; display:-webkit-box; overflow:hidden;}
-  .sortable-ghost{opacity:.5;background:#c8ebfb;border:2px dashed #3b82f6;transform:rotate(2deg)}
-  .sortable-drag{opacity:.8;transform:rotate(5deg);box-shadow:0 10px 25px rgba(0,0,0,.2);z-index:1000}
-  .sortable-chosen{background:#f0f9ff;border:2px solid #3b82f6}
-  .kanban-column{transition:all .3s ease}
-  .kanban-column.drag-over{background:#f0f9ff;border:2px dashed #3b82f6}
-  .task-card{transition:all .2s ease; user-select:none}
-  .task-card:hover{transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.15)}
-  .task-card.dragging{cursor:grabbing}
+  
+  /* Enhanced Drag & Drop Styles */
+  .drag-ghost {
+    opacity: 0.4;
+    background: #f3f4f6;
+    border: 2px dashed #6b7280;
+    transform: rotate(2deg);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .drag-chosen {
+    background: #f0f9ff;
+    border: 2px solid #3b82f6;
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .drag-dragging {
+    opacity: 0.8;
+    transform: rotate(5deg) scale(1.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .drag-fallback {
+    opacity: 0.6;
+    background: #e5e7eb;
+    border: 2px dashed #9ca3af;
+    transform: rotate(3deg);
+  }
+  
+  .kanban-column {
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+  }
+  
+  .kanban-column.drag-over {
+    background: #f0f9ff;
+    border: 2px dashed #3b82f6;
+    transform: scale(1.02);
+  }
+  
+  .task-card {
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    user-select: none;
+    cursor: grab;
+  }
+  
+  .task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .task-card.drag-start {
+    cursor: grabbing;
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .task-card:active {
+    cursor: grabbing;
+  }
+  
+  /* Body dragging state */
+  body.dragging {
+    cursor: grabbing;
+  }
+  
+  body.dragging * {
+    cursor: grabbing !important;
+  }
+  
+  /* Smooth animations for all drag states */
+  .drag-ghost,
+  .drag-chosen,
+  .drag-dragging,
+  .drag-fallback {
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  /* Enhanced visual feedback */
+  .kanban-column:hover {
+    background: rgba(249, 250, 251, 0.8);
+  }
+  
+  .task-card:hover .task-actions {
+    opacity: 1;
+  }
+  
+  .task-actions {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
   </style>
   

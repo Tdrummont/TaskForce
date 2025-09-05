@@ -11,6 +11,7 @@ class Task extends Model
 {
     use HasFactory, LogsActivity;
 
+
     protected $fillable = [
         'title',
         'description',
@@ -358,4 +359,5 @@ class Task extends Model
     {
         return $this->created_by === $user->id || $user->hasRole('admin');
     }
+
 }

@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TaskCreatedNotification extends Notification implements ShouldQueue
+class TaskCreatedNotification extends Notification
 {
     use Queueable;
 
@@ -39,6 +39,36 @@ class TaskCreatedNotification extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
+    {
+        // Usar nosso template que funciona
+        return (new MailMessage)
+            ->subject("Task Force • Nova Tarefa Criada: {$this->task->title}")
+            ->view('emails.taskforce.notification', [
+                'subject' => "Task Force • Nova Tarefa Criada: {$this->task->title}",
+                'title' => "Nova Tarefa: {$this->task->title}",
+                'recipientName' => $notifiable->name,
+                'intro' => "Uma nova tarefa foi criada no sistema Task Force. Esta é uma excelente oportunidade para demonstrar suas habilidades e contribuir para o sucesso da equipe.",
+                'highlights' => [
+                    "✨ {$this->task->title}",
+                    "📊 Status: " . ucfirst($this->task->status),
+                    "🎯 Prioridade: " . ucfirst($this->task->priority)
+                ],
+                'infoItems' => [
+                    'Criado por' => $this->creator->name,
+                    'Referência' => "#TF-{$this->task->id}",
+                    'Data de Criação' => $this->task->created_at->format('d/m/Y H:i'),
+                    'Prioridade' => ucfirst($this->task->priority),
+                    'Status' => ucfirst($this->task->status)
+                ],
+                'ctaUrl' => 'http://localhost:8001/pt/tasks/' . $this->task->id,
+                'ctaLabel' => 'Visualizar Tarefa',
+                'note' => 'Esta é uma notificação automática do sistema Task Force.',
+                'logoUrl' => 'https://via.placeholder.com/40x40/ffffff/4f46e5?text=TF',
+                'preheader' => "Nova tarefa criada: {$this->task->title}"
+            ]);
+    }
+
+    public function toMailOld(object $notifiable): MailMessage
     {
         $priorityEmoji = $this->getPriorityEmoji($this->task->priority);
         $statusEmoji = $this->getStatusEmoji($this->task->status);

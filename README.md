@@ -117,7 +117,7 @@ php artisan db:seed
 ```env
 GOOGLE_CLIENT_ID=seu_client_id
 GOOGLE_CLIENT_SECRET=seu_client_secret
-GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+GOOGLE_REDIRECT_URI=http://localhost:8001/auth/google/callback
 ```
 
 ### **7. Inicie o servidor**
@@ -133,7 +133,7 @@ npm run dev
 
 ### **1. Acesse o sistema**
 ```
-http://localhost:8000
+http://localhost:8001
 ```
 
 ### **2. Faça login**

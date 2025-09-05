@@ -20,15 +20,8 @@ class GoogleServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Socialite::extend('google', function ($app) {
-            $config = $app['config']['services.google'];
-            
-            return new \Laravel\Socialite\Two\GoogleProvider(
-                $app['request'],
-                $config['client_id'],
-                $config['client_secret'],
-                $config['redirect']
-            );
-        });
+
+        // O Socialite já tem suporte nativo ao Google
+        // Não precisamos estender, apenas garantir que as configurações estão corretas
     }
 } 
