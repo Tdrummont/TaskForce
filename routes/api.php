@@ -9,7 +9,6 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\HolidayController;
-use App\Http\Controllers\Api\HolidayController as ApiHolidayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +21,11 @@ use App\Http\Controllers\Api\HolidayController as ApiHolidayController;
 |
 */
 
-// Rotas públicas da API
+// Rotas públicas da API - Sanctum
+Route::post('/sanctum/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('/sanctum/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
+
+// Rotas públicas da API - JWT (mantidas para compatibilidade)
 Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'apiLogin']);
 Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'apiStore']);
 
@@ -35,14 +38,19 @@ Route::get('/test', function () {
     ]);
 });
 
-// Rotas protegidas da API (requerem JWT)
+// Rotas protegidas da API (requerem Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
-    // Usuário autenticado
+    // Usuário autenticado - Sanctum
+    Route::get('/sanctum/user', [App\Http\Controllers\Api\AuthController::class, 'user']);
+    Route::post('/sanctum/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
+    Route::post('/sanctum/revoke-all-tokens', [App\Http\Controllers\Api\AuthController::class, 'revokeAllTokens']);
+    
+    // Usuário autenticado - JWT (mantido para compatibilidade)
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
     
-    // Logout
+    // Logout - JWT (mantido para compatibilidade)
     Route::post('/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'apiDestroy']);
     
     // Refresh token
@@ -90,10 +98,3 @@ Route::get('/language/translations/{locale}', [LanguageController::class, 'trans
 // Verificação de feriados (pública)
 Route::get('/holidays/check', [HolidayController::class, 'check'])
     ->name('api.holidays.check');
-
-// API de feriados
-Route::prefix('holidays')->group(function () {
-    Route::post('/check-date', [ApiHolidayController::class, 'checkDate'])->name('api.holidays.check-date');
-    Route::get('/year/{year}', [ApiHolidayController::class, 'getHolidays'])->name('api.holidays.year');
-    Route::post('/check-multiple', [ApiHolidayController::class, 'checkMultipleDates'])->name('api.holidays.check-multiple');
-});

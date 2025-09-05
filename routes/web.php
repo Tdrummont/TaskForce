@@ -5,7 +5,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
-use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\SocialLoginController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,11 +20,19 @@ Route::get('/', function (Request $request) {
     return redirect("/{$pref}");
 });
 // Redireciona acessos sem locale para auth no default
-Route::redirect('/login', '/pt/login');
+Route::get('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
 Route::redirect('/register', '/pt/register');
 Route::redirect('/dashboard', '/pt/dashboard');
 Route::redirect('/tasks', '/pt/tasks');
 Route::redirect('/reports', '/pt/reports');
+
+// Google Auth (FORA do grupo {locale} para evitar /pt/ no callback)
+Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('/auth/google', [SocialLoginController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('google.callback');
+Route::get('/auth/google/callback-page', fn () => Inertia::render('Auth/GoogleCallback'))
+    ->name('google.callback.page');
 
 // Agrupa tudo que é web sob /{locale} e garante LocaleFromUrl
 Route::group([
@@ -51,17 +59,6 @@ Route::group([
         ->middleware(['auth'])
         ->name('debug.broadcasting');
 
-    // Exemplo de feriados
-    Route::get('/holiday-example', fn () => Inertia::render('Examples/HolidayExample'))
-        ->middleware(['auth'])
-        ->name('holiday.example');
-
-    // Google Auth (mantidas dentro do prefixo para manter idioma ao voltar p/ a SPA)
-    Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
-    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('login.google');
-    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
-    Route::get('/auth/google/callback-page', fn () => Inertia::render('Auth/GoogleCallback'))
-        ->name('google.callback.page');
 
     // Área logada
     Route::middleware('auth')->group(function () {
@@ -73,7 +70,6 @@ Route::group([
         Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
         Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
         Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-        Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
         Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
         Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
         Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
@@ -121,9 +117,6 @@ Route::group([
         Route::get('register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'create'])
                     ->name('register');
         Route::post('register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store']);
-        Route::get('login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])
-                    ->name('login');
-        Route::post('login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
         Route::get('forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])
                     ->name('password.request');
         Route::post('forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store'])
