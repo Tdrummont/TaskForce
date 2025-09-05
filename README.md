@@ -5,6 +5,11 @@
 [![Inertia.js](https://img.shields.io/badge/Inertia.js-2.x-blue.svg)](https://inertiajs.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC.svg)](https://tailwindcss.com)
 
+## LINK DO VIDEO DE APRESENTAÇÃO DO SISTEMA
+https://drive.google.com/drive/u/1/folders/1eJM90U87wXfCHhIf92VttS_jwhiRuvV0
+
+
+
 ## 📋 **Descrição**
 
 **TaskForce** é um sistema completo de gerenciamento de tarefas desenvolvido com Laravel 10, Vue.js 3 e Inertia.js. O sistema oferece uma interface moderna e intuitiva para gerenciar projetos, com funcionalidades avançadas como drag & drop, notificações em tempo real, e integração com Google OAuth.
@@ -73,7 +78,7 @@
 - PHP 8.1+
 - Composer 2.0+
 - Node.js 16+
-- MySQL 8.0+ ou PostgreSQL 13+
+- SQLite + ou PostgreSQL 13+
 - Redis 6.0+
 
 ### **1. Clone o repositório**
