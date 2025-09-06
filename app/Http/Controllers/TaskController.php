@@ -241,6 +241,22 @@ class TaskController extends Controller
                 NotificationService::taskCreated($task, Auth::user());
                 Log::info('🔔 Notificação de tarefa criada salva no banco', ['task_id' => $task->id]);
                 
+                // Disparar evento para WebSocket
+                try {
+                    $event = new \App\Events\TaskCreated($task, Auth::user());
+                    event($event);
+                    
+                    Log::info('📡 Evento TaskCreated disparado com sucesso', [
+                        'event_class' => \App\Events\TaskCreated::class,
+                        'task_id' => $task->id
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('❌ Erro ao disparar evento TaskCreated', [
+                        'task_id' => $task->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
                 // Enviar email de notificação para o criador
                 /** @var \App\Models\User $user */
                 $user = Auth::user();
@@ -837,6 +853,24 @@ class TaskController extends Controller
 
             $oldStatus = $task->status;
             $task->update(['status' => $request->status]);
+
+            // Disparar evento para WebSocket
+            try {
+                $event = new \App\Events\TaskStatusUpdated($task, Auth::user(), $oldStatus, $request->status);
+                event($event);
+                
+                Log::info('📡 Evento TaskStatusUpdated disparado com sucesso', [
+                    'event_class' => \App\Events\TaskStatusUpdated::class,
+                    'task_id' => $task->id,
+                    'old_status' => $oldStatus,
+                    'new_status' => $request->status
+                ]);
+            } catch (\Exception $e) {
+                Log::error('❌ Erro ao disparar evento TaskStatusUpdated', [
+                    'task_id' => $task->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             // Log da atividade
             Log::info('✅ Status da tarefa atualizado com sucesso', [

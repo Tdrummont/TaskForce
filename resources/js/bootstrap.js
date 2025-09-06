@@ -17,21 +17,33 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.Pusher = Pusher;
 
 // Verificar se as variáveis de ambiente estão disponíveis
-const pusherKey = import.meta.env.VITE_PUSHER_APP_KEY;
-const pusherCluster = import.meta.env.VITE_PUSHER_APP_CLUSTER;
+const reverbKey = import.meta.env.VITE_REVERB_APP_KEY;
+const reverbHost = import.meta.env.VITE_REVERB_HOST;
+const reverbPort = import.meta.env.VITE_REVERB_PORT;
+const reverbScheme = import.meta.env.VITE_REVERB_SCHEME;
 
-if (!pusherKey) {
-    console.warn('⚠️ VITE_PUSHER_APP_KEY não está configurado. WebSockets não funcionarão.');
-    console.warn('📝 Configure no arquivo .env: VITE_PUSHER_APP_KEY=your_app_key');
+console.log('🔧 Variáveis de ambiente Reverb:', {
+    key: reverbKey,
+    host: reverbHost,
+    port: reverbPort,
+    scheme: reverbScheme
+});
+
+if (!reverbKey) {
+    console.warn('⚠️ VITE_REVERB_APP_KEY não está configurado. WebSockets não funcionarão.');
+    console.warn('📝 Configure no arquivo .env: VITE_REVERB_APP_KEY=local');
 } else {
-    console.log('✅ Pusher configurado:', { key: pusherKey, cluster: pusherCluster });
+    console.log('✅ Reverb configurado:', { key: reverbKey, host: reverbHost, port: reverbPort });
     
     window.Echo = new Echo({
-        broadcaster: 'pusher',
-        key: pusherKey,
-        cluster: pusherCluster || 'mt1',
-        forceTLS: true,
-        encrypted: true,
+        broadcaster: 'reverb',
+        key: reverbKey,
+        wsHost: reverbHost,
+        wsPort: reverbPort,
+        wssPort: reverbPort,
+        forceTLS: reverbScheme === 'https',
+        enabledTransports: ['ws', 'wss'],
+        authEndpoint: '/broadcasting/auth',
         authorizer: (channel, options) => {
             return {
                 authorize: (socketId, callback) => {

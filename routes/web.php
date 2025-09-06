@@ -6,6 +6,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\Auth\SocialLoginController;
+use App\Notifications\TestBroadcastNotification;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -137,3 +138,14 @@ Route::get('/test-callback', function (Request $request) {
 Route::get('/test-google', function () {
     return response('Google Auth test working');
 });
+
+// Rota de teste para notificação WebSocket
+Route::get('/test-notify', function () {
+    $user = auth()->user(); // precisa estar logado no navegador
+    if (!$user) {
+        return 'Usuário não está logado';
+    }
+    
+    $user->notify(new TestBroadcastNotification());
+    return 'Notificação de teste enviada para usuário: ' . $user->name . ' (ID: ' . $user->id . ')';
+})->middleware('auth');

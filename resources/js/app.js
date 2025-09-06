@@ -1,6 +1,7 @@
 import './bootstrap'
 import './trusted-types'
 import '../css/app.css'
+import { echo } from './echo'
 
 import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
@@ -40,3 +41,8 @@ createInertiaApp({
   },
   progress: { color: '#4B5563' },
 })
+
+// Configurar listeners do Echo será feito no WebSocketService
+// echo.channel('tasks').listen('.TaskCreated', (e) => {
+//   console.log('TaskCreated recebido:', e)
+// })

@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\SyncTasksToCloud::class,
         Commands\GenerateTestData::class,
         Commands\GenerateDashboardData::class,
+        Commands\CleanOfflineUsers::class,
     ];
 
     /**
@@ -43,6 +44,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('tasks:sync-cloud --user-id=all')
                  ->dailyAt('23:00')
                  ->description('Backup automático de todas as tarefas');
+
+        // Limpar usuários offline a cada 2 minutos
+        $schedule->command('websocket:clean-offline-users')
+                 ->everyTwoMinutes()
+                 ->description('Limpar usuários offline e disparar eventos');
     }
 
     /**

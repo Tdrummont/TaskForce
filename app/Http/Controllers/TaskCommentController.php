@@ -25,6 +25,24 @@ class TaskCommentController extends Controller
             'mentions' => $request->mentions ?? []
         ]);
 
+        // Disparar evento para WebSocket
+        try {
+            $event = new \App\Events\TaskCommentAdded($task, $comment, Auth::user());
+            event($event);
+            
+            \Log::info('📡 Evento TaskCommentAdded disparado com sucesso', [
+                'event_class' => \App\Events\TaskCommentAdded::class,
+                'task_id' => $task->id,
+                'comment_id' => $comment->id
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('❌ Erro ao disparar evento TaskCommentAdded', [
+                'task_id' => $task->id,
+                'comment_id' => $comment->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
         return response()->json([
             'success' => true,
             'comment' => $comment->load('user'),

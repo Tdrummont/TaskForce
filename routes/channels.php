@@ -21,6 +21,11 @@ Broadcast::channel('user.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
+// Canal privado padrão do Laravel para notificações
+Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+
 // Canal privado para tarefas específicas
 Broadcast::channel('task.{id}', function ($user, $id) {
     // Verificar se o usuário tem acesso à tarefa
@@ -36,4 +41,20 @@ Broadcast::channel('notifications.{id}', function ($user, $id) {
 // Canal privado para dashboard do usuário
 Broadcast::channel('dashboard.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
-}); 
+});
+
+// Canal de presença para usuários online
+Broadcast::channel('online-users', function ($user) {
+    \Log::info('Canal de presença online-users acessado', [
+        'user_id' => $user->id,
+        'user_name' => $user->name,
+        'user_email' => $user->email
+    ]);
+    
+    return [
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'avatar' => $user->avatar ?? null,
+    ];
+});

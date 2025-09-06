@@ -8,6 +8,7 @@ use App\Mail\TaskDelegatedMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class TaskDelegatedNotification extends Notification implements ShouldQueue
@@ -35,7 +36,7 @@ class TaskDelegatedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'broadcast'];
     }
 
     /**
@@ -68,6 +69,31 @@ class TaskDelegatedNotification extends Notification implements ShouldQueue
             'due_date' => $this->task->due_date?->format('Y-m-d H:i:s'),
             'category' => $this->task->category,
         ];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @return BroadcastMessage
+     */
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'title' => 'Tarefa Delegada',
+            'task_id' => $this->task->id,
+            'task_title' => $this->task->title,
+            'delegated_by' => $this->delegatedBy->id,
+            'delegated_by_name' => $this->delegatedBy->name,
+            'delegated_to' => $this->delegatedTo->id,
+            'delegated_to_name' => $this->delegatedTo->name,
+            'type' => 'task_delegated',
+            'message' => "Tarefa '{$this->task->title}' foi delegada para você por {$this->delegatedBy->name}",
+            'priority' => $this->task->priority,
+            'status' => $this->task->status,
+            'due_date' => $this->task->due_date?->format('Y-m-d H:i:s'),
+            'category' => $this->task->category,
+            'created_at' => now()->toIso8601String(),
+        ]);
     }
 
     /**

@@ -6,6 +6,9 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import QuickTaskModal from '@/Components/QuickTaskModal.vue';
 import HolidaySnackbar from '@/Components/HolidaySnackbar.vue';
 import LanguageSelector from '@/Components/LanguageSelector.vue';
+import OnlineUsersFAB from '../components/OnlineUsersFAB.vue';
+import BeautifulNotificationCenter from '../components/BeautifulNotificationCenter.vue';
+import ToastContainer from '../components/BeautifulToastContainer.vue';
 
 import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 import { useLocale } from '@/Components/useLocale';
@@ -19,6 +22,7 @@ const props = defineProps({
 
 // Tipagem opcional dos slots para TS (suporta <template #header>)
 const slots = defineSlots<{
+    default?: () => any
     header?: () => any
 }>()
 
@@ -32,8 +36,10 @@ const searchQuery = ref('');
 const showFabMenu = ref(false);
 const showQuickTaskModal = ref(false);
 const showNotifications = ref(false);
-const notifications = ref([]);
+const notifications = ref<any[]>([]);
 const unreadCount = ref(0);
+const onlineUsersCount = ref(2);
+const toastContainer = ref<any>(null);
 const categories = ref([]);
 
 // Sincronizar com a prop externa
@@ -49,9 +55,23 @@ const toggleUserMenu = () => {
     showUserMenu.value = !showUserMenu.value;
 };
 
-const logout = () => {
-    const form = useForm({})
-    form.post(routeL('logout'))
+const logout = async () => {
+    try {
+        // Desconectar WebSocketService antes do logout
+        // @ts-ignore
+        const module = await import('../services/WebSocketService.js');
+        const WebSocketService = module.default;
+        
+        console.log('🔌 Desconectando WebSocketService...');
+        WebSocketService.disconnect();
+        console.log('✅ WebSocketService desconectado com sucesso');
+    } catch (error) {
+        console.error('❌ Erro ao desconectar WebSocketService:', error);
+    } finally {
+        // Executar logout mesmo se houver erro no WebSocket
+        const form = useForm({})
+        form.post(routeL('logout'))
+    }
 };
 
 const performSearch = () => {
@@ -162,13 +182,17 @@ const toggleNotifications = () => {
     }
 };
 
+
 const loadNotifications = async () => {
     console.log('🚀 loadNotifications INICIADA!');
     try {
         console.log('🔍 Carregando notificações...');
-        console.log('👤 Usuário logado:', $page.props.auth.user);
+        console.log('👤 Usuário logado:', ($page.props as any).auth.user);
         
-        const response = await fetch(routeL('api.notifications.index'), {
+        const url = routeL('api.notifications.index');
+        console.log('🔗 URL da API:', url);
+        
+        const response = await fetch(url, {
             credentials: 'same-origin',
             headers: {
                 'Accept': 'application/json',
@@ -178,29 +202,38 @@ const loadNotifications = async () => {
         });
         
         console.log('📡 Response status:', response.status);
+        console.log('📡 Response ok:', response.ok);
         console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
         
         if (response.ok) {
             const data = await response.json();
             console.log('📊 Dados recebidos:', data);
             console.log('📊 Estrutura dos dados:', Object.keys(data));
+            console.log('📊 data.success:', data.success);
+            console.log('📊 data.notifications existe:', !!data.notifications);
+            console.log('📊 data.notifications length:', data.notifications?.length);
             
             if (data.success && data.notifications) {
                 notifications.value = data.notifications;
                 console.log('✅ Notificações carregadas:', notifications.value.length);
                 console.log('📝 Primeira notificação:', notifications.value[0]);
+                console.log('📝 Todas as notificações:', notifications.value);
+                console.log('🔍 notifications.value após carregamento:', notifications.value);
             } else {
                 console.warn('⚠️ API retornou sucesso=false ou sem notificações:', data);
+                console.warn('⚠️ data.success:', data.success);
+                console.warn('⚠️ data.notifications:', data.notifications);
                 notifications.value = [];
             }
         } else {
             console.error('❌ Erro na resposta:', response.status, response.statusText);
             const text = await response.text();
             console.error('📄 Conteúdo da resposta:', text);
+            notifications.value = [];
         }
     } catch (error) {
         console.error('❌ Erro ao carregar notificações:', error);
-        console.error('📋 Stack trace:', error.stack);
+        console.error('📋 Stack trace:', (error as any).stack);
     }
 };
 
@@ -233,7 +266,7 @@ const loadUnreadCount = async () => {
     }
 };
 
-const markAsRead = async (notificationId) => {
+const markAsRead = async (notificationId: any) => {
     try {
         console.log('🔍 Marcando notificação como lida:', notificationId);
         const response = await fetch(routeL('api.notifications.markRead', { id: notificationId }), {
@@ -282,7 +315,7 @@ const markAllAsRead = async () => {
     }
 };
 
-const deleteNotification = async (notificationId) => {
+const deleteNotification = async (notificationId: any) => {
     try {
         console.log('🔍 Deletando notificação:', notificationId);
         const response = await fetch(routeL('api.notifications.delete', { id: notificationId }), {
@@ -303,32 +336,43 @@ const deleteNotification = async (notificationId) => {
     }
 };
 
+const clearAllNotifications = async () => {
+    try {
+        console.log('🔍 Limpando todas as notificações...');
+        notifications.value = [];
+        unreadCount.value = 0;
+        console.log('✅ Todas as notificações limpas');
+    } catch (error) {
+        console.error('❌ Erro ao limpar notificações:', error);
+    }
+};
+
 const getUnreadCount = () => {
     return unreadCount.value;
 };
 
-const getNotificationIcon = (type) => {
+const getNotificationIcon = (type: any) => {
     const icons = {
         success: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
         warning: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z',
         error: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
         info: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
     };
-    return icons[type] || icons.info;
+    return icons[type as keyof typeof icons] || icons.info;
 };
 
-const getNotificationColor = (type) => {
+const getNotificationColor = (type: any) => {
     const colors = {
         success: 'text-green-500',
         warning: 'text-yellow-500',
         error: 'text-red-500',
         info: 'text-blue-500'
     };
-    return colors[type] || colors.info;
+    return colors[type as keyof typeof colors] || colors.info;
 };
 
 // Função para mostrar toast de notificação
-const showToast = (message, type = 'info') => {
+const showToast = (message: any, type = 'info') => {
     // Criar elemento de toast
     const toast = document.createElement('div');
     toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${
@@ -351,10 +395,11 @@ const showToast = (message, type = 'info') => {
 };
 
 // Fechar dropdowns quando clicar fora
-const handleClickOutside = (event) => {
+const handleClickOutside = (event: any) => {
     if (showNotifications.value || showUserMenu.value) {
         const target = event.target;
-        if (!target.closest('.notification-dropdown') && !target.closest('.user-menu-dropdown')) {
+        if (!target.closest('.notification-dropdown') && 
+            !target.closest('.user-menu-dropdown')) {
             showNotifications.value = false;
             showUserMenu.value = false;
         }
@@ -364,54 +409,209 @@ const handleClickOutside = (event) => {
 onMounted(() => {
     document.addEventListener('click', handleClickOutside);
     
+    // Listener para desconectar WebSocketService ao fechar aba/navegar
+    window.addEventListener('beforeunload', () => {
+        // @ts-ignore
+        import('../services/WebSocketService.js').then((module) => {
+            const WebSocketService = module.default;
+            console.log('🔌 Desconectando WebSocketService antes de sair...');
+            WebSocketService.disconnect();
+        }).catch((error) => {
+            console.error('❌ Erro ao desconectar WebSocketService no beforeunload:', error);
+        });
+    });
+    
     console.log('🚀 Componente AuthenticatedLayout montado!');
-    console.log('👤 Usuário logado:', $page.props.auth.user);
+    console.log('🎯 FAB de Usuários Online sendo renderizado...');
+    console.log('👥 onlineUsersCount:', onlineUsersCount.value);
+    console.log('👤 Usuário logado:', ($page.props as any).auth.user);
     
     // Carregar contagem de notificações não lidas
     console.log('🔍 Iniciando carregamento de notificações...');
     loadUnreadCount();
     
-    // Configurar listener do Pusher para notificações em tempo real
-    if (window.Echo && $page.props.auth.user) {
-        const userId = $page.props.auth.user.id;
-        console.log('🔊 Configurando listener Pusher para usuário:', userId);
+    // Configurar WebSocket usando o serviço melhorado
+    if (($page.props as any).auth.user) {
+        // @ts-ignore
+        import('../services/WebSocketService.js').then((module: any) => {
+            const WebSocketService = module.default;
         
-        // Escutar canal privado do usuário
-        window.Echo.private(`user.${userId}`)
-            .listen('task.assigned', (e) => {
-                console.log('📨 Notificação recebida - Tarefa atribuída:', e);
-                // Adicionar notificação à lista
-                notifications.value.unshift({
-                    id: Date.now(),
-                    type: 'task_assigned',
-                    title: 'Nova Tarefa Atribuída',
-                    message: e.message,
-                    data: e,
-                    read_at: null,
-                    created_at: e.timestamp
+        // Inicializar serviço WebSocket
+        WebSocketService.init(($page.props as any).auth.user);
+        
+        // Configurar listeners para usuários online
+        WebSocketService.on('users_online', (users: any) => {
+            console.log('👥 Usuários online atualizados no layout:', users);
+            onlineUsersCount.value = users ? users.length : 0;
+        });
+        
+        WebSocketService.on('user_joined', (user: any) => {
+            console.log('👋 Usuário entrou, atualizando contador:', user);
+            onlineUsersCount.value++;
+        });
+        
+        WebSocketService.on('user_left', (user: any) => {
+            console.log('👋 Usuário saiu, atualizando contador:', user);
+            onlineUsersCount.value = Math.max(0, onlineUsersCount.value - 1);
+        });
+
+        // Configurar listeners para notificações
+        WebSocketService.on('task_assigned', (notification: any) => {
+            const newNotification = {
+                id: Date.now(),
+                type: 'task_assigned',
+                title: 'Nova Tarefa Atribuída',
+                message: notification.message || `A tarefa "${notification.data?.task?.title || 'Nova tarefa'}" foi atribuída para você`,
+                data: notification.data,
+                read_at: null,
+                created_at: notification.timestamp || new Date().toISOString()
+            };
+            notifications.value.unshift(newNotification);
+            unreadCount.value++;
+            
+            // Mostrar toast
+            if (toastContainer.value) {
+                toastContainer.value.addToast(newNotification);
+            }
+        });
+        
+        WebSocketService.on('task_delegated', (notification: any) => {
+            console.log('🔔 Notificação task_delegated recebida no AuthenticatedLayout:', notification);
+            console.log('🔔 Dados da notificação:', JSON.stringify(notification, null, 2));
+            
+            const newNotification = {
+                id: Date.now(),
+                type: 'task_delegated',
+                title: 'Tarefa Delegada',
+                message: notification.message || `A tarefa "${notification.data?.task?.title || 'Nova tarefa'}" foi delegada para você por ${notification.data?.delegated_by?.name || 'um usuário'}`,
+                data: notification.data,
+                read_at: null,
+                created_at: notification.timestamp || new Date().toISOString()
+            };
+            
+            console.log('🔔 Criando nova notificação:', newNotification);
+            notifications.value.unshift(newNotification);
+            unreadCount.value++;
+            console.log('🔔 Notificação adicionada. Total:', notifications.value.length);
+            
+            // Mostrar toast
+            if (toastContainer.value) {
+                console.log('🔔 Mostrando toast...');
+                toastContainer.value.addToast(newNotification);
+            } else {
+                console.warn('⚠️ toastContainer não está disponível');
+            }
+        });
+        
+        WebSocketService.on('task_created', (notification: any) => {
+            const newNotification = {
+                id: Date.now(),
+                type: 'task_created',
+                title: 'Nova Tarefa Criada',
+                message: notification.message || `A tarefa "${notification.data?.task?.title || 'Nova tarefa'}" foi criada`,
+                data: notification.data,
+                read_at: null,
+                created_at: notification.timestamp || new Date().toISOString()
+            };
+            notifications.value.unshift(newNotification);
+            unreadCount.value++;
+            
+            // Mostrar toast
+            if (toastContainer.value) {
+                toastContainer.value.addToast(newNotification);
+            }
+        });
+        
+        WebSocketService.on('task_status_updated', (notification: any) => {
+            const newNotification = {
+                id: Date.now(),
+                type: 'task_status_updated',
+                title: 'Status da Tarefa Atualizado',
+                message: notification.message || `O status da tarefa "${notification.data?.task?.title || 'Nova tarefa'}" foi alterado de "${notification.data?.old_status || 'pendente'}" para "${notification.data?.new_status || 'em progresso'}"`,
+                data: notification.data,
+                read_at: null,
+                created_at: notification.timestamp || new Date().toISOString()
+            };
+            notifications.value.unshift(newNotification);
+            unreadCount.value++;
+            
+            // Mostrar toast
+            if (toastContainer.value) {
+                toastContainer.value.addToast(newNotification);
+            }
+        });
+        
+        WebSocketService.on('task_comment_added', (notification: any) => {
+            const newNotification = {
+                id: Date.now(),
+                type: 'task_comment_added',
+                title: 'Novo Comentário',
+                message: notification.message || `${notification.data?.commented_by?.name || 'Um usuário'} comentou na tarefa "${notification.data?.task?.title || 'Nova tarefa'}"`,
+                data: notification.data,
+                read_at: null,
+                created_at: notification.timestamp || new Date().toISOString()
+            };
+            notifications.value.unshift(newNotification);
+            unreadCount.value++;
+            
+            // Mostrar toast
+            if (toastContainer.value) {
+                toastContainer.value.addToast(newNotification);
+            }
+        });
+        
+        // Listener para usuários online
+        WebSocketService.on('users_online', (users: any) => {
+            console.log('👥 Usuários online atualizados:', users);
+            onlineUsersCount.value = users.length;
+        });
+        
+        WebSocketService.on('user_joined', (user: any) => {
+            console.log('👋 Usuário entrou:', user);
+            onlineUsersCount.value++;
+            if (toastContainer.value) {
+                toastContainer.value.addToast({
+                    type: 'user_joined',
+                    title: 'Usuário Online',
+                    message: `${user.name || 'Um usuário'} está online`,
+                    timestamp: new Date().toISOString()
                 });
-                // Atualizar contagem
-                unreadCount.value++;
-                // Mostrar toast
-                showToast('Nova tarefa atribuída!', 'success');
-            })
-            .listen('task.delegated', (e) => {
-                console.log('📨 Notificação recebida - Tarefa delegada:', e);
-                // Adicionar notificação à lista
-                notifications.value.unshift({
-                    id: Date.now(),
-                    type: 'task_delegated',
-                    title: 'Tarefa Delegada',
-                    message: e.message,
-                    data: e,
-                    read_at: null,
-                    created_at: e.timestamp
-                });
-                // Atualizar contagem
-                unreadCount.value++;
-                // Mostrar toast
-                showToast('Nova tarefa delegada!', 'info');
-            });
+            }
+        });
+        
+        WebSocketService.on('user_left', (user: any) => {
+            console.log('👋 Usuário saiu:', user);
+            onlineUsersCount.value = Math.max(0, onlineUsersCount.value - 1);
+        });
+
+        // Listener para notificações do Laravel
+        WebSocketService.on('laravel_notification', (notification: any) => {
+            console.log('🔔 Notificação Laravel recebida no AuthenticatedLayout:', notification);
+            
+            const newNotification = {
+                id: Date.now(),
+                type: notification.type || 'notification',
+                title: notification.title || 'Nova Notificação',
+                message: notification.message || 'Você tem uma nova notificação',
+                data: notification.data,
+                read_at: null,
+                created_at: notification.timestamp || new Date().toISOString()
+            };
+            
+            console.log('🔔 Criando nova notificação Laravel:', newNotification);
+            notifications.value.unshift(newNotification);
+            unreadCount.value++;
+            console.log('🔔 Notificação Laravel adicionada. Total:', notifications.value.length);
+            
+            // Mostrar toast
+            if (toastContainer.value) {
+                console.log('🔔 Mostrando toast Laravel...');
+                toastContainer.value.addToast(newNotification);
+            } else {
+                console.warn('⚠️ toastContainer não está disponível para notificação Laravel');
+            }
+        });
+        });
     }
     
     // Atualizar contagem a cada 30 segundos
@@ -423,6 +623,16 @@ onMounted(() => {
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
+    
+    // Desconectar WebSocketService ao sair do componente
+    // @ts-ignore
+    import('../services/WebSocketService.js').then((module) => {
+        const WebSocketService = module.default;
+        console.log('🔌 Desconectando WebSocketService no unmount...');
+        WebSocketService.disconnect();
+    }).catch((error) => {
+        console.error('❌ Erro ao desconectar WebSocketService no unmount:', error);
+    });
 });
 </script>
 
@@ -515,93 +725,15 @@ onUnmounted(() => {
                                 <span>{{ t('navbar.new_task') }}</span>
                             </button>
 
-                            <!-- Notifications -->
-                            <div class="relative notification-dropdown">
-                                <button @click="toggleNotifications" 
-                                        class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-md transition-all duration-200 backdrop-blur-sm relative">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.83 2.17a1 1 0 00-1.66 0L1 4v16a1 1 0 001 1h16a1 1 0 001-1V4l-2.17-1.83a1 1 0 00-1.66 0L4.83 2.17z"></path>
-                                    </svg>
-                                    <!-- Notification Badge -->
-                                    <span v-if="getUnreadCount() > 0" 
-                                          class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                        {{ getUnreadCount() }}
-                                    </span>
-                                </button>
 
-                                <!-- Notifications Dropdown -->
-                                <div v-if="showNotifications" 
-                                     class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 max-h-96 overflow-y-auto">
-                                    <!-- Header -->
-                                    <div class="px-4 py-2 border-b border-gray-200">
-                                        <div class="flex items-center justify-between">
-                                            <h3 class="text-sm font-semibold text-gray-900">{{ t('notifications.title') }}</h3>
-                                            <button @click="markAllAsRead" 
-                                                    class="text-xs text-blue-600 hover:text-blue-800">
-                                                {{ t('notifications.mark_all') }}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Notifications List -->
-                                    <div v-if="notifications.length > 0">
-                                        <div v-for="notification in notifications" 
-                                             :key="notification.id"
-                                             @click="markAsRead(notification.id)"
-                                             class="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                                             :class="{ 'bg-blue-50': !notification.read }">
-                                            <div class="flex items-start space-x-3">
-                                                <!-- Icon -->
-                                                <div class="flex-shrink-0">
-                                                    <svg class="w-5 h-5" 
-                                                         :class="getNotificationColor(notification.type)"
-                                                         fill="none" 
-                                                         stroke="currentColor" 
-                                                         viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" 
-                                                              stroke-linejoin="round" 
-                                                              stroke-width="2" 
-                                                              :d="getNotificationIcon(notification.type)"></path>
-                                                    </svg>
-                                                </div>
-                                                
-                                                <!-- Content -->
-                                                <div class="flex-1 min-w-0">
-                                                    <div class="flex items-center justify-between">
-                                                        <p class="text-sm font-medium text-gray-900" 
-                                                           :class="{ 'font-semibold': !notification.read }">
-                                                            {{ notification.title }}
-                                                        </p>
-                                                        <button @click.stop="deleteNotification(notification.id)"
-                                                                class="text-gray-400 hover:text-red-500">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                    <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
-                                                    <p class="text-xs text-gray-400 mt-1">{{ notification.time }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Empty State -->
-                                    <div v-else class="px-4 py-8 text-center">
-                                        <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.83 2.17a1 1 0 00-1.66 0L1 4v16a1 1 0 001 1h16a1 1 0 001-1V4l-2.17-1.83a1 1 0 00-1.66 0L4.83 2.17z"></path>
-                                        </svg>
-                                        <p class="text-sm text-gray-500">{{ t('notifications.none') }}</p>
-                                    </div>
-
-                                    <!-- Footer -->
-                                    <div class="px-4 py-2 border-t border-gray-200">
-                                        <Link href="#" class="text-xs text-blue-600 hover:text-blue-800 block text-center">
-                                            {{ t('notifications.view_all') }}
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Centro de Notificações com Design Moderno -->
+                            <BeautifulNotificationCenter 
+                                :notifications="notifications"
+                                @mark-as-read="markAsRead"
+                                @mark-all-read="markAllAsRead"
+                                @clear-all="clearAllNotifications"
+                                @load-notifications="loadNotifications"
+                            />
 
                             <!-- User Menu -->
                             <div class="relative user-menu-dropdown">
@@ -669,6 +801,11 @@ onUnmounted(() => {
         <main>
             <slot />
         </main>
+
+        <!-- FAB de Usuários Online (Canto Inferior Esquerdo) -->
+        <OnlineUsersFAB 
+            :online-users-count="onlineUsersCount"
+        />
 
         <!-- Botão Flutuante (FAB) para Adicionar Tarefas -->
         <div class="fixed bottom-6 right-6 z-[9999]">
@@ -753,6 +890,10 @@ onUnmounted(() => {
 
         <!-- Snackbar de Feriados -->
         <HolidaySnackbar />
+
+        <!-- Toast Container para Notificações -->
+        <ToastContainer ref="toastContainer" />
+
 
     </div>
 </template>
