@@ -112,3 +112,59 @@ docker-compose.override.yml
 # Deployment
 deploy.php
 deploy.sh
+
+# Arquivos sensíveis do TaskForce
+curriculo/
+video/
+screenshots/
+*.pdf
+*.mp4
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Documentação de desenvolvimento
+*_TROUBLESHOOTING.md
+*_USUARIOS_ONLINE.md
+*_MOBILE_RESPONSIVE.md
+*_IOS_ANDROID.md
+*_VISUAL_GUIDE.md
+*_IMPROVEMENTS.md
+BEAUTIFUL_WEBSOCKET_DESIGN.md
+TESTE_NOTIFICACOES_REAIS.md
+USUARIOS_REAIS_SIDEBAR.md
+
+# Chaves e credenciais
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+auth.json
+credentials.json
+service-account.json
+
+# Logs específicos
+laravel.log
+error.log
+access.log
+debug.log
+queue.log
+reverb.log
+
+# Cache específico
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+bootstrap/cache/*
+
+# Arquivos temporários de desenvolvimento
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
