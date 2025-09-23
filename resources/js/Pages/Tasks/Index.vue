@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
       <template #header>
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-00 text-white leading-tight">
           {{ t('tasks.my_tasks') }}
         </h2>
       </template>
@@ -9,13 +9,13 @@
       <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <!-- Toolbar -->
-          <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+          <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
             <div class="p-6">
               <div class="flex flex-wrap gap-4 items-center justify-between">
                 <div class="flex gap-4">
                   <button
                     @click="backup"
-                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+                    class="bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#9333ea] text-white px-4 py-2 rounded-md hover:from-[#2563eb] hover:via-[#8b5cf6] hover:to-[#a855f7] transition flex items-center gap-2"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -26,7 +26,7 @@
   
                   <button
                     @click="showRestoreModal = true"
-                    class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition flex items-center gap-2"
+                    class="bg-white/10 border border-white/10 text-white px-4 py-2 rounded-md hover:bg-white/20 transition flex items-center gap-2"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -53,7 +53,7 @@
           </div>
   
           <!-- Search & Filters -->
-          <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+          <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
             <div class="p-6">
               <div class="flex flex-wrap gap-4 items-center">
                 <!-- Search -->
@@ -69,14 +69,14 @@
                       type="text"
                       v-model="searchQuery"
                       :placeholder="t('tasks.search_placeholder')"
-                      class="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                      class="block w-full pl-10 pr-4 py-2 rounded-md leading-5 bg-white/10 text-white placeholder-slate-300 border border-white/10 focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed] transition-all duration-200">
                   </div>
                 </div>
   
                 <!-- Filters -->
                 <div class="flex gap-3">
                   <select v-model="statusFilter"
-                    class="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    class="px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]">
                     <option value="">{{ t('filters.all_status') }}</option>
                     <option value="pending">{{ t('status.pending') }}</option>
                     <option value="in_progress">{{ t('status.in_progress') }}</option>
@@ -84,7 +84,7 @@
                   </select>
   
                   <select v-model="priorityFilter"
-                    class="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    class="px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]">
                     <option value="">{{ t('filters.all_priorities') }}</option>
                     <option value="low">{{ t('priority.low') }}</option>
                     <option value="medium">{{ t('priority.medium') }}</option>
@@ -92,7 +92,7 @@
                   </select>
   
                   <select v-model="categoryFilter"
-                    class="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    class="px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]">
                     <option value="">{{ t('filters.all_categories') }}</option>
                     <option value="Work">{{ t('categories.work') }}</option>
                     <option value="Personal">{{ t('categories.personal') }}</option>
@@ -114,7 +114,7 @@
   
               <!-- Search result badge -->
               <div v-if="searchQuery || statusFilter || priorityFilter || categoryFilter"
-                class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                class="mt-4 p-3 bg-white/5 border border-white/10 rounded-md text-white">
                 <div class="flex items-center justify-between">
                   <div class="text-sm text-blue-800">
                     <span class="font-medium">{{ filteredTasks.length }}</span>
@@ -123,7 +123,7 @@
                       {{ t('tasks.for_query') }} "<strong>{{ searchQuery }}</strong>"
                     </span>
                   </div>
-                  <button @click="clearFilters" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                  <button @click="clearFilters" class="text-indigo-300 hover:text-indigo-200 text-sm font-medium">
                     {{ t('filters.clear_filters') }}
                   </button>
                 </div>
@@ -132,14 +132,14 @@
           </div>
   
           <!-- Kanban -->
-          <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+          <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
             <div class="p-6">
               <h3 class="text-lg font-semibold mb-4">{{ t('tasks.organize') }}</h3>
-              <p class="text-sm text-gray-600 mb-6">{{ t('tasks.drag_help') }}</p>
+              <p class="text-sm text-slate-300 mb-6">{{ t('tasks.drag_help') }}</p>
   
               <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Pending -->
-                <div class="bg-gray-50 rounded-xl p-4 kanban-column">
+                <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
                   <div class="flex items-center justify-between mb-4">
                     <h4 class="text-lg font-semibold text-gray-800 flex items-center">
                       <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
@@ -174,7 +174,7 @@
                     <template #item="{ element: task }">
                       <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-yellow-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
-                          <h5 class="font-semibold text-gray-800 text-sm">{{ task.title }}</h5>
+                      <h5 class="font-semibold text-white text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
                             <span class="text-xs px-2 py-1 rounded-full" :class="getPriorityClass(task.priority)">
                               {{ getPriorityLabel(task.priority) }}
@@ -182,11 +182,11 @@
                           </div>
                         </div>
   
-                        <p v-if="task.description" class="text-gray-600 text-xs mb-3 line-clamp-2">
+                        <p v-if="task.description" class="text-slate-300 text-xs mb-3 line-clamp-2">
                           {{ task.description }}
                         </p>
   
-                        <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex items-center justify-between text-xs text-slate-300">
                           <div class="flex items-center space-x-2">
                             <span v-if="task.due_date" class="flex items-center">
                               <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +218,7 @@
                 </div>
   
                 <!-- In progress -->
-                <div class="bg-gray-50 rounded-xl p-4 kanban-column">
+                <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
                   <div class="flex items-center justify-between mb-4">
                     <h4 class="text-lg font-semibold text-gray-800 flex items-center">
                       <div class="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
@@ -253,7 +253,7 @@
                     <template #item="{ element: task }">
                       <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-orange-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
-                          <h5 class="font-semibold text-gray-800 text-sm">{{ task.title }}</h5>
+                      <h5 class="font-semibold text-white text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
                             <span class="text-xs px-2 py-1 rounded-full" :class="getPriorityClass(task.priority)">
                               {{ getPriorityLabel(task.priority) }}
@@ -261,11 +261,11 @@
                           </div>
                         </div>
   
-                        <p v-if="task.description" class="text-gray-600 text-xs mb-3 line-clamp-2">
+                        <p v-if="task.description" class="text-slate-300 text-xs mb-3 line-clamp-2">
                           {{ task.description }}
                         </p>
   
-                        <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex items-center justify-between text-xs text-slate-300">
                           <div class="flex items-center space-x-2">
                             <span v-if="task.due_date" class="flex items-center">
                               <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,7 +297,7 @@
                 </div>
   
                 <!-- Completed -->
-                <div class="bg-gray-50 rounded-xl p-4 kanban-column">
+                <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
                   <div class="flex items-center justify-between mb-4">
                     <h4 class="text-lg font-semibold text-gray-800 flex items-center">
                       <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
@@ -332,7 +332,7 @@
                     <template #item="{ element: task }">
                       <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
-                          <h5 class="font-semibold text-gray-800 text-sm">{{ task.title }}</h5>
+                      <h5 class="font-semibold text-white text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
                             <span class="text-xs px-2 py-1 rounded-full" :class="getPriorityClass(task.priority)">
                               {{ getPriorityLabel(task.priority) }}
@@ -340,11 +340,11 @@
                           </div>
                         </div>
   
-                        <p v-if="task.description" class="text-gray-600 text-xs mb-3 line-clamp-2">
+                        <p v-if="task.description" class="text-slate-300 text-xs mb-3 line-clamp-2">
                           {{ task.description }}
                         </p>
   
-                        <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex items-center justify-between text-xs text-slate-300">
                           <div class="flex items-center space-x-2">
                             <span v-if="task.due_date" class="flex items-center">
                               <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -379,11 +379,11 @@
           </div>
   
           <!-- Task list -->
-          <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+          <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6">
               <h3 class="text-lg font-semibold mb-4">{{ t('tasks.list_title') }}</h3>
   
-              <div v-if="tasks.length === 0" class="text-gray-500 text-center py-8">
+              <div v-if="tasks.length === 0" class="text-slate-300 text-center py-8">
                 {{ t('tasks.none_found') }}
               </div>
   
@@ -391,7 +391,7 @@
                 <div
                   v-for="task in tasks"
                   :key="task.id"
-                  class="border rounded-lg p-4 hover:shadow-md transition"
+                  class="border border-white/10 rounded-lg p-4 hover:shadow-md transition bg-white/5 text-white"
                   :class="{
                     'border-green-300 bg-green-50': task.status === 'completed',
                     'border-yellow-300 bg-yellow-50': task.status === 'in_progress',
@@ -403,7 +403,7 @@
                   <div class="flex justify-between items-start">
                     <div class="flex-1">
                       <h4 class="font-semibold text-lg">{{ task.title }}</h4>
-                      <p class="text-gray-600 mt-1">{{ task.description }}</p>
+                      <p class="text-slate-300 mt-1">{{ task.description }}</p>
   
                       <div class="flex gap-4 mt-3 text-sm">
                         <span class="flex items-center gap-1">
@@ -427,7 +427,7 @@
                         </span>
                       </div>
   
-                      <div class="mt-2 text-sm text-gray-500">
+                      <div class="mt-2 text-sm text-slate-300">
                         {{ t('tasks.created_by') }}: {{ task.creator?.name || t('tasks.you') }}
                         <span v-if="task.assignee">
                           | {{ t('tasks.assigned_to') }}: {{ task.assignee.name }}

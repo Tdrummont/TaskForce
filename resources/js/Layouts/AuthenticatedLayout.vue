@@ -12,6 +12,7 @@ import ToastContainer from '../components/BeautifulToastContainer.vue';
 
 import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 import { useLocale } from '@/Components/useLocale';
+import { ref as vueRef, onMounted as vueOnMounted } from 'vue';
 
 const props = defineProps({
     showingNavigation: {
@@ -54,6 +55,22 @@ const toggleSidebar = () => {
 const toggleUserMenu = () => {
     showUserMenu.value = !showUserMenu.value;
 };
+
+// Dark mode toggle
+const isDark = vueRef(false);
+const applyThemeClass = () => {
+    const root = document.documentElement;
+    if (isDark.value) root.classList.add('dark'); else root.classList.remove('dark');
+};
+const toggleDark = () => {
+    isDark.value = !isDark.value;
+    localStorage.setItem('theme:dark', isDark.value ? '1' : '0');
+    applyThemeClass();
+};
+vueOnMounted(() => {
+    isDark.value = localStorage.getItem('theme:dark') === '1';
+    applyThemeClass();
+});
 
 const logout = async () => {
     try {
@@ -637,11 +654,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#111827] to-[#1f2937]">
         <!-- Toolbar Principal Adaptada -->
         <div class="bg-white shadow-lg">
             <!-- Toolbar com Gradiente -->
-            <div class="relative h-20 bg-gradient-to-r from-blue-600 to-purple-600">
+            <div class="relative h-20 bg-gradient-to-r from-slate-800 to-cyan-600">
+
                 <!-- Background Pattern -->
                 <div class="absolute inset-0 bg-black bg-opacity-10"></div>
                 
@@ -713,6 +731,14 @@ onUnmounted(() => {
                         <div class="flex items-center space-x-2">
                             <!-- Language Selector -->
                             <LanguageSelector />
+
+                            <!-- Dark mode toggle -->
+                            <button @click="toggleDark"
+                                class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-md transition-all duration-200 backdrop-blur-sm"
+                                :title="isDark ? 'Light' : 'Dark'">
+                                <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M12 2a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 16a4 4 0 100-8 4 4 0 000 8zm8-5a1 1 0 100-2h-2a1 1 0 100 2h2zM6 12a1 1 0 100-2H4a1 1 0 100 2h2zm11.657-6.657a1 1 0 010 1.414L16.414 8.0a1 1 0 11-1.414-1.414l1.243-1.243a1 1 0 011.414 0zM9 16.414a1 1 0 10-1.414-1.414L6.343 16.243A1 1 0 107.757 17.657L9 16.414zM17.657 16.243a1 1 0 10-1.414 1.414l1.243 1.243a1 1 0 001.414-1.414l-1.243-1.243zM7.757 7.343A1 1 0 106.343 5.929L5.1 7.171A1 1 0 106.514 8.586l1.243-1.243z"/></svg>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
+                            </button>
 
                             <!-- Create Task Button -->
                             <button 
@@ -794,6 +820,11 @@ onUnmounted(() => {
                     Perfil
                 </Link>
             </div>
+        </div>
+
+        <!-- Page Header (slot) -->
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8" v-if="$slots.header">
+            <slot name="header" />
         </div>
 
         <!-- Page Content -->

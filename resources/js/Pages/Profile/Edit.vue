@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 
 defineProps({
     mustVerifyEmail: {
@@ -13,6 +13,10 @@ defineProps({
         type: String,
     },
 });
+
+const page = usePage();
+const user = (page.props as any)?.auth?.user || { name: '', email: '' };
+const firstName = (user.name || '').split(' ')[0] || user.name;
 </script>
 
 <template>
@@ -20,11 +24,17 @@ defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800"
-            >
-                Profile
-            </h2>
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 text-white flex items-center justify-center font-bold shadow">
+                    {{ (firstName || 'U')[0] }}
+                </div>
+                <div>
+                    <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+                        BEM VINDO {{ firstName }} — SEU PERFIL
+                    </h2>
+                    <p class="text-sm text-gray-500">{{ user.email }}</p>
+                </div>
+            </div>
         </template>
 
         <div class="py-12">

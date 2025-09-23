@@ -6,7 +6,7 @@
         
         <div>
             <Link :href="routeL('welcome')">
-                <h2 class="text-2xl font-bold text-gray-900">Sistema de Tarefas</h2>
+                <h2 class="text-2xl font-bold text-gray-900">Gerenciador de Tarefas</h2>
             </Link>
         </div>
 

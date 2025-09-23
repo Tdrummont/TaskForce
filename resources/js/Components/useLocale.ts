@@ -288,13 +288,13 @@ const messages: Record<Locale, Record<string, string>> = {
   },
   pt: {
     // Welcome
-    'app.title': 'Sistema de Tarefas',
+    'app.title': 'Gerenciador de Tarefas',
     'app.subtitle': 'Organize suas tarefas de forma simples e prática.',
     'auth.login': 'Login',
     'auth.register': 'Registrar',
 
     // Auth (login page)
-    'auth.title': 'Sistema de Tarefas',
+    'auth.title': 'Gerenciador de Tarefas',
     'auth.email': 'E-mail',
     'auth.password': 'Senha',
     'auth.remember': 'Lembrar-me',
