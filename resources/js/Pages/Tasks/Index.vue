@@ -141,15 +141,15 @@
                 <!-- Pending -->
                 <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
                   <div class="flex items-center justify-between mb-4">
-                    <h4 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <h4 class="text-lg font-semibold text-white flex items-center">
                       <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
                       {{ t('status.pending') }}
-                      <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">
+                      <span class="ml-2 bg-yellow-500/20 text-yellow-300 text-xs font-medium px-2 py-1 rounded-full">
                         {{ getTasksByStatus('pending').length }}
                       </span>
                     </h4>
                     <button @click="showCreateModal = true"
-                      class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200">
+                      class="text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -172,7 +172,7 @@
                     @end="onDragEnd"
                   >
                     <template #item="{ element: task }">
-                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-yellow-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
+                      <div class="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg shadow-sm border-l-4 border-yellow-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
                       <h5 class="font-semibold text-white text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
@@ -198,13 +198,13 @@
                           </div>
   
                           <div class="flex items-center space-x-2">
-                            <button @click="editTask(task)" class="text-blue-600 hover:text-blue-800 p-1">
+                            <button @click="editTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </button>
-                            <button @click="deleteTask(task.id)" class="text-red-600 hover:text-red-800 p-1">
+                            <button @click="deleteTask(task.id)" class="text-red-400 hover:text-red-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -220,15 +220,15 @@
                 <!-- In progress -->
                 <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
                   <div class="flex items-center justify-between mb-4">
-                    <h4 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <h4 class="text-lg font-semibold text-white flex items-center">
                       <div class="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
                       {{ t('status.in_progress') }}
-                      <span class="ml-2 bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full">
+                      <span class="ml-2 bg-orange-500/20 text-orange-300 text-xs font-medium px-2 py-1 rounded-full">
                         {{ getTasksByStatus('in_progress').length }}
                       </span>
                     </h4>
                     <button @click="showCreateModal = true"
-                      class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200">
+                      class="text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -251,7 +251,7 @@
                     @end="onDragEnd"
                   >
                     <template #item="{ element: task }">
-                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-orange-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
+                      <div class="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg shadow-sm border-l-4 border-orange-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
                       <h5 class="font-semibold text-white text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
@@ -277,13 +277,13 @@
                           </div>
   
                           <div class="flex items-center space-x-2">
-                            <button @click="editTask(task)" class="text-blue-600 hover:text-blue-800 p-1">
+                            <button @click="editTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </button>
-                            <button @click="deleteTask(task.id)" class="text-red-600 hover:text-red-800 p-1">
+                            <button @click="deleteTask(task.id)" class="text-red-400 hover:text-red-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -299,15 +299,15 @@
                 <!-- Completed -->
                 <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
                   <div class="flex items-center justify-between mb-4">
-                    <h4 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <h4 class="text-lg font-semibold text-white flex items-center">
                       <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
                       {{ t('status.completed') }}
-                      <span class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                      <span class="ml-2 bg-green-500/20 text-green-300 text-xs font-medium px-2 py-1 rounded-full">
                         {{ getTasksByStatus('completed').length }}
                       </span>
                     </h4>
                     <button @click="showCreateModal = true"
-                      class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200">
+                      class="text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -330,7 +330,7 @@
                     @end="onDragEnd"
                   >
                     <template #item="{ element: task }">
-                      <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
+                      <div class="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg shadow-sm border-l-4 border-green-400 hover:shadow-md transition-shadow cursor-move task-card" :data-task-id="task.id">
                         <div class="flex items-start justify-between mb-2">
                       <h5 class="font-semibold text-white text-sm">{{ task.title }}</h5>
                           <div class="flex items-center space-x-1">
@@ -356,13 +356,13 @@
                           </div>
   
                           <div class="flex items-center space-x-2">
-                            <button @click="editTask(task)" class="text-blue-600 hover:text-blue-800 p-1">
+                            <button @click="editTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </button>
-                            <button @click="deleteTask(task.id)" class="text-red-600 hover:text-red-800 p-1">
+                            <button @click="deleteTask(task.id)" class="text-red-400 hover:text-red-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -393,11 +393,11 @@
                   :key="task.id"
                   class="border border-white/10 rounded-lg p-4 hover:shadow-md transition bg-white/5 text-white"
                   :class="{
-                    'border-green-300 bg-green-50': task.status === 'completed',
-                    'border-yellow-300 bg-yellow-50': task.status === 'in_progress',
-                    'border-gray-300': task.status === 'pending',
-                    'border-red-300 bg-red-50': isOverdue(task),
-                    'border-orange-300 bg-orange-50': isDueToday(task)
+                    'border-green-400 bg-green-500/10': task.status === 'completed',
+                    'border-yellow-400 bg-yellow-500/10': task.status === 'in_progress',
+                    'border-slate-400': task.status === 'pending',
+                    'border-red-400 bg-red-500/10': isOverdue(task),
+                    'border-orange-400 bg-orange-500/10': isDueToday(task)
                   }"
                 >
                   <div class="flex justify-between items-start">
@@ -436,10 +436,10 @@
                     </div>
   
                     <div class="flex gap-2">
-                      <button @click="editTask(task)" class="text-blue-600 hover:text-blue-800">
+                      <button @click="editTask(task)" class="text-blue-400 hover:text-blue-300 transition-colors">
                         {{ t('tasks.edit') }}
                       </button>
-                      <button @click="deleteTask(task.id)" class="text-red-600 hover:text-red-800">
+                      <button @click="deleteTask(task.id)" class="text-red-400 hover:text-red-300 transition-colors">
                         {{ t('tasks.delete') }}
                       </button>
                     </div>

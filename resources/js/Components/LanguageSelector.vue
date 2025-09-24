@@ -16,14 +16,14 @@
     <!-- Dropdown Menu -->
     <div
       v-if="showDropdown"
-      class="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50"
+      class="absolute right-0 mt-2 w-32 bg-slate-800/90 backdrop-blur border border-white/10 rounded-md shadow-lg py-1 z-50"
     >
       <button
         v-for="lang in languages"
         :key="lang.code"
         @click="switchLanguage(lang.code)"
-        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-        :class="{ 'bg-blue-50 text-blue-700': current === lang.code }"
+        class="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 flex items-center space-x-2"
+        :class="{ 'bg-blue-500/20 text-blue-300': current === lang.code }"
       >
         <span class="text-lg">{{ lang.flag }}</span>
         <span>{{ lang.name }}</span>

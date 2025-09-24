@@ -226,52 +226,52 @@ function getCategoryDisplayName(category) {
     <!-- backdrop -->
     <div class="fixed inset-0 bg-black/40" @click="close"></div>
 
-    <div class="relative w-full max-w-lg bg-white rounded-xl shadow-xl p-6 space-y-4">
+    <div class="relative w-full max-w-lg bg-slate-800/90 backdrop-blur border border-white/10 rounded-xl shadow-xl p-6 space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold">
+        <h3 class="text-lg font-semibold text-white">
           {{ t('quick.new_quick_task') /* "Nova Tarefa Rápida" / "New Quick Task" */ }}
         </h3>
-        <button @click="close" class="text-gray-500 hover:text-gray-700">✕</button>
+        <button @click="close" class="text-slate-400 hover:text-white">✕</button>
       </div>
 
       <form @submit.prevent="submit" class="space-y-4">
         <!-- Título -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium text-slate-300 mb-1">
             {{ t('tasks.form.title') }} *
           </label>
           <input
             v-model="form.title"
             type="text"
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             :placeholder="t('tasks.form.title_ph')"
           />
-          <div v-if="form.errors.title" class="text-red-500 text-sm mt-1">{{ form.errors.title }}</div>
+          <div v-if="form.errors.title" class="text-red-400 text-sm mt-1">{{ form.errors.title }}</div>
         </div>
 
         <!-- Descrição -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium text-slate-300 mb-1">
             {{ t('tasks.form.description') }}
           </label>
           <textarea
             v-model="form.description"
             rows="3"
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             :placeholder="t('tasks.form.description_ph')"
           ></textarea>
-          <div v-if="form.errors.description" class="text-red-500 text-sm mt-1">{{ form.errors.description }}</div>
+          <div v-if="form.errors.description" class="text-red-400 text-sm mt-1">{{ form.errors.description }}</div>
         </div>
 
         <!-- Prioridade / Categoria -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-slate-300 mb-1">
               {{ t('tasks.form.priority') }}
             </label>
             <select
               v-model="form.priority"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="low">{{ t('priority.low') }}</option>
               <option value="medium">{{ t('priority.medium') }}</option>
@@ -281,12 +281,12 @@ function getCategoryDisplayName(category) {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-slate-300 mb-1">
               {{ t('tasks.form.category') }}
             </label>
             <select
               v-model="form.category"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">{{ t('tasks.form.category_ph') }}</option>
               <option v-for="c in availableCategories" :key="c" :value="c">
@@ -299,7 +299,7 @@ function getCategoryDisplayName(category) {
 
         <!-- Data de vencimento -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium text-slate-300 mb-1">
             {{ t('tasks.form.end_date') }}
           </label>
 
@@ -319,7 +319,7 @@ function getCategoryDisplayName(category) {
           <input
             v-model="form.due_date"
             type="date"
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
 
           <!-- Alerta de Feriado Sutil -->
