@@ -43,20 +43,21 @@ class UserLoginNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = route('dashboard');
+        $locale = app()->getLocale() ?: config('app.locale');
+        $url = route('dashboard', ['locale' => $locale], false);
         $loginTime = $this->loginTime->format('d/m/Y H:i:s');
         $loginDate = $this->loginTime->format('d/m/Y');
         $loginHour = $this->loginTime->format('H:i:s');
 
         return (new MailMessage)
-            ->greeting("🔐 Olá {$this->user->name}!")
-            ->subject("🔔 Nova Atividade Detectada - Iron Force Tasks")
+            ->greeting(" Olá {$this->user->name}!")
+            ->subject("🔔 Nova Atividade Detectada - YggdraTasks")
             ->line("**Detectamos um novo acesso à sua conta Iron Force Tasks.**")
             ->line("")
-            ->line("📅 **Data:** {$loginDate}")
-            ->line("🕐 **Horário:** {$loginHour}")
-            ->line("👤 **Usuário:** {$this->user->name}")
-            ->line("📧 **Email:** {$this->user->email}")
+            ->line("**Data:** {$loginDate}")
+            ->line("**Horário:** {$loginHour}")
+            ->line("**Usuário:** {$this->user->name}")
+            ->line("**Email:** {$this->user->email}")
             ->when($this->ipAddress, function ($message) {
                 return $message->line("🌐 **Endereço IP:** {$this->ipAddress}");
             })
@@ -64,18 +65,18 @@ class UserLoginNotification extends Notification
                 return $message->line("🌍 **Navegador:** {$this->userAgent}");
             })
             ->line("")
-            ->line("✅ **Este é um acesso autorizado?**")
+            ->line("**Este é um acesso autorizado?**")
             ->line("Se sim, você pode ignorar este email.")
             ->line("")
-            ->line("⚠️ **Se você não fez este login:**")
+            ->line("**Se você não fez este login:**")
             ->line("• Altere sua senha imediatamente")
             ->line("• Entre em contato com o suporte")
             ->line("• Ative a verificação em duas etapas")
-            ->action('🚀 Acessar Dashboard', $url)
+            ->action('Acessar Dashboard', $url)
             ->line("")
-            ->line("🔒 **Sua segurança é nossa prioridade!**")
-            ->line("Obrigado por usar o Iron Force Tasks.")
-            ->salutation('Atenciosamente, Equipe Iron Force');
+            ->line("**Sua segurança é nossa prioridade!**")
+            ->line("Obrigado por usar o YggdraTask.")
+            ->salutation('Atenciosamente, Equipe Yggdra');
     }
 
     /**

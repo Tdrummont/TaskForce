@@ -82,7 +82,6 @@ async function checkHoliday() {
     clearTimeout(timeoutId)
     
     if (!r.ok) {
-      console.warn('Holiday check failed, continuing anyway')
       return
     }
     
@@ -96,7 +95,6 @@ async function checkHoliday() {
     }
   } catch (e) {
     if (e.name !== 'AbortError') {
-      console.warn('Holiday check error, continuing anyway:', e)
     }
     // Não bloquear o processo se houver erro
   } finally {
@@ -168,23 +166,16 @@ function showSimpleHolidayAlert(holidayData) {
 watch(() => form.due_date, checkHoliday)
 
 async function submit() {
-  console.log('🚀 Enviando formulário:', form.data())
-  console.log('📍 Rota:', routeL('tasks.store'))
   
   try {
     await form.post(routeL('tasks.store'), {
       onSuccess: (page) => {
-        console.log('✅ Tarefa criada com sucesso!', page)
         emit('created')
         close()
       },
       onError: (errors) => {
-        console.error('❌ Erro ao criar tarefa:', errors)
-        console.error('📊 Dados do formulário:', form.data())
-        console.error('🔍 Erros detalhados:', form.errors)
       },
       onFinish: () => {
-        console.log('🏁 Requisição finalizada')
         // Forçar fechamento do modal após a requisição
         if (!form.hasErrors) {
           emit('created')
@@ -193,7 +184,6 @@ async function submit() {
       }
     })
   } catch (error) {
-    console.error('💥 Erro na requisição:', error)
   }
 }
 

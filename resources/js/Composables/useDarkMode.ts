@@ -5,9 +5,7 @@ export function useDarkMode() {
 
     // Função para alternar o modo escuro
     const toggleDarkMode = () => {
-        console.log('Toggle dark mode clicked, current state:', isDark.value);
         isDark.value = !isDark.value;
-        console.log('New state:', isDark.value);
         updateTheme();
     };
 

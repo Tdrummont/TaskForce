@@ -75,7 +75,6 @@ async function checkHoliday() {
     clearTimeout(timeoutId)
     
     if (!res.ok) {
-      console.warn('Holiday check failed, continuing anyway', res.status)
       return
     }
     
@@ -88,7 +87,6 @@ async function checkHoliday() {
     }
   } catch (e) {
     if (e.name !== 'AbortError') {
-      console.warn('Holiday check error, continuing anyway:', e)
     }
     // Não bloquear o processo se houver erro
   } finally {
@@ -181,7 +179,6 @@ async function checkStartDateHoliday() {
     clearTimeout(timeoutId)
     
     if (!res.ok) {
-      console.warn('Start date holiday check failed, continuing anyway', res.status)
       return
     }
     
@@ -194,7 +191,6 @@ async function checkStartDateHoliday() {
     }
   } catch (e) {
     if (e.name !== 'AbortError') {
-      console.warn('Start date holiday check error, continuing anyway:', e)
     }
     // Não bloquear o processo se houver erro
   } finally {
@@ -352,7 +348,26 @@ function clearForm() {
 
           <!-- Botões -->
           <div class="col-span-6 flex justify-end space-x-4 pt-6 border-t border-white/10">
-            <!-- seus botões aqui -->
+            <Link
+              :href="routeL('tasks.index')"
+              class="px-4 py-2 rounded-md bg-white/10 border border-white/10 text-white hover:bg-white/20 transition"
+            >
+              {{ t('tasks.form.actions.cancel') }}
+            </Link>
+            <button
+              type="button"
+              @click="clearForm"
+              class="px-4 py-2 rounded-md bg-gray-600 text-white hover:bg-gray-700 transition"
+            >
+              {{ t('tasks.form.actions.clear') }}
+            </button>
+            <button
+              type="submit"
+              :disabled="form.processing"
+              class="px-4 py-2 rounded-md bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#9333ea] text-white hover:from-[#2563eb] hover:via-[#8b5cf6] hover:to-[#a855f7] disabled:opacity-50 transition"
+            >
+              {{ form.processing ? t('common.saving') : t('tasks.form.actions.create') }}
+            </button>
           </div>
         </form>
       </div>
@@ -362,5 +377,4 @@ function clearForm() {
 
   </AuthenticatedLayout>
 </template>
-
 

@@ -10,8 +10,6 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
  if (csrfToken) {
    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
- } else {
-   console.warn('⚠️ CSRF meta tag não encontrada. Confira seu Blade base.');
  }
 // Configuração do Laravel Echo para WebSockets
 window.Pusher = Pusher;
@@ -22,19 +20,7 @@ const reverbHost = import.meta.env.VITE_REVERB_HOST;
 const reverbPort = import.meta.env.VITE_REVERB_PORT;
 const reverbScheme = import.meta.env.VITE_REVERB_SCHEME;
 
-console.log('🔧 Variáveis de ambiente Reverb:', {
-    key: reverbKey,
-    host: reverbHost,
-    port: reverbPort,
-    scheme: reverbScheme
-});
-
-if (!reverbKey) {
-    console.warn('⚠️ VITE_REVERB_APP_KEY não está configurado. WebSockets não funcionarão.');
-    console.warn('📝 Configure no arquivo .env: VITE_REVERB_APP_KEY=local');
-} else {
-    console.log('✅ Reverb configurado:', { key: reverbKey, host: reverbHost, port: reverbPort });
-    
+if (reverbKey) {
     window.Echo = new Echo({
         broadcaster: 'reverb',
         key: reverbKey,
@@ -49,12 +35,8 @@ if (!reverbKey) {
                 authorize: (socketId, callback) => {
                     // Usar apenas autenticação via CSRF token (sessão web)
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                    
-                    console.log('🔐 Autenticando canal:', channel.name);
-                    console.log('🔑 CSRF Token:', csrfToken ? 'Presente' : 'Ausente');
-                    
+
                     if (!csrfToken) {
-                        console.error('❌ CSRF Token não encontrado');
                         callback(new Error('CSRF Token não encontrado'));
                         return;
                     }
@@ -71,17 +53,9 @@ if (!reverbKey) {
                         channel_name: channel.name
                     }, { headers })
                     .then(response => {
-                        console.log('✅ Canal autenticado com sucesso:', channel.name);
                         callback(null, response.data);
                     })
                     .catch(error => {
-                        console.error('❌ Erro na autenticação do canal:', error);
-                        console.error('📊 Detalhes do erro:', {
-                            status: error.response?.status,
-                            message: error.response?.data?.message || error.message,
-                            channel: channel.name,
-                            headers: headers
-                        });
                         callback(error);
                     });
                 }

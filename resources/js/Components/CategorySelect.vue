@@ -7,13 +7,19 @@
       <select 
         :value="modelValue" 
         @change="$emit('update:modelValue', $event.target.value)"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-3 py-2 border border-white/15 rounded-md shadow-sm bg-slate-800 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        style="color-scheme: dark;"
       >
-        <option value="">Selecione uma categoria</option>
-        <option v-for="category in categories" :key="category" :value="category">
+        <option value="" style="background-color: #0f172a; color: #ffffff;">Selecione uma categoria</option>
+        <option
+          v-for="category in categories"
+          :key="category"
+          :value="category"
+          style="background-color: #0f172a; color: #ffffff;"
+        >
           {{ category }}
         </option>
-        <option value="__new__">+ Adicionar nova categoria</option>
+        <option value="__new__" style="background-color: #0f172a; color: #ffffff;">+ Adicionar nova categoria</option>
       </select>
       
       <!-- Campo para nova categoria -->

@@ -172,8 +172,8 @@ class TaskController extends Controller
             abort(403, 'Você não tem permissão para visualizar esta tarefa.');
         }
 
-        $task->load(['assignedTo', 'subtasks', 'attachments', 'comments.user']);
-
+        $task->load(['user', 'assignedTo', 'subtasks', 'attachments', 'comments.user']);
+        
         return Inertia::render('Tasks/Show', [
             'task' => $task
         ]);

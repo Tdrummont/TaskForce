@@ -28,7 +28,7 @@ function submit() {
 
     <div class="w-full max-w-md bg-white/5 backdrop-blur-2xl rounded-2xl shadow-2xl ring-1 ring-white/10 p-6">
       <div class="text-center mb-6 flex flex-col items-center">
-        <img src="/logoyggdra.png" alt="TaskForce" class="h-39 sm:h-44 md:h-56 w-auto mb-4 drop-shadow-[0_12px_40px_rgba(124,58,237,0.65)]" />
+        <img src="/images/taskYggdra.png" alt="TaskForce" class="h-39 sm:h-44 md:h-56 w-auto mb-4 drop-shadow-[0_12px_40px_rgba(124,58,237,0.65)]" />
         <h1 class="text-2xl font-bold text-white">Login</h1>
       </div>
 

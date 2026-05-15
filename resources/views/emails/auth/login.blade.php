@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Detectado - Iron Force Tasks</title>
+    <title>Login Detectado - YggdraTask  Tasks</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -185,7 +185,7 @@
     <div class="container">
         <div class="header">
             <h1>🔐 Login Detectado</h1>
-            <div class="subtitle">Iron Force Tasks - Sistema de Segurança</div>
+            <div class="subtitle">YggdraTasks - Sistema de Segurança</div>
         </div>
 
         <div style="text-align: center; margin-bottom: 30px;">
@@ -197,30 +197,30 @@
         </div>
 
         <p style="font-size: 18px; color: #374151; margin-bottom: 30px;">
-            Detectamos um <strong>novo login na sua conta</strong>. 
+            Detectamos um <strong>novo login na sua conta</strong>.
             Esta notificação é parte do nosso sistema de segurança para proteger sua conta. 🛡️
         </p>
 
         <div class="login-details">
             <h3><span class="emoji">📊</span>Detalhes do Login</h3>
-            
+
             <div class="detail-row">
                 <span class="detail-label">Usuário:</span>
                 <span class="detail-value">{{ $user->name }} ({{ $user->email }})</span>
             </div>
-            
+
             <div class="detail-row">
                 <span class="detail-label">Data e Hora:</span>
                 <span class="detail-value">⏰ {{ $loginTime->format('d/m/Y H:i:s') }}</span>
             </div>
-            
+
             @if($ipAddress)
             <div class="detail-row">
                 <span class="detail-label">Endereço IP:</span>
                 <span class="detail-value">🌐 {{ $ipAddress }}</span>
             </div>
             @endif
-            
+
             @if($userAgent)
             <div class="detail-row">
                 <span class="detail-label">Navegador/Dispositivo:</span>
@@ -271,4 +271,4 @@
         </div>
     </div>
 </body>
-</html> 
+</html>

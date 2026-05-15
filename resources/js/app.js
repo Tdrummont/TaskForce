@@ -1,14 +1,13 @@
 import './bootstrap'
 import './trusted-types'
 import '../css/app.css'
-import { echo } from './echo'
 
 import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { ZiggyVue } from '../../vendor/tightenco/ziggy'
 
-const appName = document.getElementsByTagName('title')[0]?.innerText || 'Laravel'
+const appName = document.getElementsByTagName('title')[0]?.innerText || 'YggdraTask'
 
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
@@ -44,5 +43,4 @@ createInertiaApp({
 
 // Configurar listeners do Echo será feito no WebSocketService
 // echo.channel('tasks').listen('.TaskCreated', (e) => {
-//   console.log('TaskCreated recebido:', e)
 // })

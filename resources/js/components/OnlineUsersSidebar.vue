@@ -229,7 +229,6 @@ onMounted(() => {
     import('../services/WebSocketService.js').then(({ default: WebSocketService }) => {
         // Listener para usuários online
         WebSocketService.on('users_online', (users) => {
-            console.log('👥 Usuários online atualizados no sidebar:', users);
             if (users && Array.isArray(users)) {
                 onlineUsers.value = users.map(user => ({
                     id: user.id,
@@ -243,7 +242,6 @@ onMounted(() => {
         
         // Listener para usuário entrou
         WebSocketService.on('user_joined', (user) => {
-            console.log('👋 Usuário entrou no sidebar:', user);
             if (user && !onlineUsers.value.find(u => u.id === user.id)) {
                 onlineUsers.value.push({
                     id: user.id,
@@ -257,7 +255,6 @@ onMounted(() => {
         
         // Listener para usuário saiu
         WebSocketService.on('user_left', (user) => {
-            console.log('👋 Usuário saiu do sidebar:', user);
             if (user) {
                 onlineUsers.value = onlineUsers.value.filter(u => u.id !== user.id);
             }

@@ -111,7 +111,6 @@ const processCallback = async () => {
         }
 
     } catch (err) {
-        console.error('Erro no callback:', err);
         isLoading.value = false;
         error.value = err.message || 'Erro inesperado ao processar login';
     }

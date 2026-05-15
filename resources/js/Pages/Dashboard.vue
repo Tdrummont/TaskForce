@@ -3,12 +3,12 @@
       <template #header>
         <div class="flex flex-col">
           <h2 class="font-semibold text-2xl text-800 text-white leading-tight">
-            BEM VINDO {{ firstName }} — AO SEU GERENCIADOR DE TAREFAS
+            {{ greeting }} {{ firstName }} —  GERENCIADOR DE TAREFAS
           </h2>
           <p class="text-sm text-gray-500 mt-1">{{ t('dashboard.title') }}</p>
         </div>
       </template>
-  
+
       <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <!-- KPIs -->
@@ -31,7 +31,7 @@
                 </div>
               </div>
             </div>
-  
+
             <!-- Productivity Streak -->
             <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6">
@@ -50,7 +50,7 @@
                 </div>
               </div>
             </div>
-  
+
             <!-- Overdue -->
             <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6">
@@ -69,7 +69,7 @@
                 </div>
               </div>
             </div>
-  
+
             <!-- Avg Completion Time -->
             <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6">
@@ -89,7 +89,7 @@
               </div>
             </div>
           </div>
-  
+
           <!-- Goals -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -108,7 +108,7 @@
                 </div>
               </div>
             </div>
-  
+
             <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6">
                 <h3 class="text-lg font-semibold mb-4">{{ t('dashboard.weekly_goal') }}</h3>
@@ -126,7 +126,7 @@
               </div>
             </div>
           </div>
-  
+
           <!-- Last 7 days -->
           <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
             <div class="p-6">
@@ -147,7 +147,7 @@
               </div>
             </div>
           </div>
-  
+
           <!-- Overdue highlight -->
           <div v-if="overdue_tasks.length > 0" class="bg-red-950/30 border border-red-500/30 text-white rounded-lg mb-8">
             <div class="p-6">
@@ -183,7 +183,7 @@
               </div>
             </div>
           </div>
-  
+
           <!-- Detailed stats -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <!-- Status -->
@@ -198,7 +198,7 @@
                 </div>
               </div>
             </div>
-  
+
             <!-- Priority -->
             <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6">
@@ -211,7 +211,7 @@
                 </div>
               </div>
             </div>
-  
+
             <!-- Top categories -->
             <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6">
@@ -227,7 +227,7 @@
               </div>
             </div>
           </div>
-  
+
           <!-- Recent / Upcoming -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Recent -->
@@ -253,7 +253,7 @@
                 </div>
               </div>
             </div>
-  
+
             <!-- Upcoming -->
             <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6">
@@ -277,26 +277,40 @@
                 </div>
               </div>
             </div>
-  
+
           </div>
         </div>
       </div>
     </AuthenticatedLayout>
   </template>
-  
+
   <script setup lang="ts">
   import { router, usePage } from '@inertiajs/vue3'
   import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
   import { useLocale } from '@/Components/useLocale'
   import { computed } from 'vue'
-  
+
   const { t, formatDate, routeL } = useLocale()
   const page = usePage()
   const firstName = computed(() => {
     const name = (page.props as any)?.auth?.user?.name || ''
     return name.split(' ')[0] || name
   })
-  
+
+  const greeting = computed(() => {
+    const hour = new Date().getHours()
+
+    if (hour >= 5 && hour < 12) {
+      return 'Bom dia'
+    }
+
+    if (hour >= 12 && hour < 18) {
+      return 'Boa tarde'
+    }
+
+    return 'Boa noite'
+  })
+
   const props = defineProps<{
     metrics: any,
     overdue_tasks: any[],
@@ -307,14 +321,14 @@
     recent_tasks: any[],
     upcoming_tasks: any[],
   }>()
-  
+
   const getDaysOverdue = (dueDate: string) => {
     const due = new Date(dueDate).getTime()
     const today = new Date().getTime()
     const diffTime = today - due
     return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
   }
-  
+
   const getStatusLabel = (status: string) => {
     const map: Record<string, string> = {
       pending: t('status.pending'),
@@ -323,7 +337,7 @@
     }
     return map[status] || status
   }
-  
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       pending: 'text-gray-600 bg-gray-100',
@@ -332,7 +346,7 @@
     }
     return colors[status] || 'text-gray-600 bg-gray-100'
   }
-  
+
   const getPriorityLabel = (priority: string) => {
     const map: Record<string, string> = {
       low: t('priority.low'),
@@ -341,7 +355,7 @@
     }
     return map[priority] || priority
   }
-  
+
   const getPriorityColor = (priority: string) => {
     const colors: Record<string, string> = {
       low: 'text-blue-600 bg-blue-100',
@@ -350,7 +364,7 @@
     }
     return colors[priority] || 'text-gray-600 bg-gray-100'
   }
-  
+
   const markAsCompleted = (taskId: number) => {
     if (confirm(t('dashboard.mark_completed') + '?')) {
       // ⚠️ Rotas Inertia precisam do { locale } agora:
@@ -360,4 +374,3 @@
     }
   }
   </script>
-  

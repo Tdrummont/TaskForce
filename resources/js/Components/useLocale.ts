@@ -226,9 +226,12 @@ const messages: Record<Locale, Record<string, string>> = {
     
     // Task Form
     'task.title_label': 'Title',
+    'tasks.view_task': 'View Task',
+    'task.progress_label': 'Progress',
     'task.description_label': 'Description',
     'task.priority_label': 'Priority',
     'task.category_label': 'Category',
+    'tasks.created_at': 'Created at',
     'task.due_date_label': 'Due Date',
     'task.title_placeholder': 'Enter task title',
     'task.description_quick_placeholder': 'Briefly describe the task...',
@@ -508,10 +511,16 @@ const messages: Record<Locale, Record<string, string>> = {
     
     // Task Form
     'task.title_label': 'Título',
-    'task.description_label': 'Descrição',
+    'tasks.view_task': 'Ver Tarefa',
+    'tasks.description': 'Descrição',
+    'tasks.progress': 'Progresso',
+    'tasks.completion_percentage': 'Percentual de Conclusão',
+    'tasks.task_information': 'Informações da Tarefa',
     'task.priority_label': 'Prioridade',
+    'tasks.back_to_list': 'Voltar para a lista',
     'task.category_label': 'Categoria',
-    'task.due_date_label': 'Data de Vencimento',
+    'tasks.created_at': 'Criada em',
+    'tasks.due_date': 'Data de Vencimento',
     'task.title_placeholder': 'Digite o título da tarefa',
     'task.description_quick_placeholder': 'Descreva brevemente a tarefa...',
     'task.category_placeholder': 'Selecione uma categoria',
@@ -790,9 +799,11 @@ const messages: Record<Locale, Record<string, string>> = {
     
     // Task Form
     'task.title_label': 'Título',
+    'tasks.view_task': 'Ver Tarefa',
     'task.description_label': 'Descripción',
     'task.priority_label': 'Prioridad',
     'task.category_label': 'Categoría',
+    'tasks.created_at': 'Creada el',
     'task.due_date_label': 'Fecha de Vencimiento',
     'task.title_placeholder': 'Ingresa el título de la tarea',
     'task.description_quick_placeholder': 'Describe brevemente la tarea...',
@@ -890,7 +901,6 @@ export function useLocale() {
       
       return response.json()
     } catch (error) {
-      console.error('Error switching language:', error)
       throw error
     }
   }

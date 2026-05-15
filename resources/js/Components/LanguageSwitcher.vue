@@ -26,7 +26,6 @@ const switchLanguage = async () => {
     // Recarregar a página para aplicar as traduções
     window.location.reload()
   } catch (error) {
-    console.error('Erro ao trocar idioma:', error)
   }
 }
 

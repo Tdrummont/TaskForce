@@ -47,7 +47,6 @@ async function checkHoliday() {
     clearTimeout(timeoutId)
     
     if (!r.ok) {
-      console.warn('Holiday check failed, continuing anyway', r.status)
       return
     }
     
@@ -60,7 +59,6 @@ async function checkHoliday() {
     }
   } catch (e) {
     if (e.name !== 'AbortError') {
-      console.warn('Holiday check error, continuing anyway:', e)
     }
     // Não bloquear o processo se houver erro
   } finally {

@@ -120,19 +120,16 @@ const getUserInitials = (name) => {
 // Função para alternar o menu FAB
 const toggleFab = () => {
     showFabMenu.value = !showFabMenu.value
-    console.log('🎯 Botão FAB de usuários online clicado!', showFabMenu.value)
 }
 
 
 // Função para lidar com usuários online
 const handleUsersOnline = (users) => {
-    console.log('👥 Usuários online recebidos:', users)
     onlineUsers.value = users || []
 }
 
 // Função para lidar com usuário que entrou
 const handleUserJoined = (user) => {
-    console.log('👋 Usuário entrou:', user)
     // Verificar se o usuário já não está na lista
     const existingUser = onlineUsers.value.find(u => u.id === user.id)
     if (!existingUser) {
@@ -142,7 +139,6 @@ const handleUserJoined = (user) => {
 
 // Função para lidar com usuário que saiu
 const handleUserLeft = (user) => {
-    console.log('👋 Usuário saiu:', user)
     onlineUsers.value = onlineUsers.value.filter(u => u.id !== user.id)
 }
 
@@ -153,17 +149,12 @@ onMounted(async () => {
         const module = await import('../services/WebSocketService.js')
         webSocketService.value = module.default
         
-        console.log('🔌 Conectando ao WebSocketService para usuários online...')
-        
         // Configurar listeners para eventos de usuários online
         webSocketService.value.on('users_online', handleUsersOnline)
         webSocketService.value.on('user_joined', handleUserJoined)
         webSocketService.value.on('user_left', handleUserLeft)
         
-        console.log('✅ Listeners de usuários online configurados')
-        
     } catch (error) {
-        console.error('❌ Erro ao inicializar WebSocketService:', error)
         // Não adicionar usuários de exemplo - manter lista vazia até receber dados reais
     }
 })
@@ -174,7 +165,6 @@ onUnmounted(() => {
         webSocketService.value.off('users_online', handleUsersOnline)
         webSocketService.value.off('user_joined', handleUserJoined)
         webSocketService.value.off('user_left', handleUserLeft)
-        console.log('🧹 Listeners de usuários online removidos')
         
         // Não desconectar o WebSocketService aqui pois pode estar sendo usado por outros componentes
         // A desconexão será feita no AuthenticatedLayout

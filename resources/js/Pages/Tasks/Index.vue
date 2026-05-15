@@ -5,7 +5,7 @@
           {{ t('tasks.my_tasks') }}
         </h2>
       </template>
-  
+
       <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <!-- Toolbar -->
@@ -13,6 +13,17 @@
             <div class="p-6">
               <div class="flex flex-wrap gap-4 items-center justify-between">
                 <div class="flex gap-4">
+                  <button
+                    @click="showCreateModal = true"
+                    class="bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#9333ea] text-white px-4 py-2 rounded-md hover:from-[#2563eb] hover:via-[#8b5cf6] hover:to-[#a855f7] transition flex items-center gap-2"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    {{ t('navbar.new_task') }}
+                  </button>
+
                   <button
                     @click="backup"
                     class="bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#9333ea] text-white px-4 py-2 rounded-md hover:from-[#2563eb] hover:via-[#8b5cf6] hover:to-[#a855f7] transition flex items-center gap-2"
@@ -23,7 +34,7 @@
                     </svg>
                     {{ t('tasks.backup') }}
                   </button>
-  
+
                   <button
                     @click="showRestoreModal = true"
                     class="bg-white/10 border border-white/10 text-white px-4 py-2 rounded-md hover:bg-white/20 transition flex items-center gap-2"
@@ -34,7 +45,7 @@
                     </svg>
                     {{ t('tasks.restore') }}
                   </button>
-  
+
                   <button
                     @click="showDeleteAllModal = true"
                     class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition flex items-center gap-2"
@@ -46,12 +57,12 @@
                     {{ t('tasks.delete_all') }}
                   </button>
                 </div>
-  
+
 
               </div>
             </div>
           </div>
-  
+
           <!-- Search & Filters -->
           <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
             <div class="p-6">
@@ -72,7 +83,7 @@
                       class="block w-full pl-10 pr-4 py-2 rounded-md leading-5 bg-white/10 text-white placeholder-slate-300 border border-white/10 focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed] transition-all duration-200">
                   </div>
                 </div>
-  
+
                 <!-- Filters -->
                 <div class="flex gap-3">
                   <select v-model="statusFilter"
@@ -82,7 +93,7 @@
                     <option value="in_progress">{{ t('status.in_progress') }}</option>
                     <option value="completed">{{ t('status.completed') }}</option>
                   </select>
-  
+
                   <select v-model="priorityFilter"
                     class="px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]">
                     <option value="">{{ t('filters.all_priorities') }}</option>
@@ -90,7 +101,7 @@
                     <option value="medium">{{ t('priority.medium') }}</option>
                     <option value="high">{{ t('priority.high') }}</option>
                   </select>
-  
+
                   <select v-model="categoryFilter"
                     class="px-3 py-2 border border-white/10 rounded-md bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]">
                     <option value="">{{ t('filters.all_categories') }}</option>
@@ -100,7 +111,7 @@
                     <option value="Health">{{ t('categories.health') }}</option>
                     <option value="Leisure">{{ t('categories.leisure') }}</option>
                   </select>
-  
+
                   <button @click="clearFilters"
                     class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +122,7 @@
                   </button>
                 </div>
               </div>
-  
+
               <!-- Search result badge -->
               <div v-if="searchQuery || statusFilter || priorityFilter || categoryFilter"
                 class="mt-4 p-3 bg-white/5 border border-white/10 rounded-md text-white">
@@ -130,13 +141,13 @@
               </div>
             </div>
           </div>
-  
+
           <!-- Kanban -->
           <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
             <div class="p-6">
               <h3 class="text-lg font-semibold mb-4">{{ t('tasks.organize') }}</h3>
               <p class="text-sm text-slate-300 mb-6">{{ t('tasks.drag_help') }}</p>
-  
+
               <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Pending -->
                 <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
@@ -156,11 +167,11 @@
                       </svg>
                     </button>
                   </div>
-  
-                  <draggable 
-                    v-model="pendingTasks" 
-                    group="tasks" 
-                    class="space-y-3 min-h-[200px]" 
+
+                  <draggable
+                    v-model="pendingTasks"
+                    group="tasks"
+                    class="space-y-3 min-h-[200px]"
                     item-key="id"
                     :animation="200"
                     :force-fallback="true"
@@ -181,11 +192,11 @@
                             </span>
                           </div>
                         </div>
-  
+
                         <p v-if="task.description" class="text-slate-300 text-xs mb-3 line-clamp-2">
                           {{ task.description }}
                         </p>
-  
+
                         <div class="flex items-center justify-between text-xs text-slate-300">
                           <div class="flex items-center space-x-2">
                             <span v-if="task.due_date" class="flex items-center">
@@ -196,8 +207,16 @@
                               {{ formatDate(task.due_date) }}
                             </span>
                           </div>
-  
+
                           <div class="flex items-center space-x-2">
+                              <button @click="showTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
+                                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                              </button>
                             <button @click="editTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -216,7 +235,7 @@
                     </template>
                   </draggable>
                 </div>
-  
+
                 <!-- In progress -->
                 <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
                   <div class="flex items-center justify-between mb-4">
@@ -235,11 +254,11 @@
                       </svg>
                     </button>
                   </div>
-  
-                  <draggable 
-                    v-model="inProgressTasks" 
-                    group="tasks" 
-                    class="space-y-3 min-h-[200px]" 
+
+                  <draggable
+                    v-model="inProgressTasks"
+                    group="tasks"
+                    class="space-y-3 min-h-[200px]"
                     item-key="id"
                     :animation="200"
                     :force-fallback="true"
@@ -260,11 +279,11 @@
                             </span>
                           </div>
                         </div>
-  
+
                         <p v-if="task.description" class="text-slate-300 text-xs mb-3 line-clamp-2">
                           {{ task.description }}
                         </p>
-  
+
                         <div class="flex items-center justify-between text-xs text-slate-300">
                           <div class="flex items-center space-x-2">
                             <span v-if="task.due_date" class="flex items-center">
@@ -275,8 +294,16 @@
                               {{ formatDate(task.due_date) }}
                             </span>
                           </div>
-  
+
                           <div class="flex items-center space-x-2">
+                            <button @click="showTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            </button>
                             <button @click="editTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -295,7 +322,7 @@
                     </template>
                   </draggable>
                 </div>
-  
+
                 <!-- Completed -->
                 <div class="bg-white/5 border border-white/10 rounded-xl p-4 kanban-column">
                   <div class="flex items-center justify-between mb-4">
@@ -314,11 +341,11 @@
                       </svg>
                     </button>
                   </div>
-  
-                  <draggable 
-                    v-model="completedTasks" 
-                    group="tasks" 
-                    class="space-y-3 min-h-[200px]" 
+
+                  <draggable
+                    v-model="completedTasks"
+                    group="tasks"
+                    class="space-y-3 min-h-[200px]"
                     item-key="id"
                     :animation="200"
                     :force-fallback="true"
@@ -339,11 +366,11 @@
                             </span>
                           </div>
                         </div>
-  
+
                         <p v-if="task.description" class="text-slate-300 text-xs mb-3 line-clamp-2">
                           {{ task.description }}
                         </p>
-  
+
                         <div class="flex items-center justify-between text-xs text-slate-300">
                           <div class="flex items-center space-x-2">
                             <span v-if="task.due_date" class="flex items-center">
@@ -354,8 +381,16 @@
                               {{ formatDate(task.due_date) }}
                             </span>
                           </div>
-  
+
                           <div class="flex items-center space-x-2">
+                            <button @click="showTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            </button>
                             <button @click="editTask(task)" class="text-blue-400 hover:text-blue-300 p-1 transition-colors">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -377,16 +412,16 @@
               </div>
             </div>
           </div>
-  
+
           <!-- Task list -->
           <div class="bg-white/10 backdrop-blur border border-white/10 text-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6">
               <h3 class="text-lg font-semibold mb-4">{{ t('tasks.list_title') }}</h3>
-  
+
               <div v-if="tasks.length === 0" class="text-slate-300 text-center py-8">
                 {{ t('tasks.none_found') }}
               </div>
-  
+
               <div v-else class="space-y-4">
                 <div
                   v-for="task in tasks"
@@ -404,18 +439,18 @@
                     <div class="flex-1">
                       <h4 class="font-semibold text-lg">{{ task.title }}</h4>
                       <p class="text-slate-300 mt-1">{{ task.description }}</p>
-  
+
                       <div class="flex gap-4 mt-3 text-sm">
                         <span class="flex items-center gap-1">
                           <span class="font-medium">{{ t('tasks.status') }}:</span>
                           <span :class="getStatusClass(task.status)">{{ getStatusLabel(task.status) }}</span>
                         </span>
-  
+
                         <span class="flex items-center gap-1">
                           <span class="font-medium">{{ t('tasks.priority') }}:</span>
                           <span :class="getPriorityClass(task.priority)">{{ getPriorityLabel(task.priority) }}</span>
                         </span>
-  
+
                         <span v-if="task.due_date" class="flex items-center gap-1">
                           <span class="font-medium">{{ t('tasks.due') }}:</span>
                           <span :class="getDueStatusColor(task)">
@@ -426,7 +461,7 @@
                           </span>
                         </span>
                       </div>
-  
+
                       <div class="mt-2 text-sm text-slate-300">
                         {{ t('tasks.created_by') }}: {{ task.creator?.name || t('tasks.you') }}
                         <span v-if="task.assignee">
@@ -434,7 +469,7 @@
                         </span>
                       </div>
                     </div>
-  
+
                     <div class="flex gap-2">
                       <button @click="editTask(task)" class="text-blue-400 hover:text-blue-300 transition-colors">
                         {{ t('tasks.edit') }}
@@ -448,7 +483,7 @@
               </div>
             </div>
           </div>
-  
+
           <!-- Restore Modal -->
           <Modal :show="showRestoreModal" @close="showRestoreModal = false">
             <div class="p-6">
@@ -477,7 +512,7 @@
               </form>
             </div>
           </Modal>
-  
+
           <!-- Delete All Modal -->
           <Modal :show="showDeleteAllModal" @close="showDeleteAllModal = false">
             <div class="p-6">
@@ -493,7 +528,7 @@
                   <p class="text-sm text-gray-500">{{ t('tasks.cannot_undo') }}</p>
                 </div>
               </div>
-  
+
               <div class="mb-6">
                 <div class="bg-red-50 border border-red-200 rounded-md p-4">
                   <div class="flex">
@@ -517,7 +552,7 @@
                   </div>
                 </div>
               </div>
-  
+
               <div class="flex justify-end gap-3">
                 <button type="button" @click="showDeleteAllModal = false"
                   class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition flex items-center gap-2">
@@ -538,36 +573,43 @@
               </div>
             </div>
           </Modal>
+
+          <QuickTaskModal
+            :show="showCreateModal"
+            @close="showCreateModal = false"
+            @created="handleTaskCreated"
+          />
         </div>
       </div>
     </AuthenticatedLayout>
   </template>
-  
+
   <script setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue'
   import { useForm, router } from '@inertiajs/vue3'
   import { useLocale } from '@/Components/useLocale'
   import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
   import Modal from '@/Components/Modal.vue'
+  import QuickTaskModal from '@/Components/QuickTaskModal.vue'
   import draggable from 'vuedraggable'
-  
+
   const { t, formatDate, routeL } = useLocale()
-  
+
   const props = defineProps({
     tasks: Array,
     stats: Object
   })
-  
+
   const showCreateModal = ref(false)
   const editingTask = ref(null)
   const showRestoreModal = ref(false)
   const showDeleteAllModal = ref(false)
-  
+
   const searchQuery = ref('')
   const statusFilter = ref('')
   const priorityFilter = ref('')
   const categoryFilter = ref('')
-  
+
   const filteredTasks = computed(() => {
     let tasks = props.tasks || []
     if (searchQuery.value.trim()) {
@@ -583,7 +625,7 @@
     if (categoryFilter.value) tasks = tasks.filter(t => t.category === categoryFilter.value)
     return tasks
   })
-  
+
   const form = useForm({
     title: '',
     description: '',
@@ -592,7 +634,7 @@
     priority: 'medium',
     assigned_to: null
   })
-  
+
   // Kanban columns (with D&D setters calling API)
   const pendingTasks = computed({
     get: () => filteredTasks.value.filter(t => t.status === 'pending'),
@@ -600,44 +642,48 @@
       value.filter(t => t.status !== 'pending').forEach(t => updateTaskStatus(t.id, 'pending'))
     }
   })
-  
+
   const inProgressTasks = computed({
     get: () => filteredTasks.value.filter(t => t.status === 'in_progress'),
     set: (value) => {
       value.filter(t => t.status !== 'in_progress').forEach(t => updateTaskStatus(t.id, 'in_progress'))
     }
   })
-  
+
   const completedTasks = computed({
     get: () => filteredTasks.value.filter(t => t.status === 'completed'),
     set: (value) => {
       value.filter(t => t.status !== 'completed').forEach(t => updateTaskStatus(t.id, 'completed'))
     }
   })
-  
+
   const clearFilters = () => {
     searchQuery.value = ''
     statusFilter.value = ''
     priorityFilter.value = ''
     categoryFilter.value = ''
   }
-  
+
+  const handleTaskCreated = () => {
+    showCreateModal.value = false
+    router.reload({ only: ['tasks', 'stats'] })
+  }
+
   const deleteAllTasks = () => {
     if (confirm(t('tasks.confirm_delete_all'))) {
       router.delete(routeL('tasks.deleteAll'), {
         onSuccess: () => { showDeleteAllModal.value = false },
         onError: (e) => {
-          console.error(e)
           alert(t('toast.error'))
         }
       })
     }
   }
-  
+
   const handleSearchFromLayout = (event) => {
     searchQuery.value = event.detail.query
   }
-  
+
   const getStatusClass = (status) => {
     const classes = {
       pending: 'text-gray-600',
@@ -675,7 +721,7 @@
   }
 
   const getTasksByStatus = (status) => filteredTasks.value.filter(t => t.status === status)
-  
+
   const isOverdue = (task) => task.due_date && task.status !== 'completed' && (new Date(task.due_date) < new Date())
   const isDueToday = (task) => {
     if (!task.due_date || task.status === 'completed') return false
@@ -687,7 +733,7 @@
     const days = Math.ceil(d / 86400000)
     return days > 0 && days <= 3
   }
-  
+
   const getDueStatusColor = (task) => {
     if (task.status === 'completed') return 'text-green-600'
     if (isOverdue(task)) return 'text-red-600'
@@ -695,7 +741,7 @@
     if (isDueSoon(task)) return 'text-yellow-600'
     return 'text-gray-600'
   }
-  
+
   const getDueStatusLabel = (task) => {
     if (task.status === 'completed') return t('due.completed')
     if (isOverdue(task)) return t('due.overdue')
@@ -703,18 +749,18 @@
     if (isDueSoon(task)) return t('due.soon')
     return t('due.normal')
   }
-  
+
   const backup = () => {
     window.location.href = routeL('tasks.backup')
   }
-  
+
   const restoreBackup = () => {
     const file = backupFileInput.value?.files?.[0]
     if (!file) return
-  
+
     const formData = new FormData()
     formData.append('backup_file', file)
-  
+
     fetch(routeL('tasks.restore'), {
       method: 'POST',
       body: formData,
@@ -732,39 +778,38 @@
         }
       })
       .catch(err => {
-        console.error(err)
         alert(t('toast.error'))
       })
   }
-  
 
-  
+
+
   onMounted(() => {
     window.addEventListener('search-tasks', handleSearchFromLayout)
   })
   onUnmounted(() => {
     window.removeEventListener('search-tasks', handleSearchFromLayout)
   })
-  
+
   // Drag & Drop functions
   const onDragStart = (evt) => {
     evt.item.classList.add('drag-start')
     document.body.classList.add('dragging')
   }
-  
+
   const onDragEnd = (evt) => {
     evt.item.classList.remove('drag-start')
     document.body.classList.remove('dragging')
-    
+
     // Update task status if moved to different column
     const taskId = evt.item.querySelector('.task-card').getAttribute('data-task-id')
     const newStatus = getStatusFromColumn(evt.to)
-    
+
     if (newStatus && taskId) {
       updateTaskStatus(taskId, newStatus)
     }
   }
-  
+
   const getStatusFromColumn = (column) => {
     if (column.closest('.kanban-column').querySelector('.bg-yellow-500')) {
       return 'pending'
@@ -776,10 +821,13 @@
     return null
   }
 
+  const showTask = (task) => {
+   router.get(routeL('tasks.show', { task: task.id }))
+  }
   const editTask = (task) => {
     router.get(routeL('tasks.edit', { task: task.id }))
   }
-  
+
   const deleteTask = (id) => {
     if (confirm(t('tasks.confirm_delete'))) {
       router.delete(routeL('tasks.destroy', { task: id }), {
@@ -787,7 +835,7 @@
       })
     }
   }
-  
+
   const updateTaskStatus = (taskId, newStatus) => {
     fetch(routeL('tasks.updateStatus', { task: taskId }), {
       method: 'PATCH',
@@ -805,14 +853,14 @@
       })
       .catch(() => alert(t('toast.error')))
   }
-  
+
   // Refs
   const backupFileInput = ref(null)
   </script>
-  
+
   <style scoped>
   .line-clamp-2 {line-clamp:2; -webkit-line-clamp:2; box-orient:vertical; -webkit-box-orient:vertical; display:-webkit-box; overflow:hidden;}
-  
+
   /* Enhanced Drag & Drop Styles */
   .drag-ghost {
     opacity: 0.4;
@@ -821,7 +869,7 @@
     transform: rotate(2deg);
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   }
-  
+
   .drag-chosen {
     background: #f0f9ff;
     border: 2px solid #3b82f6;
@@ -829,7 +877,7 @@
     box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   }
-  
+
   .drag-dragging {
     opacity: 0.8;
     transform: rotate(5deg) scale(1.05);
@@ -837,55 +885,55 @@
     z-index: 1000;
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   }
-  
+
   .drag-fallback {
     opacity: 0.6;
     background: #e5e7eb;
     border: 2px dashed #9ca3af;
     transform: rotate(3deg);
   }
-  
+
   .kanban-column {
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
   }
-  
+
   .kanban-column.drag-over {
     background: #f0f9ff;
     border: 2px dashed #3b82f6;
     transform: scale(1.02);
   }
-  
+
   .task-card {
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     user-select: none;
     cursor: grab;
   }
-  
+
   .task-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   }
-  
+
   .task-card.drag-start {
     cursor: grabbing;
     transform: scale(1.02);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   }
-  
+
   .task-card:active {
     cursor: grabbing;
   }
-  
+
   /* Body dragging state */
   body.dragging {
     cursor: grabbing;
   }
-  
+
   body.dragging * {
     cursor: grabbing !important;
   }
-  
+
   /* Smooth animations for all drag states */
   .drag-ghost,
   .drag-chosen,
@@ -893,19 +941,19 @@
   .drag-fallback {
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   }
-  
+
   /* Enhanced visual feedback */
   .kanban-column:hover {
     background: rgba(249, 250, 251, 0.8);
   }
-  
+
   .task-card:hover .task-actions {
     opacity: 1;
   }
-  
+
   .task-actions {
     opacity: 0.7;
     transition: opacity 0.2s ease;
   }
   </style>
-  
+

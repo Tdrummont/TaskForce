@@ -174,7 +174,7 @@
                 </v:textbox>
               </v:roundrect>
               <![endif]-->
-              <!--[if !mso]><!-- -->
+              <!--[if !mso]> -->
               <a href="{{ config('app.url') }}/pt/tasks"
                  class="btn"
                  aria-label="Abrir tarefa no sistema"

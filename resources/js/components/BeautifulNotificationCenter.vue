@@ -1,35 +1,41 @@
 <template>
     <div class="relative">
-        <!-- Botão de Notificações com Design Moderno -->
+        <!-- Botão de Notificações -->
         <button
             @click="toggleNotifications"
-            class="relative bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-xl transition-all duration-300 backdrop-blur-sm hover:scale-105 hover:shadow-lg group"
+            type="button"
+            class="relative flex h-10 w-10 items-center justify-center overflow-visible rounded-md text-white backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-cyan-700"
+            :class="[
+                showNotifications || unreadCount > 0
+                    ? 'bg-white/30 shadow-lg shadow-cyan-950/20'
+                    : 'bg-white/20 hover:bg-white/30'
+            ]"
+            :aria-label="unreadCount > 0 ? `${unreadCount} notificações não lidas` : 'Notificações'"
+            :aria-expanded="showNotifications"
         >
-            <!-- Ícone de sino com animação -->
-            <svg 
-                class="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-            >
-                <path 
-                    stroke-linecap="round" 
-                    stroke-linejoin="round" 
-                    stroke-width="2" 
-                    d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828zM4.828 17h8l-2.586-2.586a2 2 0 00-2.828 0L4.828 17z" 
-                />
-            </svg>
-            
-            <!-- Badge de notificações com animação -->
-            <span 
+            <span
                 v-if="unreadCount > 0"
-                class="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center animate-bounce shadow-lg border-2 border-white"
+                class="pointer-events-none absolute inset-0 rounded-md bg-cyan-300/20"
+            ></span>
+
+            <svg
+                class="relative z-10 h-5 w-5 transition-transform duration-200"
+                :class="unreadCount > 0 ? 'origin-top motion-safe:animate-bell-ring' : ''"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.17V11a6 6 0 00-4.5-5.81V4a1.5 1.5 0 00-3 0v1.19A6 6 0 006 11v3.17a2 2 0 01-.6 1.43L4 17h5" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a3 3 0 006 0" />
+            </svg>
+
+            <span
+                v-if="unreadCount > 0"
+                class="absolute -right-1.5 -top-1.5 z-20 flex min-w-[1.25rem] items-center justify-center rounded-full border-2 border-cyan-700 bg-rose-500 px-1.5 text-[10px] font-bold leading-4 text-white shadow-sm"
             >
                 {{ unreadCount > 99 ? '99+' : unreadCount }}
             </span>
-            
-            <!-- Efeito de brilho no hover -->
-            <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
         </button>
 
         <!-- Dropdown de Notificações com Design Moderno -->
@@ -51,7 +57,8 @@
                         <div class="flex items-center space-x-3">
                             <div class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828zM4.828 17h8l-2.586-2.586a2 2 0 00-2.828 0L4.828 17z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.17V11a6 6 0 00-4.5-5.81V4a1.5 1.5 0 00-3 0v1.19A6 6 0 006 11v3.17a2 2 0 01-.6 1.43L4 17h5" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a3 3 0 006 0" />
                                 </svg>
                             </div>
                             <h3 class="text-lg font-semibold text-white">Notificações</h3>
@@ -79,7 +86,8 @@
                     <div v-if="notifications.length === 0" class="px-6 py-12 text-center">
                         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828zM4.828 17h8l-2.586-2.586a2 2 0 00-2.828 0L4.828 17z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.17V11a6 6 0 00-4.5-5.81V4a1.5 1.5 0 00-3 0v1.19A6 6 0 006 11v3.17a2 2 0 01-.6 1.43L4 17h5" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a3 3 0 006 0" />
                             </svg>
                         </div>
                         <p class="text-gray-500 font-medium">Nenhuma notificação</p>
@@ -168,14 +176,11 @@ const unreadCount = computed(() => {
 })
 
 const toggleNotifications = () => {
-    console.log('🔔 BeautifulNotificationCenter toggleNotifications chamado!');
     showNotifications.value = !showNotifications.value;
     
     if (showNotifications.value) {
-        console.log('✅ Painel aberto, emitindo evento para carregar notificações...');
         emit('load-notifications');
     } else {
-        console.log('❌ Painel fechado');
     }
 }
 
@@ -270,6 +275,28 @@ onUnmounted(() => {
 
 .animate-bounce {
     animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+@keyframes bell-ring {
+    0%, 70%, 100% {
+        transform: rotate(0deg);
+    }
+    76% {
+        transform: rotate(12deg);
+    }
+    82% {
+        transform: rotate(-10deg);
+    }
+    88% {
+        transform: rotate(8deg);
+    }
+    94% {
+        transform: rotate(-4deg);
+    }
+}
+
+.animate-bell-ring {
+    animation: bell-ring 2.8s ease-in-out infinite;
 }
 
 /* Efeito de glassmorphism */

@@ -307,7 +307,6 @@ const checkManualDate = async () => {
         }
         
     } catch (err) {
-        console.error('Erro na verificação manual:', err);
     }
 };
 
