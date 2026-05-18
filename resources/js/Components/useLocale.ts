@@ -470,6 +470,7 @@ const messages: Record<Locale, Record<string, string>> = {
     'tasks.assigned_to': 'Atribuído a',
     'tasks.edit': 'Editar',
     'tasks.delete': 'Excluir',
+    'tasks.subtasks': 'Subtarefas',
     'tasks.restore_backup': 'Restaurar Backup',
     'tasks.select_backup_file': 'Selecione o arquivo de backup (.json)',
     'common.cancel': 'Cancelar',
@@ -484,6 +485,7 @@ const messages: Record<Locale, Record<string, string>> = {
     'common.error_try_again': 'Erro. Tente novamente.',
     'tasks.restore_error': 'Erro ao restaurar backup',
     'tasks.update_status_error': 'Erro ao atualizar status da tarefa',
+    'tasks.attachments':'Anexos',
 
     // Due labels
     'due.completed': 'Concluída',

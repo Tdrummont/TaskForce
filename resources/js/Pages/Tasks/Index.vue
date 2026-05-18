@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
       <template #header>
-        <h2 class="font-semibold text-xl text-00 text-white leading-tight">
+        <h2 class="font-semibold text-2xl text-00 text-white leading-tight">
           {{ t('tasks.my_tasks') }}
         </h2>
       </template>

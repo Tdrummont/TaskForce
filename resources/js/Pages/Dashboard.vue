@@ -3,7 +3,7 @@
       <template #header>
         <div class="flex flex-col">
           <h2 class="font-semibold text-2xl text-800 text-white leading-tight">
-            {{ greeting }} {{ firstName }} —  GERENCIADOR DE TAREFAS
+            {{ greeting }}, {{ firstName }}
           </h2>
           <p class="text-sm text-gray-500 mt-1">{{ t('dashboard.title') }}</p>
         </div>

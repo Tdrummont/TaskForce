@@ -78,8 +78,12 @@ const logout = async () => {
         // @ts-ignore
         const module = await import('../services/WebSocketService.js');
         const WebSocketService = module.default;
+
+        console.log('🔌 Desconectando WebSocketService...');
         WebSocketService.disconnect();
+        console.log('✅ WebSocketService desconectado com sucesso');
     } catch (error) {
+        console.error('❌ Erro ao desconectar WebSocketService:', error);
     } finally {
         // Executar logout mesmo se houver erro no WebSocket
         const form = useForm({})
@@ -110,15 +114,20 @@ const handleSearchKeydown = (event: KeyboardEvent) => {
 
 // Funções do FAB (Floating Action Button)
 const toggleFab = () => {
+    console.log('Toggle FAB clicked');
     showFabMenu.value = !showFabMenu.value;
+    console.log('showFabMenu:', showFabMenu.value);
 };
 
 const openNewTaskModal = () => {
+    console.log('Opening new task modal');
     showFabMenu.value = false;
+    console.log('Navigating to:', routeL('tasks.create'));
     router.get(routeL('tasks.create'));
 };
 
 const openQuickTaskModal = async () => {
+    console.log('Opening quick task modal');
     showFabMenu.value = false;
     await loadCategories();
     showQuickTaskModal.value = true;
@@ -129,12 +138,15 @@ const closeQuickTaskModal = () => {
 };
 
 const handleTaskCreated = () => {
+    console.log('Tarefa criada com sucesso!');
     // Opcional: recarregar a página ou atualizar dados
     // router.reload();
 };
 
 const loadCategories = async () => {
     try {
+        console.log('🔄 Carregando categorias...');
+        console.log('📍 URL:', routeL('tasks.categories'));
 
         const response = await fetch(routeL('tasks.categories'), {
             headers: {
@@ -145,39 +157,57 @@ const loadCategories = async () => {
             credentials: 'same-origin'
         });
 
+        console.log('📡 Resposta recebida:', response.status, response.statusText);
+
         if (response.ok) {
             const data = await response.json();
+            console.log('📊 Dados das categorias:', data);
             if (data.success) {
                 categories.value = data.categories;
+                console.log('✅ Categorias carregadas:', categories.value);
             }
         } else {
+            console.error('❌ Erro ao carregar categorias:', response.status, response.statusText);
         }
     } catch (error) {
+        console.error('❌ Erro ao carregar categorias:', error);
     }
 };
 
 const goToTasks = () => {
+    console.log('Going to tasks');
     showFabMenu.value = false;
+    console.log('Navigating to:', routeL('tasks.index'));
     router.get(routeL('tasks.index'));
 };
 
 // Funções de notificações
 const toggleNotifications = () => {
+    console.log('🔔 toggleNotifications chamado!');
+    console.log('📊 Estado atual:', { showNotifications: showNotifications.value, showUserMenu: showUserMenu.value });
 
     showNotifications.value = !showNotifications.value;
     showUserMenu.value = false; // Fechar menu do usuário se estiver aberto
 
+    console.log('🔄 Estado após toggle:', { showNotifications: showNotifications.value, showUserMenu: showUserMenu.value });
+
     if (showNotifications.value) {
+        console.log('✅ Dropdown aberto, carregando notificações...');
         loadNotifications();
     } else {
+        console.log('❌ Dropdown fechado');
     }
 };
 
 
 const loadNotifications = async () => {
+    console.log('🚀 loadNotifications INICIADA!');
     try {
+        console.log('🔍 Carregando notificações...');
+        console.log('👤 Usuário logado:', ($page.props as any).auth.user);
 
         const url = routeL('api.notifications.index');
+        console.log('🔗 URL da API:', url);
 
         const response = await fetch(url, {
             credentials: 'same-origin',
@@ -188,24 +218,45 @@ const loadNotifications = async () => {
             }
         });
 
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response ok:', response.ok);
+        console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
         if (response.ok) {
             const data = await response.json();
+            console.log('📊 Dados recebidos:', data);
+            console.log('📊 Estrutura dos dados:', Object.keys(data));
+            console.log('📊 data.success:', data.success);
+            console.log('📊 data.notifications existe:', !!data.notifications);
+            console.log('📊 data.notifications length:', data.notifications?.length);
 
             if (data.success && data.notifications) {
                 notifications.value = data.notifications;
+                console.log('✅ Notificações carregadas:', notifications.value.length);
+                console.log('📝 Primeira notificação:', notifications.value[0]);
+                console.log('📝 Todas as notificações:', notifications.value);
+                console.log('🔍 notifications.value após carregamento:', notifications.value);
             } else {
+                console.warn('⚠️ API retornou sucesso=false ou sem notificações:', data);
+                console.warn('⚠️ data.success:', data.success);
+                console.warn('⚠️ data.notifications:', data.notifications);
                 notifications.value = [];
             }
         } else {
+            console.error('❌ Erro na resposta:', response.status, response.statusText);
             const text = await response.text();
+            console.error('📄 Conteúdo da resposta:', text);
             notifications.value = [];
         }
     } catch (error) {
+        console.error('❌ Erro ao carregar notificações:', error);
+        console.error('📋 Stack trace:', (error as any).stack);
     }
 };
 
 const loadUnreadCount = async () => {
     try {
+        console.log('🔍 Carregando contagem de não lidas...');
         const response = await fetch(routeL('api.notifications.unreadCount'), {
             credentials: 'same-origin',
             headers: {
@@ -214,20 +265,27 @@ const loadUnreadCount = async () => {
             }
         });
 
+        console.log('📡 Response status:', response.status);
+
         if (response.ok) {
             const data = await response.json();
+            console.log('📊 Contagem recebida:', data);
 
             if (data.success) {
                 unreadCount.value = data.count;
+                console.log('✅ Contagem atualizada:', unreadCount.value);
             }
         } else {
+            console.error('❌ Erro na resposta:', response.status, response.statusText);
         }
     } catch (error) {
+        console.error('❌ Erro ao carregar contagem:', error);
     }
 };
 
 const markAsRead = async (notificationId: any) => {
     try {
+        console.log('🔍 Marcando notificação como lida:', notificationId);
         const response = await fetch(routeL('api.notifications.markRead', { id: notificationId }), {
             method: 'POST',
             credentials: 'same-origin',
@@ -243,13 +301,16 @@ const markAsRead = async (notificationId: any) => {
                 notification.read_at = new Date().toISOString();
             }
             await loadUnreadCount();
+            console.log('✅ Notificação marcada como lida');
         }
     } catch (error) {
+        console.error('❌ Erro ao marcar como lido:', error);
     }
 };
 
 const markAllAsRead = async () => {
     try {
+        console.log('🔍 Marcando todas como lidas...');
         const response = await fetch(routeL('api.notifications.markAllRead'), {
             method: 'POST',
             credentials: 'same-origin',
@@ -264,13 +325,16 @@ const markAllAsRead = async () => {
                 notification.read_at = new Date().toISOString();
             });
             unreadCount.value = 0;
+            console.log('✅ Todas as notificações marcadas como lidas');
         }
     } catch (error) {
+        console.error('❌ Erro ao marcar todas como lidas:', error);
     }
 };
 
 const deleteNotification = async (notificationId: any) => {
     try {
+        console.log('🔍 Deletando notificação:', notificationId);
         const response = await fetch(routeL('api.notifications.delete', { id: notificationId }), {
             method: 'DELETE',
             credentials: 'same-origin',
@@ -282,16 +346,21 @@ const deleteNotification = async (notificationId: any) => {
         if (response.ok) {
             notifications.value = notifications.value.filter(n => n.id !== notificationId);
             await loadUnreadCount();
+            console.log('✅ Notificação deletada');
         }
     } catch (error) {
+        console.error('❌ Erro ao deletar notificação:', error);
     }
 };
 
 const clearAllNotifications = async () => {
     try {
+        console.log('🔍 Limpando todas as notificações...');
         notifications.value = [];
         unreadCount.value = 0;
+        console.log('✅ Todas as notificações limpas');
     } catch (error) {
+        console.error('❌ Erro ao limpar notificações:', error);
     }
 };
 
@@ -362,12 +431,20 @@ onMounted(() => {
         // @ts-ignore
         import('../services/WebSocketService.js').then((module) => {
             const WebSocketService = module.default;
+            console.log('🔌 Desconectando WebSocketService antes de sair...');
             WebSocketService.disconnect();
         }).catch((error) => {
+            console.error('❌ Erro ao desconectar WebSocketService no beforeunload:', error);
         });
     });
 
+    console.log('🚀 Componente AuthenticatedLayout montado!');
+    console.log('🎯 FAB de Usuários Online sendo renderizado...');
+    console.log('👥 onlineUsersCount:', onlineUsersCount.value);
+    console.log('👤 Usuário logado:', ($page.props as any).auth.user);
+
     // Carregar contagem de notificações não lidas
+    console.log('🔍 Iniciando carregamento de notificações...');
     loadUnreadCount();
 
     // Configurar WebSocket usando o serviço melhorado
@@ -381,14 +458,17 @@ onMounted(() => {
 
         // Configurar listeners para usuários online
         WebSocketService.on('users_online', (users: any) => {
+            console.log('👥 Usuários online atualizados no layout:', users);
             onlineUsersCount.value = users ? users.length : 0;
         });
 
         WebSocketService.on('user_joined', (user: any) => {
+            console.log('👋 Usuário entrou, atualizando contador:', user);
             onlineUsersCount.value++;
         });
 
         WebSocketService.on('user_left', (user: any) => {
+            console.log('👋 Usuário saiu, atualizando contador:', user);
             onlineUsersCount.value = Math.max(0, onlineUsersCount.value - 1);
         });
 
@@ -413,6 +493,8 @@ onMounted(() => {
         });
 
         WebSocketService.on('task_delegated', (notification: any) => {
+            console.log('🔔 Notificação task_delegated recebida no AuthenticatedLayout:', notification);
+            console.log('🔔 Dados da notificação:', JSON.stringify(notification, null, 2));
 
             const newNotification = {
                 id: Date.now(),
@@ -423,13 +505,18 @@ onMounted(() => {
                 read_at: null,
                 created_at: notification.timestamp || new Date().toISOString()
             };
+
+            console.log('🔔 Criando nova notificação:', newNotification);
             notifications.value.unshift(newNotification);
             unreadCount.value++;
+            console.log('🔔 Notificação adicionada. Total:', notifications.value.length);
 
             // Mostrar toast
             if (toastContainer.value) {
+                console.log('🔔 Mostrando toast...');
                 toastContainer.value.addToast(newNotification);
             } else {
+                console.warn('⚠️ toastContainer não está disponível');
             }
         });
 
@@ -492,10 +579,12 @@ onMounted(() => {
 
         // Listener para usuários online
         WebSocketService.on('users_online', (users: any) => {
+            console.log('👥 Usuários online atualizados:', users);
             onlineUsersCount.value = users.length;
         });
 
         WebSocketService.on('user_joined', (user: any) => {
+            console.log('👋 Usuário entrou:', user);
             onlineUsersCount.value++;
             if (toastContainer.value) {
                 toastContainer.value.addToast({
@@ -508,11 +597,13 @@ onMounted(() => {
         });
 
         WebSocketService.on('user_left', (user: any) => {
+            console.log('👋 Usuário saiu:', user);
             onlineUsersCount.value = Math.max(0, onlineUsersCount.value - 1);
         });
 
         // Listener para notificações do Laravel
         WebSocketService.on('laravel_notification', (notification: any) => {
+            console.log('🔔 Notificação Laravel recebida no AuthenticatedLayout:', notification);
 
             const newNotification = {
                 id: Date.now(),
@@ -523,13 +614,18 @@ onMounted(() => {
                 read_at: null,
                 created_at: notification.timestamp || new Date().toISOString()
             };
+
+            console.log('🔔 Criando nova notificação Laravel:', newNotification);
             notifications.value.unshift(newNotification);
             unreadCount.value++;
+            console.log('🔔 Notificação Laravel adicionada. Total:', notifications.value.length);
 
             // Mostrar toast
             if (toastContainer.value) {
+                console.log('🔔 Mostrando toast Laravel...');
                 toastContainer.value.addToast(newNotification);
             } else {
+                console.warn('⚠️ toastContainer não está disponível para notificação Laravel');
             }
         });
         });
@@ -537,6 +633,7 @@ onMounted(() => {
 
     // Atualizar contagem a cada 30 segundos
     setInterval(() => {
+        console.log('⏰ Atualizando contagem de notificações...');
         loadUnreadCount();
     }, 30000);
 });
@@ -548,8 +645,10 @@ onUnmounted(() => {
     // @ts-ignore
     import('../services/WebSocketService.js').then((module) => {
         const WebSocketService = module.default;
+        console.log('🔌 Desconectando WebSocketService no unmount...');
         WebSocketService.disconnect();
     }).catch((error) => {
+        console.error('❌ Erro ao desconectar WebSocketService no unmount:', error);
     });
 });
 </script>

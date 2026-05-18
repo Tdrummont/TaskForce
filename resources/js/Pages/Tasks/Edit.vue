@@ -30,29 +30,29 @@ async function checkHoliday() {
   holiday.value = null
   const date = form.due_date
   if (!date) return
-  
+
   // Verificação simples e não-bloqueante
   try {
     checkingHoliday.value = true
-    
+
     // Usar AbortController para timeout
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 segundos timeout
-    
+
     const r = await fetch(`/api/holidays/check?date=${encodeURIComponent(date)}&state=${encodeURIComponent(stateUF.value)}`, {
       headers: { 'Accept': 'application/json' },
       signal: controller.signal
     })
-    
+
     clearTimeout(timeoutId)
-    
+
     if (!r.ok) {
       return
     }
-    
+
     const data = await r.json()
     holiday.value = data.is_holiday ? data.holiday : null
-    
+
     // Mostrar snackbar simples se for feriado
     if (data.is_holiday && data.holiday) {
       showSimpleHolidayAlert(data.holiday)
@@ -87,9 +87,9 @@ function showSimpleHolidayAlert(holidayData) {
       </button>
     </div>
   `
-  
+
   document.body.appendChild(alertDiv)
-  
+
   // Remover automaticamente após 5 segundos
   setTimeout(() => {
     if (alertDiv.parentElement) {
@@ -107,11 +107,11 @@ function submit() {
 
 <template>
   <AuthenticatedLayout>
-    <template #header>
-              <h2 class="text-xl font-semibold text-gray-800 leading-tight">
-          {{ t('tasks.edit.page_title') /* ex.: "Edit Task" / "Editar Tarefa" */ }}
-        </h2>
-    </template>
+<!--    <template #header>-->
+<!--              <h2 class="font-semibold text-3xl text-white leading-tight">-->
+<!--          {{ t('tasks.edit.page_title') /* ex.: "Edit Task" / "Editar Tarefa" */ }}-->
+<!--        </h2>-->
+<!--    </template>-->
 
     <div class="py-12">
       <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
@@ -218,9 +218,9 @@ function submit() {
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">{{ t('tasks.form.assignee_none') }}</option>
-                  <option 
-                    v-for="user in users" 
-                    :key="user.id" 
+                  <option
+                    v-for="user in users"
+                    :key="user.id"
                     :value="user.id"
                   >
                     {{ user.name }} ({{ user.email }})

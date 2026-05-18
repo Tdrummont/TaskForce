@@ -1,205 +1,358 @@
 <template>
   <AuthenticatedLayout>
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          {{ t('tasks.view_task') }}
-        </h2>
-        <div v-if="task" class="flex space-x-2">
-          <Link
-            :href="route('tasks.edit', { locale: locale, task: task.id })"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            {{ t('tasks.edit') }}
-          </Link>
-          <Link
-            :href="route('tasks.index', { locale: locale })"
-            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-          >
-            {{ t('tasks.back_to_list') }}
-          </Link>
-        </div>
-      </div>
-    </template>
+
+    <!-- Header da Página -->
+<!--    <template #header>-->
+<!--      <h2 class="font-semibold text-3xl text-white leading-tight">-->
+<!--        {{ t('tasks.view_task') }}-->
+<!--      </h2>-->
+<!--    </template>-->
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-        <div v-if="task" class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-          <div class="p-6 text-gray-900 dark:text-gray-100">
+        <!-- Card Principal -->
+        <div
+          v-if="task"
+          class="bg-slate-950 text-white overflow-hidden
+                 shadow-2xl rounded-2xl"
+        >
 
-            <!-- Header da Tarefa -->
-            <div class="mb-6">
-              <h1 class="text-3xl font-bold mb-2">{{ task.title }}</h1>
-              <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                <span class="flex items-center">
-                  <span class="w-2 h-2 rounded-full mr-2" :class="getStatusColor(task.status)"></span>
-                  {{ t(`status.${task.status}`) }}
-                </span>
-                <span class="flex items-center">
-                  <span class="w-2 h-2 rounded-full mr-2" :class="getPriorityColor(task.priority)"></span>
-                  {{ t(`priority.${task.priority}`) }}
-                </span>
-                <span v-if="task.category" class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                  {{ t(`categories.${task.category}`) }}
-                </span>
+          <div class="p-8 text-white">
+
+            <!-- Header da Task -->
+            <div class="flex items-start justify-between mb-8">
+
+              <div>
+                <h1 class="font-semibold text-2xl text-00 text-white leading-tight">
+                  {{ task.title }}
+                </h1>
+
+                <!-- Badges -->
+                <div class="flex items-center gap-4 mt-4 text-sm">
+
+                  <span class="flex items-center">
+                    <span
+                      class="w-2 h-2 rounded-full mr-2"
+                      :class="getStatusColor(task.status)"
+                    ></span>
+
+                    {{ t(`status.${task.status}`) }}
+                  </span>
+
+                  <span class="flex items-center">
+                    <span
+                      class="w-2 h-2 rounded-full mr-2"
+                      :class="getPriorityColor(task.priority)"
+                    ></span>
+
+                    {{ t(`priority.${task.priority}`) }}
+                  </span>
+
+                  <span
+                    v-if="task.category"
+                    class="bg-blue-800 text-white
+                           text-xs font-medium px-2.5 py-1 rounded-lg"
+                  >
+                    {{ t(`categories.${task.category}`) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Botões -->
+              <div class="flex items-center gap-3">
+
+                <Link
+                  :href="route('tasks.edit', {
+                    locale: locale,
+                    task: task.id
+                  })"
+                  class="bg-blue-600 hover:bg-blue-700
+                         text-white px-5 py-2.5 rounded-xl
+                         transition-all duration-300"
+                >
+                  {{ t('tasks.edit') }}
+                </Link>
+
+                <Link
+                  :href="route('tasks.index', {
+                    locale: locale
+                  })"
+                  class="bg-zinc-700 hover:bg-zinc-600
+                         text-white px-5 py-2.5 rounded-xl
+                         transition-all duration-300"
+                >
+                  {{ t('tasks.back_to_list') }}
+                </Link>
+
               </div>
             </div>
 
-            <!-- Informações da Tarefa -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 class="font-semibold mb-3">{{ t('tasks.task_information') }}</h3>
-                <div class="space-y-2 text-sm">
+            <!-- Informações -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+              <!-- Info -->
+              <div class="bg-slate-900 p-6 rounded-2xl">
+
+                <h3 class="font-semibold text-lg mb-5 text-white">
+                  {{ t('tasks.task_information') }}
+                </h3>
+
+                <div class="space-y-4 text-sm">
+
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">{{ t('tasks.created_by') }}:</span>
-                    <span>{{ task.user?.name || 'N/A' }}</span>
+                    <span class="text-gray-400">
+                      {{ t('tasks.created_by') }}
+                    </span>
+
+                    <span class="font-medium">
+                      {{ task.user?.name || 'N/A' }}
+                    </span>
                   </div>
+
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">{{ t('tasks.assigned_to') }}:</span>
-                    <span>{{ task.assigned_to?.name || t('tasks.unassigned') }}</span>
+                    <span class="text-gray-400">
+                      {{ t('tasks.assigned_to') }}
+                    </span>
+
+                    <span class="font-medium">
+                      {{ task.assigned_to?.name || t('tasks.unassigned') }}
+                    </span>
                   </div>
+
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">{{ t('tasks.created_at') }}:</span>
-                    <span>{{ formatDate(task.created_at) }}</span>
+                    <span class="text-gray-400">
+                      {{ t('tasks.created_at') }}
+                    </span>
+
+                    <span class="font-medium">
+                      {{ formatDate(task.created_at) }}
+                    </span>
                   </div>
-                  <div class="flex justify-between" v-if="task.due_date">
-                    <span class="text-gray-600 dark:text-gray-400">{{ t('tasks.due_date') }}:</span>
-                    <span>{{ formatDate(task.due_date) }}</span>
+
+                  <div
+                    class="flex justify-between"
+                    v-if="task.due_date"
+                  >
+                    <span class="text-gray-400">
+                      {{ t('tasks.due_date') }}
+                    </span>
+
+                    <span class="font-medium">
+                      {{ formatDate(task.due_date) }}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 class="font-semibold mb-3">{{ t('tasks.progress') }}</h3>
-                <div class="space-y-2 text-sm">
-                  <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">{{ t('tasks.completion_percentage') }}:</span>
-                    <span>{{ task.completion_percentage || 0 }}%</span>
+              <!-- Progress -->
+              <div class="bg-slate-900 p-6 rounded-2xl">
+
+                <h3 class="font-semibold text-lg mb-5 text-white">
+                  {{ t('tasks.progress') }}
+                </h3>
+
+                <div class="space-y-4">
+
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">
+                      {{ t('tasks.completion_percentage') }}
+                    </span>
+
+                    <span class="font-semibold">
+                      {{ task.completion_percentage || 0 }}%
+                    </span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
+
+                  <div class="w-full bg-zinc-700 rounded-full h-3">
                     <div
-                      class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      :style="{ width: (task.completion_percentage || 0) + '%' }"
+                      class="bg-blue-600 h-3 rounded-full transition-all duration-500"
+                      :style="{
+                        width: (task.completion_percentage || 0) + '%'
+                      }"
                     ></div>
                   </div>
+
                 </div>
               </div>
             </div>
 
             <!-- Descrição -->
-            <div class="mb-6" v-if="task.description">
-              <h3 class="font-semibold mb-3">{{ t('tasks.description') }}</h3>
-              <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <p class="whitespace-pre-wrap">{{ task.description }}</p>
-              </div>
-            </div>
+            <div class="mb-8" v-if="task.description">
 
-            <!-- Tags -->
-            <div class="mb-6" v-if="task.tags && task.tags.length > 0">
-              <h3 class="font-semibold mb-3">{{ t('tasks.tags') }}</h3>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="tag in task.tags"
-                  :key="tag"
-                  class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded"
-                >
-                  {{ tag }}
-                </span>
-              </div>
-            </div>
+              <h3 class="font-semibold text-lg mb-3 text-white">
+                {{ t('tasks.description') }}
+              </h3>
 
-            <!-- Subtarefas -->
-            <div class="mb-6" v-if="task.subtasks && task.subtasks.length > 0">
-              <h3 class="font-semibold mb-3">{{ t('tasks.subtasks') }}</h3>
-              <div class="space-y-2">
-                <div
-                  v-for="subtask in task.subtasks"
-                  :key="subtask.id"
-                  class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center justify-between"
-                >
-                  <div class="flex items-center">
-                    <input
-                      type="checkbox"
-                      :checked="subtask.status === 'completed'"
-                      class="mr-3"
-                      disabled
-                    >
-                    <span :class="{ 'line-through text-gray-500': subtask.status === 'completed' }">
-                      {{ subtask.title }}
-                    </span>
-                  </div>
-                  <span class="text-xs px-2 py-1 rounded" :class="getStatusBadgeClass(subtask.status)">
-                    {{ t(`status.${subtask.status}`) }}
-                  </span>
-                </div>
-              </div>
-            </div>
+              <textarea
+                readonly
+                class="w-full min-h-[180px]
+                       bg-slate-900
+                       border border-zinc-700
+                       rounded-2xl p-5
+                       text-white
+                       resize-none
+                       focus:ring-0 focus:outline-none"
+              >{{ task.description }}</textarea>
 
-            <!-- Comentários -->
-            <div class="mb-6" v-if="task.comments && task.comments.length > 0">
-              <h3 class="font-semibold mb-3">{{ t('tasks.comments') }}</h3>
-              <div class="space-y-4">
-                <div
-                  v-for="comment in task.comments"
-                  :key="comment.id"
-                  class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
-                >
-                  <div class="flex justify-between items-start mb-2">
-                    <span class="font-medium">{{ comment.user?.name }}</span>
-                    <span class="text-xs text-gray-500">{{ formatDate(comment.created_at) }}</span>
-                  </div>
-                  <p class="text-sm whitespace-pre-wrap">{{ comment.content }}</p>
-                </div>
-              </div>
             </div>
 
             <!-- Anexos -->
-            <div class="mb-6" v-if="task.attachments && task.attachments.length > 0">
-              <h3 class="font-semibold mb-3">{{ t('tasks.attachments') }}</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="mb-8">
+
+              <div class="flex items-center mb-4">
+
+                <h3 class="font-semibold text-lg text-white">
+                  {{ t('tasks.attachments') }}
+                </h3>
+
+                <span
+                  class="ml-2 text-xs bg-slate-800 text-white
+                         px-2 py-1 rounded-lg"
+                >
+                  {{ task.attachments?.length || 0 }}
+                </span>
+
+              </div>
+
+              <div class="flex flex-wrap gap-4">
+
+                <!-- Arquivos -->
                 <div
                   v-for="attachment in task.attachments"
                   :key="attachment.id"
-                  class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
+                  class="w-72 bg-slate-900 border border-zinc-700
+                         rounded-2xl p-4 hover:border-blue-500
+                         transition-all duration-300"
                 >
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                      </svg>
+
+                  <div class="flex items-center gap-4">
+
+                    <!-- Ícone -->
+                    <div
+                      class="w-12 h-12 bg-zinc-800 rounded-xl
+                             flex items-center justify-center"
+                    >
+                      📎
                     </div>
-                    <div class="ml-3 flex-1 min-w-0">
-                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {{ attachment.original_name }}
+
+                    <!-- Info -->
+                    <div class="min-w-0">
+
+                      <p class="text-sm text-white truncate">
+                        {{ attachment.original_filename }}
                       </p>
-                      <p class="text-xs text-gray-500">
+
+                      <p class="text-xs text-gray-400">
                         {{ formatFileSize(attachment.file_size) }}
                       </p>
+
                     </div>
                   </div>
                 </div>
+
+                <!-- Botão Adicionar -->
+                <button
+                  @click="$refs.fileInput.click()"
+                  class="w-24 h-24 border-2 border-dashed
+                         border-zinc-600 hover:border-blue-500
+                         rounded-2xl flex items-center justify-center
+                         text-gray-400 hover:text-blue-400
+                         transition-all duration-300"
+                >
+                  <svg
+                    class="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Input -->
+                <input
+                  ref="fileInput"
+                  type="file"
+                  multiple
+                  class="hidden"
+                  @change="handleFiles"
+                />
+
+              </div>
+
+              <!-- Upload Preview -->
+              <div
+                v-if="selectedFiles.length > 0"
+                class="mt-6 space-y-3"
+              >
+
+                <div
+                  v-for="(file, index) in selectedFiles"
+                  :key="index"
+                  class="flex items-center justify-between
+                         bg-slate-900 border border-zinc-700
+                         rounded-xl px-4 py-3"
+                >
+
+                  <div>
+                    <p class="text-sm text-white">
+                      {{ file.name }}
+                    </p>
+
+                    <p class="text-xs text-gray-400">
+                      {{ formatFileSize(file.size) }}
+                    </p>
+                  </div>
+
+                  <button
+                    @click="removeFile(index)"
+                    class="text-red-400 hover:text-red-300"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <button
+                  @click="uploadFiles"
+                  class="bg-blue-600 hover:bg-blue-700
+                         text-white px-5 py-2.5 rounded-xl
+                         transition-all duration-300"
+                >
+                  Enviar Arquivos
+                </button>
+
               </div>
             </div>
 
           </div>
         </div>
 
-        <div v-else class="text-center text-gray-500 py-12">
+        <!-- Loading -->
+        <div
+          v-else
+          class="text-center text-gray-500 py-12"
+        >
           Carregando...
         </div>
 
       </div>
     </div>
+
   </AuthenticatedLayout>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { useLocale } from '@/Components/useLocale'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-
+import axios from 'axios'
 const { t, formatDate } = useLocale()
 const page = usePage()
 const locale = page.props.locale ?? 'pt'
@@ -207,6 +360,50 @@ const locale = page.props.locale ?? 'pt'
 const props = defineProps({
   task: Object
 })
+
+const selectedFiles = ref([])
+
+const handleFiles = (event) => {
+  selectedFiles.value = Array.from(event.target.files)
+}
+const removeFile = (index) => {
+  selectedFiles.value.splice(index, 1)
+}
+
+const uploadFiles = async () => {
+
+  if (!selectedFiles.value.length) return
+
+  try {
+
+    for (const file of selectedFiles.value) {
+
+      const formData = new FormData()
+
+      formData.append('file', file)
+
+      await axios.post(
+        route('tasks.attachments.store', {
+          locale: locale,
+          task: props.task.id
+        }),
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+    }
+
+    selectedFiles.value = []
+
+    window.location.reload()
+
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 const getStatusColor = (status) => {
   const colors = {
