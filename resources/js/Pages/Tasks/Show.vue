@@ -84,7 +84,6 @@
                 >
                   {{ t('tasks.back_to_list') }}
                 </Link>
-
               </div>
             </div>
 
@@ -349,7 +348,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Link, usePage } from '@inertiajs/vue3'
+import { Link, router, usePage } from '@inertiajs/vue3'
 import { useLocale } from '@/Components/useLocale'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import axios from 'axios'

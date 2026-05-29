@@ -6,6 +6,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import QuickTaskModal from '@/Components/QuickTaskModal.vue';
 import HolidaySnackbar from '@/Components/HolidaySnackbar.vue';
 import LanguageSelector from '@/Components/LanguageSelector.vue';
+import GlobalSearch from '@/Components/GlobalSearch.vue';
 import OnlineUsersFAB from '../components/OnlineUsersFAB.vue';
 import BeautifulNotificationCenter from '../components/BeautifulNotificationCenter.vue';
 import ToastContainer from '../components/BeautifulToastContainer.vue';
@@ -39,9 +40,35 @@ const showQuickTaskModal = ref(false);
 const showNotifications = ref(false);
 const notifications = ref<any[]>([]);
 const unreadCount = ref(0);
-const onlineUsersCount = ref(2);
+const onlineUsersCount = ref(0);
 const toastContainer = ref<any>(null);
 const categories = ref([]);
+let notificationRefreshInterval: number | null = null;
+
+const handleUsersOnline = (users: any) => {
+    onlineUsersCount.value = Array.isArray(users) ? users.length : 0;
+};
+
+const handleUserJoined = (user: any) => {
+    if (!user) {
+        return;
+    }
+
+    onlineUsersCount.value++;
+
+    if (toastContainer.value) {
+        toastContainer.value.addToast({
+            type: 'user_joined',
+            title: 'Usuário Online',
+            message: `${user.name || 'Um usuário'} está online`,
+            timestamp: new Date().toISOString()
+        });
+    }
+};
+
+const handleUserLeft = () => {
+    onlineUsersCount.value = Math.max(0, onlineUsersCount.value - 1);
+};
 
 // Sincronizar com a prop externa
 watch(() => props.showingNavigation, (newValue) => {
@@ -88,27 +115,6 @@ const logout = async () => {
         // Executar logout mesmo se houver erro no WebSocket
         const form = useForm({})
         form.post(routeL('logout'))
-    }
-};
-
-const performSearch = () => {
-    if (searchQuery.value.trim()) {
-        // Se estiver na página de tarefas, usar filtros locais
-        if (window.location.pathname.includes('/tasks')) {
-            // Emitir evento para a página de tarefas
-            window.dispatchEvent(new CustomEvent('search-tasks', {
-                detail: { query: searchQuery.value }
-            }));
-        } else {
-            // Navegar para a página de tarefas com a pesquisa
-            router.get(routeL('tasks.index'), { search: searchQuery.value });
-        }
-    }
-};
-
-const handleSearchKeydown = (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
-        performSearch();
     }
 };
 
@@ -426,18 +432,6 @@ const handleClickOutside = (event: any) => {
 onMounted(() => {
     document.addEventListener('click', handleClickOutside);
 
-    // Listener para desconectar WebSocketService ao fechar aba/navegar
-    window.addEventListener('beforeunload', () => {
-        // @ts-ignore
-        import('../services/WebSocketService.js').then((module) => {
-            const WebSocketService = module.default;
-            console.log('🔌 Desconectando WebSocketService antes de sair...');
-            WebSocketService.disconnect();
-        }).catch((error) => {
-            console.error('❌ Erro ao desconectar WebSocketService no beforeunload:', error);
-        });
-    });
-
     console.log('🚀 Componente AuthenticatedLayout montado!');
     console.log('🎯 FAB de Usuários Online sendo renderizado...');
     console.log('👥 onlineUsersCount:', onlineUsersCount.value);
@@ -457,20 +451,9 @@ onMounted(() => {
         WebSocketService.init(($page.props as any).auth.user);
 
         // Configurar listeners para usuários online
-        WebSocketService.on('users_online', (users: any) => {
-            console.log('👥 Usuários online atualizados no layout:', users);
-            onlineUsersCount.value = users ? users.length : 0;
-        });
-
-        WebSocketService.on('user_joined', (user: any) => {
-            console.log('👋 Usuário entrou, atualizando contador:', user);
-            onlineUsersCount.value++;
-        });
-
-        WebSocketService.on('user_left', (user: any) => {
-            console.log('👋 Usuário saiu, atualizando contador:', user);
-            onlineUsersCount.value = Math.max(0, onlineUsersCount.value - 1);
-        });
+        WebSocketService.on('users_online', handleUsersOnline);
+        WebSocketService.on('user_joined', handleUserJoined);
+        WebSocketService.on('user_left', handleUserLeft);
 
         // Configurar listeners para notificações
         WebSocketService.on('task_assigned', (notification: any) => {
@@ -577,30 +560,6 @@ onMounted(() => {
             }
         });
 
-        // Listener para usuários online
-        WebSocketService.on('users_online', (users: any) => {
-            console.log('👥 Usuários online atualizados:', users);
-            onlineUsersCount.value = users.length;
-        });
-
-        WebSocketService.on('user_joined', (user: any) => {
-            console.log('👋 Usuário entrou:', user);
-            onlineUsersCount.value++;
-            if (toastContainer.value) {
-                toastContainer.value.addToast({
-                    type: 'user_joined',
-                    title: 'Usuário Online',
-                    message: `${user.name || 'Um usuário'} está online`,
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        WebSocketService.on('user_left', (user: any) => {
-            console.log('👋 Usuário saiu:', user);
-            onlineUsersCount.value = Math.max(0, onlineUsersCount.value - 1);
-        });
-
         // Listener para notificações do Laravel
         WebSocketService.on('laravel_notification', (notification: any) => {
             console.log('🔔 Notificação Laravel recebida no AuthenticatedLayout:', notification);
@@ -632,7 +591,7 @@ onMounted(() => {
     }
 
     // Atualizar contagem a cada 30 segundos
-    setInterval(() => {
+    notificationRefreshInterval = window.setInterval(() => {
         console.log('⏰ Atualizando contagem de notificações...');
         loadUnreadCount();
     }, 30000);
@@ -641,10 +600,17 @@ onMounted(() => {
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
 
+    if (notificationRefreshInterval) {
+        clearInterval(notificationRefreshInterval);
+    }
+
     // Desconectar WebSocketService ao sair do componente
     // @ts-ignore
     import('../services/WebSocketService.js').then((module) => {
         const WebSocketService = module.default;
+        WebSocketService.off('users_online', handleUsersOnline);
+        WebSocketService.off('user_joined', handleUserJoined);
+        WebSocketService.off('user_left', handleUserLeft);
         console.log('🔌 Desconectando WebSocketService no unmount...');
         WebSocketService.disconnect();
     }).catch((error) => {
@@ -686,24 +652,7 @@ onUnmounted(() => {
 
                     <!-- Center: Search Bar -->
                     <div class="flex-1 max-w-lg mx-8 hidden lg:block">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </div>
-                            <input type="text"
-                                   :placeholder="t('navbar.search_ph')"
-                                   class="block w-full pl-10 pr-12 py-2 border border-blue-300 rounded-md leading-5 bg-white bg-opacity-20 text-white placeholder-blue-200 focus:outline-none focus:bg-white focus:text-gray-900 focus:border-white transition-all duration-200 backdrop-blur-sm"
-                                   v-model="searchQuery"
-                                   @keydown="handleSearchKeydown">
-                            <button @click="performSearch"
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-200 hover:text-white transition-colors">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </button>
-                        </div>
+                        <GlobalSearch />
                     </div>
 
                     <!-- Right Side -->

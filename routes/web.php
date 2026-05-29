@@ -111,6 +111,10 @@ Route::group([
         Route::post('/api/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'apiMarkAllAsRead'])->name('api.notifications.markAllRead');
         Route::delete('/api/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'apiDelete'])->name('api.notifications.delete');
         Route::delete('/api/notifications/clear-all', [App\Http\Controllers\NotificationController::class, 'apiClearAll'])->name('api.notifications.clearAll');
+
+        // Global Search
+        Route::get('/api/search', [App\Http\Controllers\SearchController::class, 'globalSearch'])->name('api.search.global');
+        Route::get('/search', [App\Http\Controllers\SearchController::class, 'results'])->name('search.results');
     });
 
     // Rota SPA (fallback) - captura rotas específicas que não existem

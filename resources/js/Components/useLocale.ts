@@ -131,6 +131,19 @@ const messages: Record<Locale, Record<string, string>> = {
         'navbar.search_ph': 'Search tasks...',
         'navbar.profile': 'Profile',
         'navbar.logout': 'Logout',
+
+        // Global Search
+        'search.placeholder': 'Search tasks, people, messages...',
+        'search.recent': 'Recent searches',
+        'search.clear_recent': 'Clear recent searches',
+        'search.tab_tasks': 'Tasks',
+        'search.tab_users': 'People',
+        'search.tab_messages': 'Messages',
+        'search.no_tasks': 'No tasks found',
+        'search.no_users': 'No people found',
+        'search.no_messages': 'No messages found',
+        'search.view_all': 'View all results',
+
         // Notifications
         'notifications.title': 'Notifications',
         'notifications.mark_all': 'Mark all as read',
@@ -184,6 +197,7 @@ const messages: Record<Locale, Record<string, string>> = {
     'tasks.you': 'You',
     'tasks.assigned_to': 'Assigned to',
     'tasks.edit': 'Edit',
+    'tasks.mark_completed': 'Complete Task',
     'tasks.delete': 'Delete',
     'tasks.restore_backup': 'Restore Backup',
     'tasks.select_backup_file': 'Select the backup file (.json)',
@@ -416,6 +430,19 @@ const messages: Record<Locale, Record<string, string>> = {
         'navbar.search_ph': 'Pesquisar tarefas...',
         'navbar.profile': 'Perfil',
         'navbar.logout': 'Sair',
+
+        // Global Search
+        'search.placeholder': 'Pesquisar tarefas, pessoas, mensagens...',
+        'search.recent': 'Pesquisas recentes',
+        'search.clear_recent': 'Limpar pesquisas recentes',
+        'search.tab_tasks': 'Tarefas',
+        'search.tab_users': 'Pessoas',
+        'search.tab_messages': 'Mensagens',
+        'search.no_tasks': 'Nenhuma tarefa encontrada',
+        'search.no_users': 'Nenhuma pessoa encontrada',
+        'search.no_messages': 'Nenhuma mensagem encontrada',
+        'search.view_all': 'Ver todos os resultados',
+
         // Notifications
         'notifications.title': 'Notificações',
         'notifications.mark_all': 'Marcar todas como lidas',
@@ -469,6 +496,7 @@ const messages: Record<Locale, Record<string, string>> = {
     'tasks.you': 'Você',
     'tasks.assigned_to': 'Atribuído a',
     'tasks.edit': 'Editar',
+    'tasks.mark_completed': 'Concluir tarefa',
     'tasks.delete': 'Excluir',
     'tasks.subtasks': 'Subtarefas',
     'tasks.restore_backup': 'Restaurar Backup',
@@ -495,6 +523,7 @@ const messages: Record<Locale, Record<string, string>> = {
     'due.normal': 'Normal',
     'due.tomorrow': 'Amanhã',
     'due.next_week': 'Próxima Semana',
+    'Overdue.tasks': 'Tarefas Vencidas',
 
     // Quick Task
     'quick_task.title': 'Nova Tarefa Rápida',
@@ -759,6 +788,7 @@ const messages: Record<Locale, Record<string, string>> = {
     'tasks.you': 'Tú',
     'tasks.assigned_to': 'Asignado a',
     'tasks.edit': 'Editar',
+    'tasks.mark_completed': 'Completar tarea',
     'tasks.delete': 'Eliminar',
     'tasks.restore_backup': 'Restaurar Respaldo',
     'tasks.select_backup_file': 'Selecciona el archivo de respaldo (.json)',

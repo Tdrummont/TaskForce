@@ -11,6 +11,8 @@ class WebSocketService {
         this.reconnectDelay = 1000; // 1 segundo
         this.isConnected = false;
         this.connectionCheckInterval = null;
+        this.presenceChannel = null;
+        this.userChannel = null;
     }
 
     /**
@@ -19,6 +21,14 @@ class WebSocketService {
     init(user) {
         if (!user || !window.Echo) {
             return;
+        }
+
+        if (this.userId === user.id && this.echo === window.Echo && (this.userChannel || this.presenceChannel)) {
+            return;
+        }
+
+        if (this.echo && this.userId !== user.id) {
+            this.disconnect();
         }
 
         this.userId = user.id;
@@ -35,6 +45,10 @@ class WebSocketService {
      * Configurar monitoramento de conexão
      */
     setupConnectionMonitoring() {
+        if (this.connectionCheckInterval) {
+            clearInterval(this.connectionCheckInterval);
+        }
+
         // Verificar conexão a cada 30 segundos
         this.connectionCheckInterval = setInterval(() => {
             if (this.echo && this.echo.connector && this.echo.connector.pusher) {
@@ -54,10 +68,10 @@ class WebSocketService {
             return;
         }
         
-        const userChannel = this.echo.private(`App.Models.User.${this.userId}`);
+        this.userChannel = this.echo.private(`App.Models.User.${this.userId}`);
         
         // Eventos de tarefas
-        userChannel
+        this.userChannel
             .listen('task.assigned', (data) => {
                 this.handleTaskAssigned(data);
             })
@@ -85,7 +99,7 @@ class WebSocketService {
         if (!this.echo) return;
 
         try {
-            const presenceChannel = this.echo.join('online-users')
+            this.presenceChannel = this.echo.join('online-users')
                 .here((users) => {
                     this.emit('users_online', users);
                 })
@@ -254,9 +268,13 @@ class WebSocketService {
     leaveAllChannels() {
         if (this.echo) {
             this.echo.leave('online-users');
-            this.echo.leave('private-user.' + this.userId);
-            this.echo.leave('tasks');
+            if (this.userId) {
+                this.echo.leave(`private-App.Models.User.${this.userId}`);
+            }
         }
+
+        this.presenceChannel = null;
+        this.userChannel = null;
     }
 
     /**
@@ -274,6 +292,8 @@ class WebSocketService {
 
         this.listeners.clear();
         this.isConnected = false;
+        this.echo = null;
+        this.userId = null;
     }
 
     /**
